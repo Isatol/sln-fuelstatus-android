@@ -78,7 +78,7 @@ class DatabaseTest {
             old.version = 1
         }
         val database = Room.databaseBuilder(context, FuelDatabase::class.java, name)
-            .addMigrations(FuelDatabase.MIGRATION_1_2, FuelDatabase.MIGRATION_2_3).build()
+            .addMigrations(FuelDatabase.MIGRATION_1_2, FuelDatabase.MIGRATION_2_3, FuelDatabase.MIGRATION_3_4).build()
         try {
             assertEquals(1, database.dao().allVehicles().size)
             assertEquals("Original", database.dao().allRefuels().single().notes)
@@ -137,7 +137,7 @@ class DatabaseTest {
             old.execSQL("INSERT INTO backup_revision VALUES (1, 9)")
             old.version = 2
         }
-        val database = Room.databaseBuilder(context, FuelDatabase::class.java, name).addMigrations(FuelDatabase.MIGRATION_2_3).build()
+        val database = Room.databaseBuilder(context, FuelDatabase::class.java, name).addMigrations(FuelDatabase.MIGRATION_2_3, FuelDatabase.MIGRATION_3_4).build()
         try {
             assertEquals(FuelType.Magna.code, database.dao().allVehicles().single().fuelType)
             assertEquals(FuelType.Unspecified.code, database.dao().allRefuels().single().fuelType)

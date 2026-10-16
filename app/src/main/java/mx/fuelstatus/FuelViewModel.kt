@@ -15,7 +15,8 @@ import java.io.ByteArrayOutputStream
 
 data class Preferences(val theme: String = "system", val dynamicColor: Boolean = true, val vehicleId: String = "")
 data class FuelState(val vehicles: List<Vehicle> = emptyList(), val refuels: List<Refuel> = emptyList(),
-    val expenses: List<Expense> = emptyList(), val preferences: Preferences = Preferences(), val loaded: Boolean = false) {
+    val expenses: List<Expense> = emptyList(), val preferences: Preferences = Preferences(), val loaded: Boolean = false,
+    val paymentMethods: List<PaymentMethod> = listOf(PaymentMethod.Cash)) {
     val selectedVehicle get() = vehicles.firstOrNull { it.id == preferences.vehicleId } ?: vehicles.firstOrNull()
     val selectedRefuels get() = refuels.filter { it.vehicleId == selectedVehicle?.id }
     val selectedExpenses get() = expenses.filter { it.vehicleId == selectedVehicle?.id }
@@ -33,8 +34,8 @@ class FuelViewModel(application: Application) : AndroidViewModel(application) {
     val restorePreview = _restorePreview.asStateFlow()
     private val _driveBusy = MutableStateFlow(false)
     val driveBusy = _driveBusy.asStateFlow()
-    val state = combine(repository.dao.vehicles(), repository.dao.refuels(), repository.dao.expenses(), preferences) { vehicles, refuels, expenses, preference ->
-        FuelState(vehicles, refuels, expenses, preference, loaded = true)
+    val state = combine(repository.dao.vehicles(), repository.dao.refuels(), repository.dao.expenses(), preferences, repository.dao.paymentMethods()) { vehicles, refuels, expenses, preference, methods ->
+        FuelState(vehicles, refuels, expenses, preference, loaded = true, paymentMethods = methods)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), FuelState(preferences = preferences.value))
     private val _busy = MutableStateFlow(false)
     val busy = _busy.asStateFlow()
@@ -65,6 +66,7 @@ class FuelViewModel(application: Application) : AndroidViewModel(application) {
     fun selectVehicle(id: String) { preference { it.copy(vehicleId = id) } }
     fun theme(value: String) { preference { it.copy(theme = value) } }
     fun dynamicColor(value: Boolean) { preference { it.copy(dynamicColor = value) } }
+    fun addPaymentMethod(method: PaymentMethod, onSuccess: () -> Unit) = work("Tarjeta guardada", onSuccess, true) { repository.addPaymentMethod(method) }
     fun save(refuel: Refuel, onSuccess: () -> Unit) = work("Llenado guardado", onSuccess, true) { repository.save(refuel) }
     fun save(expense: Expense, onSuccess: () -> Unit) = work("Gasto guardado", onSuccess, true) { repository.save(expense) }
     fun save(vehicle: Vehicle, onSuccess: () -> Unit) = work("Vehículo guardado", onSuccess, true) {
@@ -142,7 +144,7 @@ class FuelViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun exportCsv(uri: Uri) = work("CSV de llenados exportado") {
-        val text = FuelCsv.export(repository.dao.allVehicles(), repository.dao.allRefuels())
+        val text = FuelCsv.export(repository.dao.allVehicles(), repository.dao.allRefuels(), repository.dao.allPaymentMethods())
         getApplication<Application>().contentResolver.openOutputStream(uri, "wt")?.bufferedWriter(Charsets.UTF_8)?.use { it.write(text) }
             ?: error("No se pudo guardar el archivo.")
     }

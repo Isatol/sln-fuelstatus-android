@@ -13,7 +13,7 @@ class FuelApplication : Application() {
 
 class FuelGraph(application: Application) {
     val repository = FuelRepository(Room.databaseBuilder(application, FuelDatabase::class.java, "fuelstatus.db")
-        .addMigrations(FuelDatabase.MIGRATION_1_2, FuelDatabase.MIGRATION_2_3).build())
+        .addMigrations(FuelDatabase.MIGRATION_1_2, FuelDatabase.MIGRATION_2_3, FuelDatabase.MIGRATION_3_4).build())
     val appearance = AppearanceStore(application)
     val backup = BackupRuntime(application, repository, appearance)
 }

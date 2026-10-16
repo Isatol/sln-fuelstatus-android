@@ -2,6 +2,7 @@ package mx.fuelstatus.backup
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import com.google.gson.JsonNull
 import com.google.gson.JsonParser
 import mx.fuelstatus.Preferences
 import mx.fuelstatus.data.*
@@ -15,6 +16,7 @@ data class BackupDocument(
     val refuels: List<Refuel>,
     val expenses: List<Expense>,
     val appearance: Preferences,
+    val paymentMethods: List<PaymentMethod> = listOf(PaymentMethod.Cash),
 )
 
 data class LocalBackup(val document: BackupDocument, val bytes: ByteArray) {
@@ -34,7 +36,7 @@ object BackupCodec {
         validate(payload)
         val envelope = JsonObject().apply {
             addProperty("format", "fuelstatus-backup")
-            addProperty("version", 2)
+            addProperty("version", 3)
             addProperty("sha256", sha256(gson.toJson(payload).toByteArray(Charsets.UTF_8)))
             add("data", payload)
         }
@@ -49,7 +51,7 @@ object BackupCodec {
             val root = JsonParser.parseString(bytes.toString(Charsets.UTF_8)).asJsonObject
             require(root.string("format") == "fuelstatus-backup") { "No es una copia de FuelStatus." }
             val version = root.long("version")
-            require(version in 1L..2L) { "Esta copia necesita otra versión de FuelStatus." }
+            require(version in 1L..3L) { "Esta copia necesita otra versión de FuelStatus." }
             val payload = root.getAsJsonObject("data") ?: error("Faltan los datos del respaldo.")
             require(root.string("sha256") == sha256(gson.toJson(payload).toByteArray(Charsets.UTF_8))) { "La copia está incompleta o su contenido fue modificado." }
             if (version == 1L) {
@@ -59,6 +61,10 @@ object BackupCodec {
                 payload.getAsJsonArray("refuels")?.forEach { row ->
                     if (!row.asJsonObject.has("fuelType")) row.asJsonObject.addProperty("fuelType", FuelType.Unspecified.code)
                 }
+            }
+            if (version < 3L) {
+                payload.add("paymentMethods", gson.toJsonTree(listOf(PaymentMethod.Cash)))
+                payload.getAsJsonArray("refuels")?.forEach { row -> row.asJsonObject.add("paymentMethodId", JsonNull.INSTANCE) }
             }
             validate(payload)
             return gson.fromJson(payload, BackupDocument::class.java)
@@ -78,6 +84,15 @@ object BackupCodec {
             }
         }
         val vehicles = rows("vehicles")
+        val methods = rows("paymentMethods")
+        val methodIds = methods.map { it.string("id") }.toSet()
+        require(methods.any { it.string("id") == PaymentMethod.Cash.id &&
+            it.string("name") == PaymentMethod.Cash.name && it.string("brand") == PaymentBrand.Cash.code }) { "Falta el método de pago Efectivo." }
+        methods.forEach {
+            require(it.string("name").isNotBlank() && it.string("name").length <= PaymentMethod.MAX_NAME_LENGTH) { "Nombre del método de pago inválido." }
+            val brand = PaymentBrand.fromCode(it.string("brand"))
+            require(brand != null && (brand != PaymentBrand.Cash || it.string("id") == PaymentMethod.Cash.id)) { "Marca del método de pago inválida." }
+        }
         val ids = vehicles.map { it.string("id") }.toSet()
         vehicles.forEach {
             require(it.string("name").isNotBlank()) { "Vehículo sin nombre." }
@@ -91,6 +106,10 @@ object BackupCodec {
             it.bool("fullTank"); it.bool("included"); it.bool("missedPrevious")
             it.string("station"); it.string("notes")
             require(FuelType.entries.any { fuel -> fuel.code == it.string("fuelType") }) { "Combustible del llenado inválido." }
+            val methodId = it.get("paymentMethodId")
+            if (methodId != null && !methodId.isJsonNull) {
+                require(it.string("paymentMethodId") in methodIds) { "Un llenado hace referencia a un método de pago inexistente." }
+            }
         }
         rows("expenses").forEach {
             require(it.string("vehicleId") in ids) { "Un gasto hace referencia a un vehículo inexistente." }

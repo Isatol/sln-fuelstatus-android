@@ -5,7 +5,7 @@ import java.math.RoundingMode
 import java.security.MessageDigest
 import java.time.Instant
 
-data class FuelImportRow(val vehicle: Vehicle, val refuel: Refuel)
+data class FuelImportRow(val vehicle: Vehicle, val refuel: Refuel, val paymentMethod: PaymentMethod? = null)
 
 object FuelCsv {
     const val MAX_BYTES = 5 * 1024 * 1024
@@ -45,14 +45,26 @@ object FuelCsv {
                 val price = decimal("price")
                 val odo = decimal("meters")
                 require(amount > BigDecimal.ZERO && price > BigDecimal.ZERO && odo >= BigDecimal.ZERO) { "Litros, precio o kilometraje inválidos." }
+                val paymentName = value("paymentMethodName")
+                val paymentBrand = value("paymentMethodBrand").lowercase()
+                val method = when {
+                    paymentName.isEmpty() && paymentBrand.isEmpty() -> null
+                    paymentBrand == PaymentBrand.Cash.code -> PaymentMethod.Cash
+                    else -> {
+                        require(PaymentBrand.fromCode(paymentBrand)?.let { it != PaymentBrand.Cash } == true &&
+                            paymentName.isNotEmpty() && paymentName.length <= PaymentMethod.MAX_NAME_LENGTH) { "Método de pago inválido." }
+                        PaymentMethod("payment-${digest("$paymentBrand|${paymentName.lowercase()}")}", paymentName, paymentBrand)
+                    }
+                }
                 val refuel = Refuel(vehicleId = vehicle.id, timestamp = Instant.parse(value("dateISO8601")).toEpochMilli(),
                     odometerMeters = scaled(odo, 3), volumeMl = scaled(amount, 3), costCents = scaled(amount * price, 2),
                     fullTank = bool("fullFillup", true), included = bool("showInStatistic", true),
                     missedPrevious = bool("missedPrevious", false),
                     station = value("gasStation"), notes = value("comment"),
-                    fuelType = FuelType.fromCsv(value("fuelType").ifBlank { value("octane") }).code)
+                    fuelType = FuelType.fromCsv(value("fuelType").ifBlank { value("octane") }).code,
+                    paymentMethodId = method?.id)
                 require(refuel.volumeMl > 0 && refuel.costCents > 0) { "Importe o volumen menor a la precisión admitida." }
-                FuelImportRow(vehicle, refuel.copy(id = "fuel-${signature(refuel)}"))
+                FuelImportRow(vehicle, refuel.copy(id = "fuel-${signature(refuel)}"), method)
             } catch (e: Exception) {
                 throw IllegalArgumentException("Fila ${index + 2}: ${e.message ?: "dato inválido"}", e)
             }
@@ -94,18 +106,21 @@ object FuelCsv {
         return rows
     }
 
-    fun export(vehicles: List<Vehicle>, refuels: List<Refuel>): String {
-        val header = listOf("carName", "carType", "carYear", "carIsEV", "dateISO8601", "amount", "price", "meters", "fullFillup", "showInStatistic", "comment", "gasStation", "missedPrevious", "fuelType", "vehicleFuelType")
+    fun export(vehicles: List<Vehicle>, refuels: List<Refuel>, paymentMethods: List<PaymentMethod> = listOf(PaymentMethod.Cash)): String {
+        val header = listOf("carName", "carType", "carYear", "carIsEV", "dateISO8601", "amount", "price", "meters", "fullFillup", "showInStatistic", "comment", "gasStation", "missedPrevious", "fuelType", "vehicleFuelType", "paymentMethodName", "paymentMethodBrand")
+        val methodsById = paymentMethods.associateBy { it.id }
         fun escape(s: String) = if (s.any { it == ',' || it == '"' || it == '\n' || it == '\r' }) "\"${s.replace("\"", "\"\"")}\"" else s
         return buildString {
             append(header.joinToString(",")).append("\r\n")
             for (r in refuels.sortedBy { it.timestamp }) {
                 val v = vehicles.first { it.id == r.vehicleId }
+                val method = r.paymentMethodId?.let { methodsById[it] ?: error("No se encontró el método de pago de un llenado.") }
                 // Enough precision to reconstruct the same total to the cent when importing.
                 val price = BigDecimal(r.costCents).movePointLeft(2).divide(BigDecimal(r.volumeMl).movePointLeft(3), 12, RoundingMode.HALF_UP)
                 append(listOf(v.name, v.type, v.year.toString(), "false", Instant.ofEpochMilli(r.timestamp).toString(),
                     BigDecimal(r.volumeMl).movePointLeft(3).toPlainString(), price.toPlainString(),
-                    BigDecimal(r.odometerMeters).movePointLeft(3).toPlainString(), r.fullTank.toString(), r.included.toString(), r.notes, r.station, r.missedPrevious.toString(), r.fuelType, v.fuelType)
+                    BigDecimal(r.odometerMeters).movePointLeft(3).toPlainString(), r.fullTank.toString(), r.included.toString(), r.notes, r.station, r.missedPrevious.toString(), r.fuelType, v.fuelType,
+                    method?.name.orEmpty(), method?.brand.orEmpty())
                     .joinToString(",") { escape(it) }).append("\r\n")
             }
         }

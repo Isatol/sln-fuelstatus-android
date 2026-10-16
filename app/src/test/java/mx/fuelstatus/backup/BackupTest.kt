@@ -31,7 +31,7 @@ class BackupTest {
         assertThrows(IllegalArgumentException::class.java) { BackupCodec.decode(text.toByteArray()) }
     }
     @Test fun unsupportedVersionAndTruncatedFilesAreRejected() {
-        val text = BackupCodec.encode(document()).toString(Charsets.UTF_8).replace("\"version\":2", "\"version\":9")
+        val text = BackupCodec.encode(document()).toString(Charsets.UTF_8).replace("\"version\":3", "\"version\":9")
         assertThrows(IllegalArgumentException::class.java) { BackupCodec.decode(text.toByteArray()) }
         assertThrows(IllegalArgumentException::class.java) { BackupCodec.decode("{bad".toByteArray()) }
     }
@@ -60,7 +60,7 @@ class BackupTest {
 
     private inner class Source : BackupSource {
         var doc = document()
-        override suspend fun reset() { doc = doc.copy(revision = 1, vehicles = emptyList(), refuels = emptyList(), expenses = emptyList(), appearance = Preferences()) }
+        override suspend fun reset() { doc = doc.copy(revision = 1, vehicles = emptyList(), refuels = emptyList(), expenses = emptyList(), appearance = Preferences(), paymentMethods = listOf(PaymentMethod.Cash)) }
         override suspend fun revision() = doc.revision
         override suspend fun snapshot(deviceId: String, now: Long) = doc.copy(deviceId = deviceId, createdAt = now)
         override suspend fun restore(document: BackupDocument) { doc = document.copy(revision = doc.revision + 1) }

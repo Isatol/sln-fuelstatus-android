@@ -13,6 +13,8 @@ interface FuelDao {
     @Query("SELECT * FROM refuels") suspend fun allRefuels(): List<Refuel>
     @Query("SELECT * FROM expenses ORDER BY timestamp DESC") fun expenses(): Flow<List<Expense>>
     @Query("SELECT * FROM expenses") suspend fun allExpenses(): List<Expense>
+    @Query("SELECT * FROM payment_methods ORDER BY CASE WHEN id = 'cash' THEN 0 ELSE 1 END, name COLLATE NOCASE") fun paymentMethods(): Flow<List<PaymentMethod>>
+    @Query("SELECT * FROM payment_methods ORDER BY CASE WHEN id = 'cash' THEN 0 ELSE 1 END, name COLLATE NOCASE") suspend fun allPaymentMethods(): List<PaymentMethod>
     @Query("SELECT revision FROM backup_revision WHERE id = 1") suspend fun revision(): Long?
     @Insert(onConflict = OnConflictStrategy.IGNORE) suspend fun initializeRevision(value: BackupRevision)
     @Query("UPDATE backup_revision SET revision = revision + 1 WHERE id = 1") suspend fun changed()
@@ -20,8 +22,12 @@ interface FuelDao {
     @Query("DELETE FROM expenses") suspend fun deleteAllExpenses()
     @Query("DELETE FROM backup_revision") suspend fun deleteRevision()
     @Query("DELETE FROM vehicles") suspend fun deleteAllVehicles()
+    @Query("DELETE FROM payment_methods") suspend fun deleteAllPaymentMethods()
     @Insert suspend fun insertVehicles(values: List<Vehicle>)
     @Insert suspend fun insertExpenses(values: List<Expense>)
+    @Insert suspend fun insertPaymentMethods(values: List<PaymentMethod>)
+    @Insert(onConflict = OnConflictStrategy.IGNORE) suspend fun initializeCash(value: PaymentMethod)
+    @Insert suspend fun insertPaymentMethod(value: PaymentMethod)
     @Upsert suspend fun save(vehicle: Vehicle)
     @Upsert suspend fun save(refuel: Refuel)
     @Upsert suspend fun save(expense: Expense)
@@ -30,10 +36,19 @@ interface FuelDao {
     @Delete suspend fun delete(expense: Expense)
 }
 
-@Database(entities = [Vehicle::class, Refuel::class, Expense::class, BackupRevision::class], version = 3, exportSchema = true)
+@Database(entities = [Vehicle::class, Refuel::class, Expense::class, BackupRevision::class, PaymentMethod::class], version = 4, exportSchema = true)
 abstract class FuelDatabase : RoomDatabase() {
     abstract fun dao(): FuelDao
     companion object {
+        val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("CREATE TABLE IF NOT EXISTS payment_methods (id TEXT NOT NULL, name TEXT NOT NULL, brand TEXT NOT NULL, PRIMARY KEY(id))")
+                db.execSQL("INSERT INTO payment_methods (id, name, brand) VALUES ('cash', 'Efectivo', 'cash')")
+                db.execSQL("ALTER TABLE refuels ADD COLUMN paymentMethodId TEXT DEFAULT NULL REFERENCES payment_methods(id) ON UPDATE NO ACTION ON DELETE RESTRICT")
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_refuels_paymentMethodId ON refuels(paymentMethodId)")
+            }
+        }
+
         val MIGRATION_2_3 = object : Migration(2, 3) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE vehicles ADD COLUMN fuelType TEXT NOT NULL DEFAULT 'magna'")

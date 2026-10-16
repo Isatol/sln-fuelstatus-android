@@ -59,4 +59,25 @@ class FuelCsvTest {
         assertEquals("unspecified", FuelCsv.parse("$header\n$row").single().refuel.fuelType)
     }
 
+    @Test fun csvKeepsCardNameBrandAndCashWhileOldRowsStayUnspecified() {
+        val parsed = FuelCsv.parse("$header\n$row").single()
+        assertNull(parsed.refuel.paymentMethodId)
+        assertNull(parsed.paymentMethod)
+        for (brand in listOf("visa", "mastercard", "amex")) {
+            val method = PaymentMethod("card", "Mi tarjeta, \"personal\"", brand)
+            val csv = FuelCsv.export(listOf(parsed.vehicle), listOf(parsed.refuel.copy(paymentMethodId = method.id)), listOf(PaymentMethod.Cash, method))
+            val reimported = FuelCsv.parse(csv).single()
+            assertEquals(method.name, reimported.paymentMethod!!.name)
+            assertEquals(method.brand, reimported.paymentMethod.brand)
+            assertEquals(reimported.paymentMethod.id, reimported.refuel.paymentMethodId)
+            assertEquals(parsed.refuel.costCents, reimported.refuel.costCents)
+        }
+        val cash = FuelCsv.parse(FuelCsv.export(listOf(parsed.vehicle), listOf(parsed.refuel.copy(paymentMethodId = PaymentMethod.Cash.id)))).single()
+        assertEquals(PaymentMethod.Cash, cash.paymentMethod)
+    }
+
+    @Test(expected = IllegalArgumentException::class) fun invalidPaymentMetadataIsRejectedBeforeImport() {
+        FuelCsv.parse("$header,paymentMethodName,paymentMethodBrand\n$row,Mi tarjeta,invalid")
+    }
+
 }

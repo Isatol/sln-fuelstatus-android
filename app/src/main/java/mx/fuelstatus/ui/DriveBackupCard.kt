@@ -13,6 +13,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import mx.fuelstatus.backup.SyncState
 import mx.fuelstatus.backup.RestorePreview
+import mx.fuelstatus.R
 import java.text.DateFormat
 import java.util.Date
 
@@ -27,8 +28,8 @@ fun DriveBackupCard(state: SyncState, busy: Boolean, onConnect: () -> Unit, onSy
     val enabled = !busy && !state.running
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text("Copias y Google Drive", style = MaterialTheme.typography.titleLarge)
-            Text("Tu historial se guarda primero en este teléfono. Drive conserva una copia de vehículos, llenados, gastos y apariencia.", style = MaterialTheme.typography.bodyMedium)
+            SettingsTitle(R.drawable.ic_cloud_sync, "Copias y Google Drive", MaterialTheme.typography.titleLarge)
+            Text("Tu historial se guarda primero en este teléfono. Drive conserva una copia de vehículos, llenados, gastos, métodos de pago y apariencia.", style = MaterialTheme.typography.bodyMedium)
             Text("Copia local: ${backupDate(state.lastLocalAt)}", style = MaterialTheme.typography.bodySmall)
             if (state.localError.isNotBlank()) Text(state.localError, color = MaterialTheme.colorScheme.error)
             if (state.connected) {
@@ -88,7 +89,7 @@ fun DriveBackupCard(state: SyncState, busy: Boolean, onConnect: () -> Unit, onSy
 @Composable
 fun RestoreBackupDialog(preview: RestorePreview, busy: Boolean, onConfirm: () -> Unit, onDismiss: () -> Unit) {
     AlertDialog(onDismissRequest = { if (!busy) onDismiss() }, title = { Text("Restaurar historial") },
-        text = { Text("Copia del ${backupDate(preview.document.createdAt)}\n${preview.document.vehicles.size} vehículos · ${preview.document.refuels.size} llenados · ${preview.document.expenses.size} gastos\n\nReemplazará el historial de este teléfono. Antes se guardará una copia local de recuperación del historial actual.") },
+        text = { Text("Copia del ${backupDate(preview.document.createdAt)}\n${preview.document.vehicles.size} vehículos · ${preview.document.refuels.size} llenados · ${preview.document.expenses.size} gastos\n${preview.document.paymentMethods.size} métodos de pago\n\nReemplazará el historial de este teléfono. Antes se guardará una copia local de recuperación del historial actual.") },
         confirmButton = { TextButton(onClick = onConfirm, enabled = !busy) { Text("Restaurar historial") } },
         dismissButton = { TextButton(onClick = onDismiss, enabled = !busy) { Text("Cancelar") } })
 }
