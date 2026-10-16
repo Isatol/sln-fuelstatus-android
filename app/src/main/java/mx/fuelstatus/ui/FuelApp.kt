@@ -5,6 +5,10 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -19,6 +23,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -122,7 +127,15 @@ fun FuelApp(model: FuelViewModel, onConnectDrive: () -> Unit) {
                 }
                 if (busy) LinearProgressIndicator(Modifier.fillMaxWidth())
                 if (!state.loaded) Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
-                else AnimatedContent(destination, label = "section", modifier = Modifier.weight(1f)) { page ->
+                else AnimatedContent(destination, label = "section",
+                    modifier = Modifier.weight(1f).fillMaxWidth().clipToBounds(),
+                    transitionSpec = {
+                        val direction = if (targetState.ordinal > initialState.ordinal)
+                            AnimatedContentTransitionScope.SlideDirection.Left
+                        else AnimatedContentTransitionScope.SlideDirection.Right
+                        (slideIntoContainer(direction, tween(300, easing = FastOutSlowInEasing)) togetherWith
+                            slideOutOfContainer(direction, tween(300, easing = FastOutSlowInEasing))).using(null)
+                    }) { page ->
                     when (page) {
                         Destination.Refuels -> RefuelsScreen(state, { openEditor("refuel", it.id) }, { importFile.launch(arrayOf("text/*", "application/csv", "application/octet-stream")) })
                         Destination.Expenses -> ExpensesScreen(state) { openEditor("expense", it.id) }
