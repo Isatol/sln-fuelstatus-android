@@ -202,16 +202,22 @@ private fun RefuelsScreen(state: FuelState, onEdit: (Refuel) -> Unit, onImport: 
                             Box(Modifier.clip(CircleShape).background(MaterialTheme.colorScheme.secondaryContainer).padding(11.dp)) { FuelIcon(R.drawable.ic_pump) }
                             Column(Modifier.weight(1f).padding(start = 12.dp)) {
                                 Text(date(refuel.timestamp), fontWeight = FontWeight.Bold)
-                                Text("${number(refuel.km, 0)} km · ${if (refuel.fullTank) "Tanque lleno" else "Carga parcial"}", style = MaterialTheme.typography.bodySmall)
+                                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.padding(vertical = 4.dp)) {
+                                    RefuelDetail(R.drawable.ic_route, "${number(refuel.km, 0)} km")
+                                    RefuelDetail(if (refuel.fullTank) R.drawable.ic_water_full else R.drawable.ic_water_medium,
+                                        if (refuel.fullTank) "Tanque lleno" else "Carga parcial")
+                                }
                                 Text(FuelType.fromCode(refuel.fuelType).label, style = MaterialTheme.typography.bodySmall)
                             }
                             Text(money(refuel.cost), fontWeight = FontWeight.Bold)
                         }
                         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = .5f))
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            SmallMetric("Litros", "${number(refuel.liters)} L")
-                            SmallMetric("Precio / L", money(refuel.pricePerLiter))
-                            SmallMetric("Rendimiento", periods[refuel.id]?.let { "${number(it.kmPerLiter)} km/L" } ?: "—")
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            SmallMetric("Litros", "${number(refuel.liters)} L", Modifier.weight(1f), R.drawable.ic_water_drop)
+                            SmallMetric("Precio / L", money(refuel.pricePerLiter), Modifier.weight(1f), R.drawable.ic_payments)
+                            SmallMetric("Rendimiento", periods[refuel.id]?.let { "${number(it.kmPerLiter)} km/L" } ?: "—",
+                                Modifier.weight(1f), R.drawable.ic_speed)
                         }
                         if (!refuel.included) Text("Fuera de estadísticas", color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.labelMedium)
                         if (refuel.missedPrevious) Text("Falta una carga anterior", style = MaterialTheme.typography.labelMedium)
@@ -379,9 +385,23 @@ private fun Metric(label: String, value: String, modifier: Modifier = Modifier) 
     }
 }
 @Composable
-private fun SmallMetric(label: String, value: String) {
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+private fun RefuelDetail(icon: Int, text: String) {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        Icon(painterResource(icon), contentDescription = null, modifier = Modifier.size(16.dp),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(text, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+@Composable
+private fun SmallMetric(label: String, value: String, modifier: Modifier = Modifier, icon: Int? = null) {
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            icon?.let {
+                Icon(painterResource(it), contentDescription = null, modifier = Modifier.size(16.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
         Text(value, style = MaterialTheme.typography.labelLarge)
     }
 }
