@@ -4,6 +4,10 @@ Repositorio: [Isatol/sln-fuelstatus-android](https://github.com/Isatol/sln-fuels
 
 Aplicación personal de combustible y gastos de vehículos inspirada en Fuel, con interfaz nativa para Android. Nombre anterior de trabajo: **FuelDroid**.
 
+## Versión 0.3
+
+Borrado de datos con confirmación y opción de borrar las copias de Drive, combustible por vehículo y por llenado, e importación con selección del vehículo de destino. Las instalaciones nuevas comienzan sin vehículos; las actualizaciones conservan el historial existente. Detalles en [docs/DATOS_Y_COMBUSTIBLE.md](docs/DATOS_Y_COMBUSTIBLE.md).
+
 ## Lo que definimos
 
 - **Plataforma:** Android nativo con Kotlin y Jetpack Compose; uso principal en un Pixel 10.
@@ -11,7 +15,7 @@ Aplicación personal de combustible y gastos de vehículos inspirada en Fuel, co
 - **Llenados:** alta, consulta, edición y eliminación; fecha, odómetro, litros, importe total, precio por litro calculado, tanque completo/parcial, gasolinera y notas. Opciones para excluir una carga de estadísticas o indicar una carga anterior faltante.
 - **Gastos:** registro, edición y eliminación de servicios, mantenimiento, seguros, estacionamientos, peajes, lavados y otros gastos.
 - **Estadísticas:** km/L, precio medio por litro, costo de combustible por kilómetro, volumen, combustible pagado y gastos totales; cálculos a partir de datos registrados.
-- **Vehículos:** historial separado para cada auto; Mazda 3 Hatchback 2025 como vehículo inicial. Selección, alta y edición de vehículos.
+- **Vehículos:** historial separado para cada auto, selección, alta, edición y combustible predeterminado. Los vehículos existentes se conservan al actualizar.
 - **Ajustes:** apariencia e importación del historial CSV de Fuel. Se agregó exportación CSV de llenados para poder recuperar ese historial.
 - **Datos:** persistencia local con Room; funcionamiento sin conexión, sin cuenta, anuncios ni suscripción. Moneda MXN, distancias en km, volumen en litros.
 - **Entrega:** proyecto fuente y APK debug instalable. Compilación local con Android Studio; GitHub Actions queda pendiente de configurar.
@@ -20,11 +24,11 @@ Aplicación personal de combustible y gastos de vehículos inspirada en Fuel, co
 
 ## Estado de esta recreación
 
-La base de la implementación contiene las cinco secciones, formularios, Room, cálculos e importación/exportación de llenados. No se incluyen datos de demostración ni el CSV personal dentro del APK. La app comienza con el vehículo inicial y permite importar el historial desde Ajustes.
+La base de la implementación contiene las cinco secciones, formularios, Room, cálculos e importación/exportación de llenados. No se incluyen datos de demostración ni el CSV personal dentro del APK. Las instalaciones nuevas comienzan sin vehículos y permiten crearlos o importar uno desde Ajustes.
 
 Se utiliza un CSV privado externo al proyecto como comprobación local opcional; no se copia al repositorio. La comparación visual con Fuel y sus totales sigue pendiente de verificar en el teléfono.
 
-**Validado en 0.2:** APK debug compilado, 45 pruebas JVM y 7 pruebas instrumentadas aprobadas, Android Lint sin errores (20 avisos). La autorización y subida reales con la cuenta del usuario siguen pendientes. Detalles en [docs/VALIDACION.md](docs/VALIDACION.md).
+**Validado en 0.3:** APK debug compilado y firmado, 56 pruebas JVM y 17 pruebas instrumentadas aprobadas, Android Lint sin errores (19 avisos). El borrado de Drive se comprobó con un servicio simulado; no se eliminaron copias de la cuenta real. Detalles en [docs/VALIDACION.md](docs/VALIDACION.md).
 
 ## Abrir y ejecutar
 
@@ -73,7 +77,7 @@ Se usa el método **tanque lleno a tanque lleno**. La primera carga completa fij
 
 - Material 3 **1.5.0-beta01** permite usar `MaterialExpressiveTheme`; es una dependencia beta deliberada por el requisito Expressive. [Notas oficiales de Material 3](https://developer.android.com/jetpack/androidx/releases/compose-material3).
 - [Compatibilidad de AGP 9.2](https://developer.android.com/build/releases/agp-9-2-0-release-notes).
-- Paquete Android: `mx.fuelstatus`; base de datos: `fuelstatus.db`, esquema 2, con migración que conserva el historial de la versión 1. El esquema de Room se conserva en `app/schemas` para futuras migraciones.
+- Paquete Android: `mx.fuelstatus`; base de datos: `fuelstatus.db`, esquema 3, con migraciones que conservan el historial de versiones 1 y 2. El esquema de Room se conserva en `app/schemas` para futuras migraciones.
 - Se declaran Internet y estado de red para la copia opcional en Drive. Android backup automático está deshabilitado; Room y el JSON privado se conservan en el dispositivo.
 - El CSV incluye **llenados**; el respaldo JSON de Drive incluye también vehículos, gastos y apariencia. Desinstalar elimina los datos y copias locales, pero conserva las copias ya confirmadas en Drive.
 

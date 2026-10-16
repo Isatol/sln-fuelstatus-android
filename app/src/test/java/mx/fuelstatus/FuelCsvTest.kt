@@ -49,4 +49,14 @@ class FuelCsvTest {
         val reimported = FuelCsv.parse(exported)
         assertEquals(rows.sortedBy { it.refuel.id }, reimported.sortedBy { it.refuel.id })
     }
+    @Test fun explicitFuelColumnsRoundTripAndMissingFuelStaysUnknown() {
+        val source = "$header,fuelType,vehicleFuelType\n$row,premium,diesel"
+        val parsed = FuelCsv.parse(source).single()
+        assertEquals("premium", parsed.refuel.fuelType)
+        assertEquals("diesel", parsed.vehicle.fuelType)
+        val copy = FuelCsv.parse(FuelCsv.export(listOf(parsed.vehicle), listOf(parsed.refuel))).single()
+        assertEquals(parsed, copy)
+        assertEquals("unspecified", FuelCsv.parse("$header\n$row").single().refuel.fuelType)
+    }
+
 }

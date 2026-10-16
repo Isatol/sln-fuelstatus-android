@@ -17,6 +17,10 @@ class LocalBackupStore(private val directory: File) {
         return LocalBackup(BackupCodec.decode(bytes), bytes)
     }
 
+    fun clear() {
+        check(!directory.exists() || directory.deleteRecursively()) { "No se pudieron eliminar todas las copias locales. Intenta borrar los datos nuevamente." }
+    }
+
     fun write(backup: LocalBackup) = atomicWrite(File(directory, "latest.json"), backup.bytes)
 
     fun preserveBeforeRestore(backup: LocalBackup) {

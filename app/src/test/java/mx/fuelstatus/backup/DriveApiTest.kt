@@ -56,4 +56,13 @@ class DriveApiTest {
         assertEquals("page2", requests[1].query["pageToken"])
         assertTrue(requests[0].query.getValue("q").contains("'folder-id' in parents"))
     }
+    @Test fun userRequestedHistoryDeletionUsesRecoverableTrashAndNeverDeletesFolder() = runBlocking {
+        val requests = mutableListOf<DriveRequest>()
+        val api = DriveApi(DriveTransport { request -> requests += request; DriveResponse(200, "{}".toByteArray()) })
+        api.trash("backup-file")
+        assertEquals("PATCH", requests.single().method)
+        assertEquals("files/backup-file", requests.single().path)
+        assertEquals("{\"trashed\":true}", requests.single().body!!.toString(Charsets.UTF_8))
+    }
+
 }

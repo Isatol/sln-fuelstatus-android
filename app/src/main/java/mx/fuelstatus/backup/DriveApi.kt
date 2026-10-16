@@ -110,6 +110,9 @@ class DriveApi(private val transport: DriveTransport, private val sensitiveToken
     }
 
     override suspend fun download(id: String): ByteArray = response(DriveRequest("GET", "files/${id(id)}", mapOf("alt" to "media"))).bytes
+    override suspend fun trash(id: String) {
+        response(DriveRequest("PATCH", "files/${id(id)}", body = "{\"trashed\":true}".toByteArray(Charsets.UTF_8)))
+    }
     override suspend fun delete(id: String) { response(DriveRequest("DELETE", "files/${id(id)}")) }
 
     private fun remote(json: JsonObject): RemoteBackup {

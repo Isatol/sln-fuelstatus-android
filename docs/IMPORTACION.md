@@ -31,3 +31,8 @@ Los duplicados se reconocen por vehículo, fecha, odómetro, litros e importe. L
 Incluye llenados de todos los vehículos en UTF-8, con encabezados del importador y una columna adicional `missedPrevious` para conservar el indicador de carga faltante al volver a FuelStatus. El precio por litro se exporta con precisión suficiente para recuperar el mismo importe en centavos.
 
 La compatibilidad de entrada se ha definido a partir del export de Fuel encontrado. La importación de este CSV de salida en la aplicación Fuel original todavía no se ha comprobado.
+
+
+## Selección de destino y combustible (0.3)
+
+Antes de importar se muestra una vista previa para elegir el vehículo de origen del archivo y el destino en la aplicación, o crear el vehículo encontrado. Un checkbox permite aplicar el combustible del destino a todos los registros nuevos. Si se desactiva, se conserva `fuelType` del CSV o Sin especificar cuando no esté indicado. La exportación incluye las columnas opcionales `fuelType` y `vehicleFuelType`. Consulte [DATOS_Y_COMBUSTIBLE.md](DATOS_Y_COMBUSTIBLE.md).

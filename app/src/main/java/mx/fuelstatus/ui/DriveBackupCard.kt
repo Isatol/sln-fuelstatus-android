@@ -39,6 +39,8 @@ fun DriveBackupCard(state: SyncState, busy: Boolean, onConnect: () -> Unit, onSy
                     "offline" -> "Sin conexión · copia pendiente"
                     "uploading" -> "Subiendo copia a Drive…"
                     "connecting" -> "Conectando con Google…"
+                    "reset_failed" -> "Borrado incompleto · revisa el error"
+                    "resetting" -> "Borrando datos…"
                     "restoring" -> "Restaurando historial…"
                     "auth_required" -> "Se necesita autorización"
                     "review" -> "Hay un historial en Drive para revisar"

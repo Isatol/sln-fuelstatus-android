@@ -39,7 +39,8 @@ object FuelCsv {
                 require(!bool("carIsEV", false)) { "Esta versión importa vehículos de combustible." }
                 val year = value("carYear").toIntOrNull() ?: 2025
                 require(year in 1886..2100) { "Año del vehículo inválido." }
-                val vehicle = Vehicle(id = digest("$carName|${value("carType")}|$year"), name = carName, type = value("carType"), year = year)
+                val vehicle = Vehicle(id = digest("$carName|${value("carType")}|$year"), name = carName, type = value("carType"), year = year,
+                    fuelType = FuelType.fromCsv(value("vehicleFuelType")).takeIf { it != FuelType.Unspecified }?.code ?: FuelType.Magna.code)
                 val amount = decimal("amount")
                 val price = decimal("price")
                 val odo = decimal("meters")
@@ -48,7 +49,8 @@ object FuelCsv {
                     odometerMeters = scaled(odo, 3), volumeMl = scaled(amount, 3), costCents = scaled(amount * price, 2),
                     fullTank = bool("fullFillup", true), included = bool("showInStatistic", true),
                     missedPrevious = bool("missedPrevious", false),
-                    station = value("gasStation"), notes = value("comment"))
+                    station = value("gasStation"), notes = value("comment"),
+                    fuelType = FuelType.fromCsv(value("fuelType").ifBlank { value("octane") }).code)
                 require(refuel.volumeMl > 0 && refuel.costCents > 0) { "Importe o volumen menor a la precisión admitida." }
                 FuelImportRow(vehicle, refuel.copy(id = "fuel-${signature(refuel)}"))
             } catch (e: Exception) {
@@ -93,7 +95,7 @@ object FuelCsv {
     }
 
     fun export(vehicles: List<Vehicle>, refuels: List<Refuel>): String {
-        val header = listOf("carName", "carType", "carYear", "carIsEV", "dateISO8601", "amount", "price", "meters", "fullFillup", "showInStatistic", "comment", "gasStation", "missedPrevious")
+        val header = listOf("carName", "carType", "carYear", "carIsEV", "dateISO8601", "amount", "price", "meters", "fullFillup", "showInStatistic", "comment", "gasStation", "missedPrevious", "fuelType", "vehicleFuelType")
         fun escape(s: String) = if (s.any { it == ',' || it == '"' || it == '\n' || it == '\r' }) "\"${s.replace("\"", "\"\"")}\"" else s
         return buildString {
             append(header.joinToString(",")).append("\r\n")
@@ -103,7 +105,7 @@ object FuelCsv {
                 val price = BigDecimal(r.costCents).movePointLeft(2).divide(BigDecimal(r.volumeMl).movePointLeft(3), 12, RoundingMode.HALF_UP)
                 append(listOf(v.name, v.type, v.year.toString(), "false", Instant.ofEpochMilli(r.timestamp).toString(),
                     BigDecimal(r.volumeMl).movePointLeft(3).toPlainString(), price.toPlainString(),
-                    BigDecimal(r.odometerMeters).movePointLeft(3).toPlainString(), r.fullTank.toString(), r.included.toString(), r.notes, r.station, r.missedPrevious.toString())
+                    BigDecimal(r.odometerMeters).movePointLeft(3).toPlainString(), r.fullTank.toString(), r.included.toString(), r.notes, r.station, r.missedPrevious.toString(), r.fuelType, v.fuelType)
                     .joinToString(",") { escape(it) }).append("\r\n")
             }
         }
