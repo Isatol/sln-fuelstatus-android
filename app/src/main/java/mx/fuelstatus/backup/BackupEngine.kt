@@ -19,6 +19,7 @@ class BackupEngine(
     private val invalidateToken: suspend (String) -> Unit = {},
     private val now: () -> Long = System::currentTimeMillis,
 ) {
+    @Volatile private var resetting = false
     private val localMutex = Mutex()
     private val syncMutex = Mutex()
     val state get() = store.state
@@ -55,7 +56,7 @@ class BackupEngine(
 
     fun requestSync(force: Boolean = false) {
         val current = state.value
-        if (!current.connected || current.needsChoice || current.running || (current.phase == "auth_required" && !force)) return
+        if (resetting || current.phase == "reset_failed" || !current.connected || current.needsChoice || current.running || (current.phase == "auth_required" && !force)) return
         if (!current.pending && !force) return
         store.update { it.copy(phase = if (online()) "pending" else "offline") }
         enqueue(force)
@@ -92,11 +93,53 @@ class BackupEngine(
         }
     }
 
+    /** The caller must obtain explicit confirmation. Local data is kept if Drive cleanup fails. */
+    suspend fun reset(deleteDrive: Boolean) {
+        check(!resetting) { "Ya hay un borrado en curso." }
+        resetting = true
+        try {
+            cancelWork()
+            syncMutex.withLock {
+                val current = state.value
+                store.update { it.copy(phase = "resetting") }
+                if (deleteDrive) {
+                    check(current.connected) { "La sesión de Drive cambió. Revisa la cuenta antes de borrar." }
+                    check(online()) { "Necesitas conexión para borrar las copias de Drive. Los datos locales se conservan." }
+                    val drive = driveFactory(tokenProvider(current.email))
+                    check(drive.email().equals(current.email, true)) { "La cuenta de Google cambió. Reconecta la cuenta antes de borrar." }
+                    val copies = drive.backups(current.folderId)
+                    var removed = 0
+                    try {
+                        for (copy in copies) { drive.trash(copy.id); removed++ }
+                    } catch (e: CancellationException) { throw e }
+                    catch (e: Exception) {
+                        throw DriveFailure("No se completó el borrado de Drive",
+                            "Se enviaron $removed de ${copies.size} copias a la papelera. Los datos locales se conservan. Repite Borrar datos para continuar.\n${detail(e)}")
+                    }
+                }
+                localMutex.withLock {
+                    source.reset()
+                    local.clear()
+                    store.update { SyncState() }
+                }
+                refreshLocal()
+            }
+        } catch (e: CancellationException) {
+            store.update { it.copy(phase = "reset_failed", errorTitle = "El borrado se interrumpió",
+                errorDetail = "Repite Borrar datos para completar la operación. La sincronización automática está pausada.", errorAt = now()) }
+            throw e
+        } catch (e: Exception) {
+            recordFailure(e)
+            store.update { it.copy(phase = "reset_failed") }
+            throw e
+        } finally { resetting = false }
+    }
+
     suspend fun synchronize(force: Boolean = false): SyncOutcome = syncMutex.withLock {
         var token: String? = null
         try {
             val current = state.value
-            if (!current.connected || current.needsChoice) return@withLock SyncOutcome.NeedsAction
+            if (resetting || current.phase in listOf("reset_failed", "resetting") || !current.connected || current.needsChoice) return@withLock SyncOutcome.NeedsAction
             if (!online()) { store.update { it.copy(phase = "offline") }; return@withLock SyncOutcome.Retry }
             val backup = refreshLocal()
             store.update { it.copy(phase = "uploading", lastAttemptAt = now()) }

@@ -25,7 +25,7 @@ data class SyncState(
     val connected get() = email.isNotBlank()
     val pending get() = localRevision > cloudRevision
     val needsChoice get() = candidateId.isNotBlank()
-    val running get() = phase in listOf("connecting", "uploading", "restoring")
+    val running get() = phase in listOf("connecting", "uploading", "restoring", "resetting")
 }
 
 interface SyncStateStore {
@@ -36,6 +36,7 @@ interface SyncStateStore {
 interface BackupSource {
     suspend fun revision(): Long
     suspend fun snapshot(deviceId: String, now: Long): BackupDocument
+    suspend fun reset()
     suspend fun restore(document: BackupDocument)
 }
 
@@ -54,6 +55,7 @@ interface DriveGateway {
     suspend fun backups(folderId: String): List<RemoteBackup>
     suspend fun upload(folderId: String, backup: LocalBackup): RemoteBackup
     suspend fun download(id: String): ByteArray
+    suspend fun trash(id: String)
     suspend fun delete(id: String)
 }
 

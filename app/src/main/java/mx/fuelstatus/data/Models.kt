@@ -9,6 +9,7 @@ data class Vehicle(
     val name: String = "Mazda 3",
     val type: String = "Hatchback",
     val year: Int = 2025,
+    @ColumnInfo(defaultValue = "'magna'") val fuelType: String = FuelType.Magna.code,
 ) {
     @get:Ignore
     val label: String get() = "$name $type $year".trim()
@@ -29,6 +30,7 @@ data class Refuel(
     val missedPrevious: Boolean = false,
     val station: String = "",
     val notes: String = "",
+    @ColumnInfo(defaultValue = "'unspecified'") val fuelType: String = FuelType.Unspecified.code,
 ) {
     @get:Ignore
     val liters get() = volumeMl / 1000.0

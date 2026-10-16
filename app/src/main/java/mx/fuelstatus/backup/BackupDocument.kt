@@ -34,7 +34,7 @@ object BackupCodec {
         validate(payload)
         val envelope = JsonObject().apply {
             addProperty("format", "fuelstatus-backup")
-            addProperty("version", 1)
+            addProperty("version", 2)
             addProperty("sha256", sha256(gson.toJson(payload).toByteArray(Charsets.UTF_8)))
             add("data", payload)
         }
@@ -48,9 +48,18 @@ object BackupCodec {
         try {
             val root = JsonParser.parseString(bytes.toString(Charsets.UTF_8)).asJsonObject
             require(root.string("format") == "fuelstatus-backup") { "No es una copia de FuelStatus." }
-            require(root.long("version") == 1L) { "Esta copia necesita otra versión de FuelStatus." }
+            val version = root.long("version")
+            require(version in 1L..2L) { "Esta copia necesita otra versión de FuelStatus." }
             val payload = root.getAsJsonObject("data") ?: error("Faltan los datos del respaldo.")
             require(root.string("sha256") == sha256(gson.toJson(payload).toByteArray(Charsets.UTF_8))) { "La copia está incompleta o su contenido fue modificado." }
+            if (version == 1L) {
+                payload.getAsJsonArray("vehicles")?.forEach { row ->
+                    if (!row.asJsonObject.has("fuelType")) row.asJsonObject.addProperty("fuelType", FuelType.Magna.code)
+                }
+                payload.getAsJsonArray("refuels")?.forEach { row ->
+                    if (!row.asJsonObject.has("fuelType")) row.asJsonObject.addProperty("fuelType", FuelType.Unspecified.code)
+                }
+            }
             validate(payload)
             return gson.fromJson(payload, BackupDocument::class.java)
         } catch (e: IllegalArgumentException) { throw e }
@@ -69,11 +78,11 @@ object BackupCodec {
             }
         }
         val vehicles = rows("vehicles")
-        require(vehicles.isNotEmpty()) { "El respaldo no contiene vehículos." }
         val ids = vehicles.map { it.string("id") }.toSet()
         vehicles.forEach {
             require(it.string("name").isNotBlank()) { "Vehículo sin nombre." }
             it.string("type")
+            require(FuelType.entries.any { fuel -> fuel.code == it.string("fuelType") }) { "Combustible del vehículo inválido." }
             require(it.long("year") in 1886..2100) { "Año del vehículo inválido." }
         }
         rows("refuels").forEach {
@@ -81,6 +90,7 @@ object BackupCodec {
             require(it.long("timestamp") > 0 && it.long("odometerMeters") >= 0 && it.long("volumeMl") > 0 && it.long("costCents") > 0) { "Carga con valores inválidos." }
             it.bool("fullTank"); it.bool("included"); it.bool("missedPrevious")
             it.string("station"); it.string("notes")
+            require(FuelType.entries.any { fuel -> fuel.code == it.string("fuelType") }) { "Combustible del llenado inválido." }
         }
         rows("expenses").forEach {
             require(it.string("vehicleId") in ids) { "Un gasto hace referencia a un vehículo inexistente." }

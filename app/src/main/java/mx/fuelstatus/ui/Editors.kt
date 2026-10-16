@@ -25,6 +25,7 @@ fun RefuelEditor(vehicle: Vehicle, records: List<Refuel>, existing: Refuel?, bus
     var odometer by rememberSaveable(key) { mutableStateOf(existing?.let { inputNumber(it.odometerMeters, 3) }.orEmpty()) }
     var liters by rememberSaveable(key) { mutableStateOf(existing?.let { inputNumber(it.volumeMl, 3) }.orEmpty()) }
     var total by rememberSaveable(key) { mutableStateOf(existing?.let { inputNumber(it.costCents, 2) }.orEmpty()) }
+    var fuelType by rememberSaveable(key) { mutableStateOf(existing?.fuelType ?: vehicle.fuelType) }
     var full by rememberSaveable(key) { mutableStateOf(existing?.fullTank ?: true) }
     var included by rememberSaveable(key) { mutableStateOf(existing?.included ?: true) }
     var missed by rememberSaveable(key) { mutableStateOf(existing?.missedPrevious ?: false) }
@@ -33,6 +34,7 @@ fun RefuelEditor(vehicle: Vehicle, records: List<Refuel>, existing: Refuel?, bus
     var error by rememberSaveable(key) { mutableStateOf<String?>(null) }
     var deleteConfirmation by remember { mutableStateOf(false) }
     EditorSheet(if (existing == null) "Nuevo llenado" else "Editar llenado", vehicle.label, busy, onDismiss) {
+        FuelSelector(fuelType, { fuelType = it }, allowUnspecified = existing != null)
         DateField(timestamp) { timestamp = it }
         NumberField("Odómetro (km)", odometer, { odometer = it }, "Último: ${records.maxOfOrNull { it.km }?.let { number(it, 0) } ?: "—"} km")
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -62,7 +64,7 @@ fun RefuelEditor(vehicle: Vehicle, records: List<Refuel>, existing: Refuel?, bus
                 else -> null
             }
             if (error == null) onSave(Refuel(existing?.id ?: UUID.randomUUID().toString(), vehicle.id, timestamp,
-                meters!!, ml!!, amount!!, full, included, missed, station.trim(), notes.trim()))
+                meters!!, ml!!, amount!!, full, included, missed, station.trim(), notes.trim(), fuelType))
         }) { Text("Guardar llenado") }
         if (existing != null) TextButton(onClick = { deleteConfirmation = true }, enabled = !busy, modifier = Modifier.fillMaxWidth()) {
             Text("Eliminar llenado", color = MaterialTheme.colorScheme.error)
@@ -112,6 +114,7 @@ fun VehicleEditor(existing: Vehicle?, vehicles: List<Vehicle>, busy: Boolean, on
     val key = existing?.id ?: "new-vehicle"
     var name by rememberSaveable(key) { mutableStateOf(existing?.name.orEmpty()) }
     var type by rememberSaveable(key) { mutableStateOf(existing?.type.orEmpty()) }
+    var fuelType by rememberSaveable(key) { mutableStateOf(existing?.fuelType ?: FuelType.Magna.code) }
     var year by rememberSaveable(key) { mutableStateOf(existing?.year?.toString().orEmpty()) }
     var error by rememberSaveable(key) { mutableStateOf<String?>(null) }
     EditorSheet(if (existing == null) "Añadir vehículo" else "Editar vehículo", "Un historial independiente para cada auto", busy, onDismiss) {
@@ -119,6 +122,7 @@ fun VehicleEditor(existing: Vehicle?, vehicles: List<Vehicle>, busy: Boolean, on
         OutlinedTextField(type, { type = it }, label = { Text("Tipo (Hatchback, Sedán…)") }, singleLine = true, modifier = Modifier.fillMaxWidth())
         OutlinedTextField(year, { year = it }, label = { Text("Año") }, singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.fillMaxWidth())
+        FuelSelector(fuelType, { fuelType = it })
         error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
         Button(enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp), onClick = {
             val y = year.toIntOrNull()
@@ -128,8 +132,23 @@ fun VehicleEditor(existing: Vehicle?, vehicles: List<Vehicle>, busy: Boolean, on
                 vehicles.any { it.id != existing?.id && it.name.equals(name.trim(), true) && it.type.equals(type.trim(), true) && it.year == y } -> "Ese vehículo ya está registrado."
                 else -> null
             }
-            if (error == null) onSave(Vehicle(existing?.id ?: UUID.randomUUID().toString(), name.trim(), type.trim(), y!!))
+            if (error == null) onSave(Vehicle(existing?.id ?: UUID.randomUUID().toString(), name.trim(), type.trim(), y!!, fuelType))
         }) { Text("Guardar vehículo") }
+    }
+}
+
+@Composable
+fun FuelSelector(value: String, onChange: (String) -> Unit, allowUnspecified: Boolean = false, enabled: Boolean = true) {
+    var expanded by remember { mutableStateOf(false) }
+    Box {
+        OutlinedButton(onClick = { expanded = true }, enabled = enabled, modifier = Modifier.fillMaxWidth()) {
+            Text("Combustible: ${FuelType.fromCode(value).label}")
+        }
+        DropdownMenu(expanded, onDismissRequest = { expanded = false }) {
+            FuelType.entries.filter { allowUnspecified || it != FuelType.Unspecified }.forEach { fuel ->
+                DropdownMenuItem(text = { Text(fuel.label) }, onClick = { onChange(fuel.code); expanded = false })
+            }
+        }
     }
 }
 

@@ -27,6 +27,8 @@ class FuelViewModel(application: Application) : AndroidViewModel(application) {
     private val engine = graph.backup.engine
     private val preferences = graph.appearance.state
     val backupState = engine.state
+    private val _importPreview = MutableStateFlow<ImportPreview?>(null)
+    val importPreview = _importPreview.asStateFlow()
     private val _restorePreview = MutableStateFlow<RestorePreview?>(null)
     val restorePreview = _restorePreview.asStateFlow()
     private val _driveBusy = MutableStateFlow(false)
@@ -42,6 +44,7 @@ class FuelViewModel(application: Application) : AndroidViewModel(application) {
     init { work { repository.initialize(); engine.refreshLocal() } }
 
     fun onForeground() {
+        if (_driveBusy.value || engine.state.value.phase == "resetting") return
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 repository.initialize()
@@ -55,12 +58,9 @@ class FuelViewModel(application: Application) : AndroidViewModel(application) {
             catch (e: Exception) { engine.failed(e) }
         }
     }
-    private fun preference(change: (Preferences) -> Preferences) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try { graph.appearance.update(change); repository.settingsChanged(); engine.afterMutation() }
-            catch (e: CancellationException) { throw e }
-            catch (e: Exception) { _messages.emit(e.message ?: "No se pudo guardar el ajuste.") }
-        }
+    private fun preference(change: (Preferences) -> Preferences) = work(changed = true) {
+        graph.appearance.update(change)
+        repository.settingsChanged()
     }
     fun selectVehicle(id: String) { preference { it.copy(vehicleId = id) } }
     fun theme(value: String) { preference { it.copy(theme = value) } }
@@ -85,12 +85,20 @@ class FuelViewModel(application: Application) : AndroidViewModel(application) {
     fun reviewDriveCopy() { driveAction { _restorePreview.value = engine.previewRestore() } }
     fun dismissRestore() { _restorePreview.value = null }
     fun useLocalHistory() { driveAction { engine.useLocalHistory() } }
+    fun resetData(deleteDrive: Boolean, onSuccess: () -> Unit) {
+        if (_driveBusy.value) return
+        work("Datos eliminados", onSuccess) {
+            engine.reset(deleteDrive)
+            _restorePreview.value = null
+            _importPreview.value = null
+        }
+    }
     fun confirmRestore() {
         val preview = _restorePreview.value ?: return
         work("Historial restaurado; copia local guardada", { _restorePreview.value = null }) { engine.restore(preview) }
     }
     private fun driveAction(block: suspend () -> Unit) {
-        if (_driveBusy.value) return
+        if (_driveBusy.value || _busy.value) return
         _driveBusy.value = true
         viewModelScope.launch(Dispatchers.IO) {
             try { block() }
@@ -100,7 +108,7 @@ class FuelViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun importCsv(uri: Uri) = work(changed = true) {
+    fun prepareImport(uri: Uri) = work() {
         val bytes = getApplication<Application>().contentResolver.openInputStream(uri)?.use { input ->
             val output = ByteArrayOutputStream()
             val buffer = ByteArray(8192)
@@ -112,8 +120,25 @@ class FuelViewModel(application: Application) : AndroidViewModel(application) {
             }
             output.toByteArray()
         } ?: error("No se pudo abrir el archivo.")
-        val result = repository.import(FuelCsv.parse(bytes.toString(Charsets.UTF_8)))
-        _messages.emit("${result.imported} llenados importados · ${result.duplicates} duplicados omitidos")
+        _importPreview.value = ImportPreview(FuelCsv.parse(bytes.toString(Charsets.UTF_8)))
+    }
+
+    fun dismissImport() { if (!_busy.value) _importPreview.value = null }
+    fun confirmImport(plan: ImportPlan) {
+        val preview = _importPreview.value ?: return
+        work(onSuccess = { _importPreview.value = null }, changed = true) {
+            val result = repository.import(preview.rows, plan)
+            if (plan.targetVehicleId == null) {
+                val source = preview.vehicles.first { it.id == plan.sourceVehicleId }
+                repository.dao.allVehicles().firstOrNull {
+                    it.name.equals(source.name, true) && it.type.equals(source.type, true) && it.year == source.year
+                }?.let { vehicle ->
+                    graph.appearance.update { it.copy(vehicleId = vehicle.id) }
+                }
+            } else graph.appearance.update { it.copy(vehicleId = plan.targetVehicleId) }
+            repository.settingsChanged()
+            _messages.emit("${result.imported} llenados importados · ${result.duplicates} duplicados omitidos")
+        }
     }
 
     fun exportCsv(uri: Uri) = work("CSV de llenados exportado") {
@@ -123,7 +148,7 @@ class FuelViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun work(message: String? = null, onSuccess: (() -> Unit)? = null, changed: Boolean = false, block: suspend () -> Unit) {
-        if (_busy.value) return
+        if (_busy.value || _driveBusy.value) return
         _busy.value = true
         viewModelScope.launch(Dispatchers.IO) {
             try { block(); if (changed) engine.afterMutation(); onSuccess?.let { withContext(Dispatchers.Main) { it() } }; message?.let { _messages.emit(it) } }

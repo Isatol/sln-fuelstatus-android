@@ -43,7 +43,9 @@ class PersistentSyncState(context: Context) : SyncStateStore {
     private val mutable = MutableStateFlow(runCatching {
         gson.fromJson(prefs.getString("status", "{}"), SyncState::class.java) ?: SyncState()
     }.getOrDefault(SyncState()).let {
-        if (it.running) it.copy(phase = if (it.connected) "pending" else "disconnected") else it
+        if (it.phase == "resetting") it.copy(phase = "reset_failed", errorTitle = "El borrado se interrumpió",
+            errorDetail = "Repite Borrar datos para completar la operación. La sincronización automática está pausada.")
+        else if (it.running) it.copy(phase = if (it.connected) "pending" else "disconnected") else it
     })
     override val state = mutable.asStateFlow()
     val deviceId: String = prefs.getString("device_id", null) ?: UUID.randomUUID().toString().also {
@@ -61,6 +63,10 @@ class RoomBackupSource(private val repository: FuelRepository, private val appea
     override suspend fun snapshot(deviceId: String, now: Long): BackupDocument = repository.database.withTransaction {
         BackupDocument(now, deviceId, revision(), repository.dao.allVehicles(), repository.dao.allRefuels(),
             repository.dao.allExpenses(), appearance.state.value)
+    }
+    override suspend fun reset() {
+        repository.reset()
+        appearance.update { Preferences() }
     }
     override suspend fun restore(document: BackupDocument) {
         repository.database.withTransaction {

@@ -18,6 +18,7 @@ interface FuelDao {
     @Query("UPDATE backup_revision SET revision = revision + 1 WHERE id = 1") suspend fun changed()
     @Query("DELETE FROM refuels") suspend fun deleteAllRefuels()
     @Query("DELETE FROM expenses") suspend fun deleteAllExpenses()
+    @Query("DELETE FROM backup_revision") suspend fun deleteRevision()
     @Query("DELETE FROM vehicles") suspend fun deleteAllVehicles()
     @Insert suspend fun insertVehicles(values: List<Vehicle>)
     @Insert suspend fun insertExpenses(values: List<Expense>)
@@ -29,10 +30,17 @@ interface FuelDao {
     @Delete suspend fun delete(expense: Expense)
 }
 
-@Database(entities = [Vehicle::class, Refuel::class, Expense::class, BackupRevision::class], version = 2, exportSchema = true)
+@Database(entities = [Vehicle::class, Refuel::class, Expense::class, BackupRevision::class], version = 3, exportSchema = true)
 abstract class FuelDatabase : RoomDatabase() {
     abstract fun dao(): FuelDao
     companion object {
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE vehicles ADD COLUMN fuelType TEXT NOT NULL DEFAULT 'magna'")
+                db.execSQL("ALTER TABLE refuels ADD COLUMN fuelType TEXT NOT NULL DEFAULT 'unspecified'")
+            }
+        }
+
         val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("CREATE TABLE IF NOT EXISTS backup_revision (id INTEGER NOT NULL, revision INTEGER NOT NULL, PRIMARY KEY(id))")

@@ -1,4 +1,28 @@
-# Validación 0.2.0 · Google Drive
+# Validación 0.3.0 · Datos, combustible e importación
+
+16 de octubre de 2026. Android Studio/JDK de esta Mac, Gradle 9.4.1, SDK 37 y emulador Medium Phone API 37 en modo desechable.
+
+- **APK debug 0.3.0 compilado y firmado:** `app/build/outputs/apk/debug/app-debug.apk`; entrega en `.local/releases/FuelStatus-0.3.0-datos-combustible.apk` (36 892 446 bytes).
+- **56 pruebas JVM aprobadas, sin omisiones:** 10 de estadísticas, 12 de CSV (incluida la comprobación opcional del archivo privado), 30 de respaldo/sincronización/restauración/borrado y 4 del contrato REST de Drive.
+- **17 pruebas instrumentadas aprobadas:** 10 de Room, 4 de diálogos de borrado/importación, 2 de Ajustes de Drive y 1 del recorrido completo por la app.
+- **Android Lint:** cero errores y 19 avisos. No se suprimieron avisos para obtener este resultado.
+- **Firma compatible con la versión anterior:** SHA-1 `81:BA:D0:FD:EB:A0:29:7E:6B:3E:F9:04:FF:6B:1D:AD:80:33:1F:36`.
+- **SHA-256 del APK:** `098a17cbf66770ab1112d38b6b20c0fbf165ea26ea9d6be89e78173eb67bc8ad`.
+- Se comprobó que el APK no contiene CSV, bases de datos ni archivos de historial privados.
+
+La validación de Room cubre migraciones 1→3 y 2→3 conservando el historial, combustible predeterminado y desconocido en registros antiguos, importación a un destino elegido, creación del vehículo encontrado, selección de una fuente entre varios vehículos, duplicados, conservación de ediciones realizadas con versiones anteriores, separación por vehículo y reinicio sin datos después de volver a inicializar.
+
+Las pruebas del motor de respaldo cubren borrado local sin conexión conservando Drive, limpieza de archivos de recuperación, reinicio de apariencia y sesión, borrado remoto completo, fallo de red, borrado parcial con detalle del avance, cuenta incorrecta, reintento y coordinación con una subida que ya estaba en curso. El contrato REST verifica el uso de `PATCH` con `trashed=true` para las copias seleccionadas.
+
+La prueba de interfaz crea un vehículo Premium, comprueba que el nuevo llenado lo selecciona de forma predeterminada, guarda ese llenado con Magna y verifica que el vehículo mantiene Premium. También cancela y confirma el borrado, comprueba que desaparece el vehículo y recrea la Activity para verificar que no reaparece. Los cuatro diálogos verifican, entre otros casos, la casilla de Drive desactivada por defecto y la importación cuando aún no hay vehículos.
+
+La primera ejecución del recorrido completo no encontraba el botón de borrado porque la lista de Ajustes todavía no había compuesto ese elemento fuera de pantalla. Se corrigió el desplazamiento de la prueba; la ejecución completa posterior aprobó las 17 pruebas. Se revisaron las capturas de la tarjeta roja y del diálogo en `.local/qa/feature-ajustes-borrar.png` y `.local/qa/feature-confirmacion-borrar.png`.
+
+**Límite de la validación:** las operaciones de Drive usan un servicio simulado. No se probó el borrado remoto con la cuenta real ni se eliminaron respaldos del usuario. Queda pendiente la comprobación del APK en el teléfono con la autorización real de Google.
+
+---
+
+# Validación histórica 0.2.0 · Google Drive
 
 16 de octubre de 2026. Misma configuración Android/Gradle descrita en la validación inicial.
 
