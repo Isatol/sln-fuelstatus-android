@@ -8,6 +8,8 @@ Aplicación personal de combustible y gastos de vehículos inspirada en Fuel, co
 
 Borrado de datos con confirmación y opción de borrar las copias de Drive, combustible por vehículo y por llenado, e importación con selección del vehículo de destino. Las instalaciones nuevas comienzan sin vehículos; las actualizaciones conservan el historial existente. Detalles en [docs/DATOS_Y_COMBUSTIBLE.md](docs/DATOS_Y_COMBUSTIBLE.md).
 
+Las tarjetas de Llenados incluyen iconos Material Symbols Rounded para el kilometraje, litros, precio por litro y rendimiento, con recipientes de distinto nivel para tanque lleno y carga parcial. Se incluyen como vectores locales y respetan el tema de la app; su licencia se conserva en `app/src/main/assets/licenses`.
+
 ## Lo que definimos
 
 - **Plataforma:** Android nativo con Kotlin y Jetpack Compose; uso principal en un Pixel 10.

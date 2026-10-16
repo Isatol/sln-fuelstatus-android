@@ -1,3 +1,18 @@
+# Validación visual · Iconos de Llenados
+
+16 de octubre de 2026. Rama `20261016-iconos-llenados`, emulador Medium Phone API 37 en modo desechable.
+
+- **APK debug generado:** `.local/releases/FuelStatus-0.3.0-iconos-llenados.apk` (36 981 775 bytes), con la misma firma de las entregas anteriores.
+- **Compilación y Android Lint aprobados:** cero errores y 19 avisos. No se añadieron dependencias ni se cambiaron cálculos o persistencia.
+- **Prueba existente de navegación aprobada:** `NavigationTest`, una prueba instrumentada que recorre las secciones, guarda un llenado, cambia el tema y comprueba el borrado y reinicio de la app.
+- **Revisión visual:** tarjetas con tanque lleno y carga parcial, iconos de kilometraje/litros/precio/rendimiento, tema claro, tema oscuro y texto al 130 %. Los estados se distinguen y el kilometraje y estado del tanque pasan a otra línea cuando es necesario.
+- Los datos para esta revisión son sintéticos y solo se cargaron en el emulador. Las capturas se conservan en `.local/qa/iconos-llenados/claro.png`, `oscuro.png` y `oscuro-texto130.png`; no se publican bases de datos de prueba ni historiales en el APK o repositorio.
+- **SHA-256 del APK:** `69263846768338c249b0c0f3711645cb011f4d5feb5632149cb875e72558c460`.
+
+Los seis iconos oficiales de Material Symbols Rounded se incluyen como VectorDrawable y usan los colores del tema. Los textos visibles conservan el significado para accesibilidad; los iconos decorativos no añaden anuncios duplicados. La licencia Apache 2.0 se incluye en los recursos del APK. No se añadieron pruebas nuevas para este cambio visual ni se repitieron las pruebas de negocio de la entrega anterior.
+
+---
+
 # Validación 0.3.0 · Datos, combustible e importación
 
 16 de octubre de 2026. Android Studio/JDK de esta Mac, Gradle 9.4.1, SDK 37 y emulador Medium Phone API 37 en modo desechable.

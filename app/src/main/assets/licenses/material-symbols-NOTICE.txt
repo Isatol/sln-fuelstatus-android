@@ -1,0 +1,10 @@
+Material Symbols Rounded
+Google
+https://fonts.google.com/icons
+https://github.com/google/material-design-icons
+
+Licensed under the Apache License, Version 2.0.
+See material-symbols-LICENSE.txt.
+
+Icons: route, water_drop, payments, speed, water_full, water_medium.
+Original SVG geometry converted to Android VectorDrawable with a Y translation.
