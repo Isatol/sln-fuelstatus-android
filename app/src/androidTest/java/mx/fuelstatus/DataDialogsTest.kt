@@ -63,5 +63,19 @@ class DataDialogsTest {
         assertNull(plan!!.targetVehicleId)
         assertTrue(plan!!.useVehicleFuel)
         assertEquals("magna", plan!!.newVehicleFuelType)
+        assertEquals(PaymentMethod.Cash.id, plan!!.paymentMethodId)
+    }
+
+    @Test fun importPaymentStartsWithCashAndCanAssignAnExistingCard() {
+        var plan: ImportPlan? = null
+        val target = Vehicle("target", "Mi auto", "Sedán", 2024)
+        val card = PaymentMethod("mastercard", "Tarjeta gasolina", "mastercard")
+        compose.setContent { FuelTheme(Preferences()) {
+            ImportFuelDialog(preview(), listOf(target), target.id, false, { plan = it }, {}, {}, listOf(PaymentMethod.Cash, card))
+        } }
+        compose.onNodeWithText("Efectivo").performScrollTo().assertIsDisplayed().performClick()
+        compose.onNodeWithText("Tarjeta gasolina").performClick()
+        compose.onNodeWithText("Importar llenados").performClick()
+        assertEquals(card.id, plan!!.paymentMethodId)
     }
 }

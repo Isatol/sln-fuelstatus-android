@@ -1,4 +1,28 @@
-# Validación visual · Iconos de Llenados
+# Validación 0.4.0 · Métodos de pago y Ajustes
+
+16 de octubre de 2026. Rama `20261016-metodos-pago-ajustes`, Gradle 9.4.1, JDK integrado de Android Studio, emulador Medium Phone API 37 en modo desechable.
+
+- **APK debug generado y firmado:** `.local/releases/FuelStatus-0.4.0-metodos-de-pago.apk` (37 188 655 bytes), paquete `mx.fuelstatus`, versionCode 4.
+- **61 pruebas JVM aprobadas, sin omisiones:** 10 de estadísticas, 14 de CSV (incluida la comprobación opcional del archivo privado), 30 del motor de respaldo, 3 del respaldo de métodos de pago y 4 del contrato REST de Drive.
+- **21 pruebas instrumentadas aprobadas:** 10 de Room general, 3 de persistencia/migración de métodos de pago, 5 de diálogos, 2 de Ajustes de Drive y 1 del recorrido completo por la app.
+- **Android Lint:** cero errores y 19 avisos. El logo PNG de Visa está en `drawable-nodpi` para conservar sus proporciones sin escalado por densidad.
+- **Firma compatible con las entregas anteriores:** SHA-1 `81:BA:D0:FD:EB:A0:29:7E:6B:3E:F9:04:FF:6B:1D:AD:80:33:1F:36`.
+- **SHA-256 del APK:** `29ab70967dbf703c970287b259046761bffe9194955d44a76399d6deb5ba6691`.
+- Se comprobó que el APK incluye los avisos de los recursos visuales y no contiene CSV, bases de datos ni historiales privados.
+
+Las pruebas de datos verifican las migraciones 1→4, 2→4 y 3→4, conservación de importes/notas/combustible, método histórico sin especificar, Efectivo disponible por defecto, integridad de referencias, rechazo de métodos inexistentes sin avanzar la revisión, nombres duplicados, persistencia después de reabrir Room, restauración conjunta de métodos e historial y borrado completo que vuelve a dejar únicamente Efectivo.
+
+Las pruebas de importación verifican que el método elegido se aplique a los llenados nuevos, que repetir un CSV con otra selección no cambie duplicados y que el CSV exportado conserve el nombre y marca. Los respaldos de formato 3 conservan tarjetas y referencias; se verificó la conversión de formato 2 y se mantiene la prueba del formato 1, sin deducir pagos históricos. Se rechazan referencias rotas, marcas inválidas y métodos duplicados.
+
+El recorrido de interfaz crea un vehículo, abre Mis métodos de pago, comprueba la validación del nombre vacío, agrega VISA/Mastercard/American Express, recrea la Activity, selecciona una tarjeta en Nuevo llenado y comprueba que aparece debajo del importe. Después borra los datos y verifica que desaparecen las tarjetas personalizadas y permanece Efectivo. El diálogo de importación se comprobó con Efectivo inicialmente seleccionado y con una tarjeta elegida.
+
+Se revisaron las capturas reales de la pantalla completa, selector y etiqueta de pago en `.local/qa/metodos-pago/metodos-lista.png`, `nuevo-llenado.png` y `llenado-pago.png`. Se usó un historial sintético adicional para comprobar nombres largos, método sin especificar, tema claro/oscuro y letra al 130 %; capturas `historial-claro.png`, `historial-oscuro.png` e `historial-texto130.png`. El emulador se cerró y su almacenamiento desechable se descartó al terminar.
+
+**Límite de esta validación:** las pruebas remotas usan un servicio de Drive simulado. La serialización, restauración y contrato REST se comprobaron sin operar sobre respaldos de la cuenta real. La instalación y autorización reales en el teléfono quedan como comprobación externa.
+
+---
+
+# Validación histórica visual · Iconos de Llenados
 
 16 de octubre de 2026. Rama `20261016-iconos-llenados`, emulador Medium Phone API 37 en modo desechable.
 

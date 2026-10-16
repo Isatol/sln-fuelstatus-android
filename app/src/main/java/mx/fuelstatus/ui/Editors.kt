@@ -19,13 +19,15 @@ import java.util.UUID
 
 @Composable
 fun RefuelEditor(vehicle: Vehicle, records: List<Refuel>, existing: Refuel?, busy: Boolean,
-    onDismiss: () -> Unit, onSave: (Refuel) -> Unit, onDelete: (Refuel) -> Unit) {
+    onDismiss: () -> Unit, onSave: (Refuel) -> Unit, onDelete: (Refuel) -> Unit,
+    paymentMethods: List<PaymentMethod> = listOf(PaymentMethod.Cash)) {
     val key = existing?.id ?: "new-refuel"
     var timestamp by rememberSaveable(key) { mutableLongStateOf(existing?.timestamp ?: System.currentTimeMillis()) }
     var odometer by rememberSaveable(key) { mutableStateOf(existing?.let { inputNumber(it.odometerMeters, 3) }.orEmpty()) }
     var liters by rememberSaveable(key) { mutableStateOf(existing?.let { inputNumber(it.volumeMl, 3) }.orEmpty()) }
     var total by rememberSaveable(key) { mutableStateOf(existing?.let { inputNumber(it.costCents, 2) }.orEmpty()) }
     var fuelType by rememberSaveable(key) { mutableStateOf(existing?.fuelType ?: vehicle.fuelType) }
+    var paymentMethodId by rememberSaveable(key) { mutableStateOf(if (existing != null) existing.paymentMethodId else PaymentMethod.Cash.id) }
     var full by rememberSaveable(key) { mutableStateOf(existing?.fullTank ?: true) }
     var included by rememberSaveable(key) { mutableStateOf(existing?.included ?: true) }
     var missed by rememberSaveable(key) { mutableStateOf(existing?.missedPrevious ?: false) }
@@ -35,6 +37,7 @@ fun RefuelEditor(vehicle: Vehicle, records: List<Refuel>, existing: Refuel?, bus
     var deleteConfirmation by remember { mutableStateOf(false) }
     EditorSheet(if (existing == null) "Nuevo llenado" else "Editar llenado", vehicle.label, busy, onDismiss) {
         FuelSelector(fuelType, { fuelType = it }, allowUnspecified = existing != null)
+        PaymentMethodSelector(paymentMethods, paymentMethodId, { paymentMethodId = it }, enabled = !busy, allowUnspecified = existing != null)
         DateField(timestamp) { timestamp = it }
         NumberField("Odómetro (km)", odometer, { odometer = it }, "Último: ${records.maxOfOrNull { it.km }?.let { number(it, 0) } ?: "—"} km")
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -64,7 +67,7 @@ fun RefuelEditor(vehicle: Vehicle, records: List<Refuel>, existing: Refuel?, bus
                 else -> null
             }
             if (error == null) onSave(Refuel(existing?.id ?: UUID.randomUUID().toString(), vehicle.id, timestamp,
-                meters!!, ml!!, amount!!, full, included, missed, station.trim(), notes.trim(), fuelType))
+                meters!!, ml!!, amount!!, full, included, missed, station.trim(), notes.trim(), fuelType, paymentMethodId))
         }) { Text("Guardar llenado") }
         if (existing != null) TextButton(onClick = { deleteConfirmation = true }, enabled = !busy, modifier = Modifier.fillMaxWidth()) {
             Text("Eliminar llenado", color = MaterialTheme.colorScheme.error)

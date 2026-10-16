@@ -16,7 +16,7 @@ En **Ajustes → Importar CSV de Fuel**, elige el export de llenados. La importa
 | `showInStatistic` | Inclusión en totales y consumo. |
 | `comment`, `gasStation` | Notas y gasolinera. |
 
-Las columnas adicionales del CSV original se ignoran. No se importan coordenadas, métodos de pago, precios de compra ni costos anuales del vehículo. `drivenDistance` no se usa: se calculan diferencias de odómetro. No se solicita acceso a la ubicación.
+Las columnas adicionales del CSV original se ignoran. No se importan coordenadas, precios de compra ni costos anuales del vehículo. El método de pago se elige en el diálogo de importación. `drivenDistance` no se usa: se calculan diferencias de odómetro. No se solicita acceso a la ubicación.
 
 ## Validaciones
 
@@ -36,3 +36,7 @@ La compatibilidad de entrada se ha definido a partir del export de Fuel encontra
 ## Selección de destino y combustible (0.3)
 
 Antes de importar se muestra una vista previa para elegir el vehículo de origen del archivo y el destino en la aplicación, o crear el vehículo encontrado. Un checkbox permite aplicar el combustible del destino a todos los registros nuevos. Si se desactiva, se conserva `fuelType` del CSV o Sin especificar cuando no esté indicado. La exportación incluye las columnas opcionales `fuelType` y `vehicleFuelType`. Consulte [DATOS_Y_COMBUSTIBLE.md](DATOS_Y_COMBUSTIBLE.md).
+
+## Métodos de pago (0.4)
+
+El diálogo agrega un selector con Efectivo y las tarjetas registradas. El método elegido se aplica a todos los llenados nuevos de esa importación y no cambia duplicados existentes. La exportación añade `paymentMethodName` y `paymentMethodBrand` (`cash`, `visa`, `mastercard` o `amex`), con campos vacíos si el registro no tiene método especificado. El lector reconoce estas columnas cuando están presentes; los CSV anteriores siguen siendo válidos. Consulte [METODOS_DE_PAGO.md](METODOS_DE_PAGO.md).

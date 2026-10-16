@@ -1,0 +1,10 @@
+Payment brand marks are used to identify user-created payment methods.
+They are separate from the Apache-licensed Material Symbols.
+
+Visa: https://cdn.visa.com/v2/assets/images/logos/visa/blue/logo.png
+American Express: https://www.aexp-static.com/cdaas/one/statics/axp-static-assets/1.8.0/package/dist/img/logos/dls-logo-bluebox-solid.svg
+American Express SVG geometry converted to Android VectorDrawable.
+Mastercard: vector geometry of the overlapping circles, using the brand colors.
+Brand reference: https://www.mastercard.com/brandcenter/us/en/download-artwork.html
+
+Visa, Mastercard and American Express marks belong to their respective owners.

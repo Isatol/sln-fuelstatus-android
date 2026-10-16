@@ -16,8 +16,9 @@ data class Vehicle(
 }
 
 @Entity(tableName = "refuels", foreignKeys = [ForeignKey(entity = Vehicle::class,
-    parentColumns = ["id"], childColumns = ["vehicleId"], onDelete = ForeignKey.CASCADE)],
-    indices = [Index("vehicleId")])
+    parentColumns = ["id"], childColumns = ["vehicleId"], onDelete = ForeignKey.CASCADE),
+    ForeignKey(entity = PaymentMethod::class, parentColumns = ["id"], childColumns = ["paymentMethodId"], onDelete = ForeignKey.RESTRICT)],
+    indices = [Index("vehicleId"), Index("paymentMethodId")])
 data class Refuel(
     @PrimaryKey val id: String = UUID.randomUUID().toString(),
     val vehicleId: String,
@@ -31,6 +32,7 @@ data class Refuel(
     val station: String = "",
     val notes: String = "",
     @ColumnInfo(defaultValue = "'unspecified'") val fuelType: String = FuelType.Unspecified.code,
+    @ColumnInfo(defaultValue = "NULL") val paymentMethodId: String? = null,
 ) {
     @get:Ignore
     val liters get() = volumeMl / 1000.0

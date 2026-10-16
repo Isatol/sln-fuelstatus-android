@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import mx.fuelstatus.backup.SyncState
+import mx.fuelstatus.R
 import mx.fuelstatus.data.*
 
 @Composable
@@ -23,8 +24,8 @@ fun DeleteDataCard(state: SyncState, busy: Boolean, onDelete: (Boolean) -> Unit)
     LaunchedEffect(state.email) { confirmation = false }
     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer), modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text("Borrar datos", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onErrorContainer)
-            Text("Elimina vehículos, llenados, gastos y copias locales. Restablece la apariencia y desconecta Drive, como al comenzar de nuevo.",
+            SettingsTitle(R.drawable.ic_delete_forever, "Borrar datos", MaterialTheme.typography.titleLarge, MaterialTheme.colorScheme.onErrorContainer)
+            Text("Elimina vehículos, llenados, gastos, tarjetas guardadas y copias locales. Restablece la apariencia y desconecta Drive, como al comenzar de nuevo.",
                 color = MaterialTheme.colorScheme.onErrorContainer)
             if (state.connected) {
                 Row(Modifier.fillMaxWidth().toggleable(deleteDrive, enabled = !busy, role = Role.Checkbox,
@@ -43,7 +44,7 @@ fun DeleteDataCard(state: SyncState, busy: Boolean, onDelete: (Boolean) -> Unit)
     }
     if (confirmation) AlertDialog(onDismissRequest = { if (!busy) confirmation = false },
         title = { Text("¿Borrar todos los datos?") },
-        text = { Text("Se eliminarán todos los vehículos, llenados, gastos y copias locales de recuperación. Los ajustes volverán a sus valores iniciales y se desconectará Drive. Esta eliminación local no se puede deshacer.\n\n" +
+        text = { Text("Se eliminarán todos los vehículos, llenados, gastos, tarjetas guardadas y copias locales de recuperación. Los ajustes volverán a sus valores iniciales y se desconectará Drive. Esta eliminación local no se puede deshacer.\n\n" +
             if (deleteDrive && state.connected) "También se enviarán a la papelera todas las copias de FuelStatus de ${state.email}. Necesitas conexión. Si Drive falla, los datos locales se conservan."
             else "Las copias existentes en Drive se conservarán.") },
         confirmButton = { TextButton(enabled = !busy, onClick = { confirmation = false; onDelete(deleteDrive && state.connected) }) {
@@ -54,12 +55,14 @@ fun DeleteDataCard(state: SyncState, busy: Boolean, onDelete: (Boolean) -> Unit)
 
 @Composable
 fun ImportFuelDialog(preview: ImportPreview, vehicles: List<Vehicle>, selectedVehicleId: String?, busy: Boolean,
-    onImport: (ImportPlan) -> Unit, onCreateVehicle: () -> Unit, onDismiss: () -> Unit) {
+    onImport: (ImportPlan) -> Unit, onCreateVehicle: () -> Unit, onDismiss: () -> Unit,
+    paymentMethods: List<PaymentMethod> = listOf(PaymentMethod.Cash)) {
     var sourceId by rememberSaveable { mutableStateOf(preview.vehicles.first().id) }
     val source = preview.vehicles.firstOrNull { it.id == sourceId } ?: preview.vehicles.first()
     val sourceRows = preview.rows.filter { it.vehicle.id == source.id }
     var targetId by rememberSaveable(vehicles.map { it.id }) { mutableStateOf(selectedVehicleId ?: vehicles.firstOrNull()?.id ?: "create") }
     var useVehicleFuel by rememberSaveable { mutableStateOf(true) }
+    var paymentMethodId by rememberSaveable { mutableStateOf(PaymentMethod.Cash.id) }
     var createdFuel by rememberSaveable(source.id) { mutableStateOf(source.fuelType) }
     val target = vehicles.firstOrNull { it.id == targetId }
     val matching = vehicles.firstOrNull { it.name.equals(source.name, true) && it.type.equals(source.type, true) && it.year == source.year }
@@ -90,11 +93,14 @@ fun ImportFuelDialog(preview: ImportPreview, vehicles: List<Vehicle>, selectedVe
                     Text("Usar $label en todos los llenados importados", modifier = Modifier.weight(1f))
                 }
                 if (!useVehicleFuel) Text("Se conservará el combustible indicado en el CSV. Si el archivo no lo indica, el registro quedará como Sin especificar.", style = MaterialTheme.typography.bodySmall)
+                PaymentMethodSelector(paymentMethods, paymentMethodId, { paymentMethodId = it ?: PaymentMethod.Cash.id },
+                    enabled = !busy, label = "Método de pago para los registros")
+                Text("Se aplicará a todos los llenados nuevos de esta importación.", style = MaterialTheme.typography.bodySmall)
                 Text("Los duplicados se omiten. Tus registros actuales se conservan.", style = MaterialTheme.typography.bodySmall)
             }
         },
         confirmButton = { TextButton(enabled = !busy && ((targetId == "create" && canCreate) || target != null), onClick = {
-            onImport(ImportPlan(source.id, target?.id, useVehicleFuel, createdFuel))
+            onImport(ImportPlan(source.id, target?.id, useVehicleFuel, createdFuel, paymentMethodId))
         }) { Text(if (targetId == "create") "Crear e importar" else "Importar llenados") } },
         dismissButton = { TextButton(enabled = !busy, onClick = onDismiss) { Text("Cancelar") } })
 }

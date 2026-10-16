@@ -62,7 +62,7 @@ class RoomBackupSource(private val repository: FuelRepository, private val appea
     override suspend fun revision() = repository.dao.revision() ?: 1L
     override suspend fun snapshot(deviceId: String, now: Long): BackupDocument = repository.database.withTransaction {
         BackupDocument(now, deviceId, revision(), repository.dao.allVehicles(), repository.dao.allRefuels(),
-            repository.dao.allExpenses(), appearance.state.value)
+            repository.dao.allExpenses(), appearance.state.value, repository.dao.allPaymentMethods())
     }
     override suspend fun reset() {
         repository.reset()
@@ -72,6 +72,7 @@ class RoomBackupSource(private val repository: FuelRepository, private val appea
         repository.database.withTransaction {
             val dao = repository.dao
             dao.deleteAllRefuels(); dao.deleteAllExpenses(); dao.deleteAllVehicles()
+            dao.deleteAllPaymentMethods(); dao.insertPaymentMethods(document.paymentMethods)
             dao.insertVehicles(document.vehicles); dao.insertRefuels(document.refuels); dao.insertExpenses(document.expenses)
             dao.initializeRevision(BackupRevision()); dao.changed()
         }

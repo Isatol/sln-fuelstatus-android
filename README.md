@@ -4,7 +4,11 @@ Repositorio: [Isatol/sln-fuelstatus-android](https://github.com/Isatol/sln-fuels
 
 Aplicación personal de combustible y gastos de vehículos inspirada en Fuel, con interfaz nativa para Android. Nombre anterior de trabajo: **FuelDroid**.
 
-## Versión 0.3
+## Versión 0.4
+
+Métodos de pago con Efectivo, tarjetas VISA/Mastercard/American Express, pantalla completa de administración, selección por llenado y método común al importar CSV. Los métodos se conservan en Room, copias locales y Drive; los registros antiguos mantienen su método como Sin especificar. Detalles en [docs/METODOS_DE_PAGO.md](docs/METODOS_DE_PAGO.md).
+
+### Funcionalidad de 0.3
 
 Borrado de datos con confirmación y opción de borrar las copias de Drive, combustible por vehículo y por llenado, e importación con selección del vehículo de destino. Las instalaciones nuevas comienzan sin vehículos; las actualizaciones conservan el historial existente. Detalles en [docs/DATOS_Y_COMBUSTIBLE.md](docs/DATOS_Y_COMBUSTIBLE.md).
 
@@ -30,7 +34,7 @@ La base de la implementación contiene las cinco secciones, formularios, Room, c
 
 Se utiliza un CSV privado externo al proyecto como comprobación local opcional; no se copia al repositorio. La comparación visual con Fuel y sus totales sigue pendiente de verificar en el teléfono.
 
-**Validado en 0.3:** APK debug compilado y firmado, 56 pruebas JVM y 17 pruebas instrumentadas aprobadas, Android Lint sin errores (19 avisos). El borrado de Drive se comprobó con un servicio simulado; no se eliminaron copias de la cuenta real. Detalles en [docs/VALIDACION.md](docs/VALIDACION.md).
+**Validado en 0.4:** APK debug compilado y firmado, 61 pruebas JVM y 21 pruebas instrumentadas aprobadas, Android Lint sin errores (19 avisos). Se comprobó la migración, métodos de pago, importación, restauración y reinicio completo. Las pruebas de Drive usan un servicio simulado; no se modificaron copias de la cuenta real. Detalles en [docs/VALIDACION.md](docs/VALIDACION.md).
 
 ## Abrir y ejecutar
 
@@ -79,7 +83,7 @@ Se usa el método **tanque lleno a tanque lleno**. La primera carga completa fij
 
 - Material 3 **1.5.0-beta01** permite usar `MaterialExpressiveTheme`; es una dependencia beta deliberada por el requisito Expressive. [Notas oficiales de Material 3](https://developer.android.com/jetpack/androidx/releases/compose-material3).
 - [Compatibilidad de AGP 9.2](https://developer.android.com/build/releases/agp-9-2-0-release-notes).
-- Paquete Android: `mx.fuelstatus`; base de datos: `fuelstatus.db`, esquema 3, con migraciones que conservan el historial de versiones 1 y 2. El esquema de Room se conserva en `app/schemas` para futuras migraciones.
+- Paquete Android: `mx.fuelstatus`; base de datos: `fuelstatus.db`, esquema 4, con migraciones que conservan el historial de versiones 1, 2 y 3. El esquema de Room se conserva en `app/schemas` para futuras migraciones.
 - Se declaran Internet y estado de red para la copia opcional en Drive. Android backup automático está deshabilitado; Room y el JSON privado se conservan en el dispositivo.
 - El CSV incluye **llenados**; el respaldo JSON de Drive incluye también vehículos, gastos y apariencia. Desinstalar elimina los datos y copias locales, pero conserva las copias ya confirmadas en Drive.
 

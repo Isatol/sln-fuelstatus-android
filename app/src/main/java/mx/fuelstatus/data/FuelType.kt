@@ -21,7 +21,8 @@ enum class FuelType(val code: String, val label: String) {
 }
 
 data class ImportPlan(val sourceVehicleId: String, val targetVehicleId: String? = null,
-    val useVehicleFuel: Boolean = true, val newVehicleFuelType: String = FuelType.Magna.code)
+    val useVehicleFuel: Boolean = true, val newVehicleFuelType: String = FuelType.Magna.code,
+    val paymentMethodId: String = PaymentMethod.Cash.id)
 
 data class ImportPreview(val rows: List<FuelImportRow>) {
     val vehicles get() = rows.map { it.vehicle }.distinctBy { it.id }

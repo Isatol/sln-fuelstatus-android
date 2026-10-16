@@ -8,3 +8,5 @@ See material-symbols-LICENSE.txt.
 
 Icons: route, water_drop, payments, speed, water_full, water_medium.
 Original SVG geometry converted to Android VectorDrawable with a Y translation.
+
+Additional icons: palette, cloud_sync, upload_file, delete_forever, account_balance_wallet, add_card, arrow_back, keyboard_arrow_down, chevron_right.
