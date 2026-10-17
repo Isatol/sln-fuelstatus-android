@@ -39,6 +39,27 @@ class NavigationTest {
         compose.onNodeWithText("Amex viajes").assertIsDisplayed()
         capture("metodos-pago")
         compose.onNodeWithContentDescription("Volver a Ajustes").performClick()
+        compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("Categorías de gastos"))
+        compose.onNodeWithText("Categorías de gastos").performClick()
+        compose.onNodeWithText("Servicio").assertIsDisplayed()
+        compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("Otros"))
+        capture("categorias-lista")
+        compose.onNodeWithText("Agregar categoría").performClick()
+        compose.onNodeWithText("Guardar categoría").performClick()
+        compose.onNodeWithText("Escribe un nombre de hasta 50 caracteres.").assertIsDisplayed()
+        compose.onNodeWithText("Nombre de la categoría").performTextInput("Llantas")
+        compose.onNodeWithText("Etiqueta").performScrollTo().performClick()
+        capture("categorias-iconos")
+        compose.onNodeWithText("Buscar icono").performTextInput("neumático")
+        compose.onNodeWithText("Llanta").performClick()
+        compose.activityRule.scenario.recreate()
+        compose.onNodeWithText("Nombre de la categoría").assertTextContains("Llantas")
+        compose.onNodeWithText("Llanta").assertIsDisplayed()
+        compose.onNodeWithText("Guardar categoría").performClick()
+        compose.waitUntil(15000) { compose.onAllNodesWithContentDescription("Volver a Ajustes").fetchSemanticsNodes().isNotEmpty() }
+        compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("Llantas"))
+        compose.onNodeWithText("Llantas").assertIsDisplayed()
+        compose.onNodeWithContentDescription("Volver a Ajustes").performClick()
         compose.onNodeWithContentDescription("Llenados").performClick()
         compose.waitUntil(15000) { compose.onAllNodesWithContentDescription("Nuevo llenado").fetchSemanticsNodes().isNotEmpty() }
         compose.onNodeWithContentDescription("Nuevo llenado").performClick()
@@ -58,6 +79,19 @@ class NavigationTest {
         capture("llenados")
         compose.onNodeWithContentDescription("Gastos").performClick()
         compose.onNodeWithContentDescription("Nuevo gasto").assertIsDisplayed()
+        compose.onNodeWithContentDescription("Nuevo gasto").performClick()
+        compose.onNodeWithText("Servicio").assertIsDisplayed().performClick()
+        compose.onNodeWithText("Llantas").performScrollTo().performClick()
+        compose.onNodeWithText("Total pagado ($)").performTextInput("2500")
+        capture("nuevo-gasto-categoria")
+        compose.onNodeWithText("Guardar gasto").performScrollTo().performClick()
+        compose.waitUntil(15000) { compose.onAllNodesWithText("Gasto guardado").fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithText("Llantas").assertIsDisplayed().performClick()
+        compose.onNode(hasText("Llantas") and hasAnyAncestor(isDialog())).assertIsDisplayed().performClick()
+        compose.onNodeWithText("Otros").performScrollTo().performClick()
+        compose.onNodeWithText("Guardar gasto").performScrollTo().performClick()
+        compose.waitUntil(15000) { compose.onAllNodesWithText("Editar gasto").fetchSemanticsNodes().isEmpty() }
+        compose.onNodeWithText("Otros").assertIsDisplayed()
         capture("gastos")
         compose.onNodeWithContentDescription("Estadísticas").performClick()
         compose.onNodeWithText("Cómo calculamos").performScrollTo().assertIsDisplayed()
@@ -75,6 +109,18 @@ class NavigationTest {
         compose.onNodeWithText("Sistema").performClick()
         compose.onNodeWithText("Conectar Google Drive").performScrollTo().assertIsDisplayed()
         capture("ajustes-drive")
+        // Snackbar overlays the bottom of the list; wait until queued expense messages clear before tapping there.
+        var messageClearedAt = 0L
+        compose.waitUntil(30000) {
+            val now = android.os.SystemClock.uptimeMillis()
+            if (compose.onAllNodesWithText("Gasto guardado").fetchSemanticsNodes().isNotEmpty()) {
+                messageClearedAt = 0L
+                false
+            } else {
+                if (messageClearedAt == 0L) messageClearedAt = now
+                now - messageClearedAt >= 500
+            }
+        }
         compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("Borrar todos los datos"))
         capture("ajustes-borrar")
         compose.onNodeWithText("Borrar todos los datos").performClick()
@@ -96,6 +142,12 @@ class NavigationTest {
         compose.onNodeWithText("Visa personal").assertDoesNotExist()
         compose.onNodeWithText("Tarjeta gasolina").assertDoesNotExist()
         compose.onNodeWithText("Amex viajes").assertDoesNotExist()
+        compose.onNodeWithContentDescription("Volver a Ajustes").performClick()
+        compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("Categorías de gastos"))
+        compose.onNodeWithText("Categorías de gastos").performClick()
+        compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("Otros"))
+        compose.onNodeWithText("Llantas").assertDoesNotExist()
+        compose.onNodeWithText("Otros").assertIsDisplayed()
     }
 
     private fun addCard(name: String, brand: String) {
@@ -118,7 +170,7 @@ class NavigationTest {
         compose.waitForIdle()
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         File(context.filesDir, "qa-$name.png").outputStream().use {
-            val target = if (name in listOf("confirmacion-borrar", "nuevo-llenado-pago")) compose.onNode(isDialog()) else compose.onRoot()
+            val target = if (name in listOf("confirmacion-borrar", "nuevo-llenado-pago", "categorias-iconos", "nuevo-gasto-categoria")) compose.onNode(isDialog()) else compose.onRoot()
             target.captureToImage().asAndroidBitmap().compress(Bitmap.CompressFormat.PNG, 100, it)
         }
     }

@@ -16,7 +16,8 @@ import java.io.ByteArrayOutputStream
 data class Preferences(val theme: String = "system", val dynamicColor: Boolean = true, val vehicleId: String = "")
 data class FuelState(val vehicles: List<Vehicle> = emptyList(), val refuels: List<Refuel> = emptyList(),
     val expenses: List<Expense> = emptyList(), val preferences: Preferences = Preferences(), val loaded: Boolean = false,
-    val paymentMethods: List<PaymentMethod> = listOf(PaymentMethod.Cash)) {
+    val paymentMethods: List<PaymentMethod> = listOf(PaymentMethod.Cash),
+    val expenseCategories: List<ExpenseCategory> = ExpenseCategory.Defaults) {
     val selectedVehicle get() = vehicles.firstOrNull { it.id == preferences.vehicleId } ?: vehicles.firstOrNull()
     val selectedRefuels get() = refuels.filter { it.vehicleId == selectedVehicle?.id }
     val selectedExpenses get() = expenses.filter { it.vehicleId == selectedVehicle?.id }
@@ -36,7 +37,8 @@ class FuelViewModel(application: Application) : AndroidViewModel(application) {
     val driveBusy = _driveBusy.asStateFlow()
     val state = combine(repository.dao.vehicles(), repository.dao.refuels(), repository.dao.expenses(), preferences, repository.dao.paymentMethods()) { vehicles, refuels, expenses, preference, methods ->
         FuelState(vehicles, refuels, expenses, preference, loaded = true, paymentMethods = methods)
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), FuelState(preferences = preferences.value))
+    }.combine(repository.dao.expenseCategories()) { state, categories -> state.copy(expenseCategories = categories) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), FuelState(preferences = preferences.value))
     private val _busy = MutableStateFlow(false)
     val busy = _busy.asStateFlow()
     private val _messages = MutableSharedFlow<String>(extraBufferCapacity = 8)
@@ -67,6 +69,7 @@ class FuelViewModel(application: Application) : AndroidViewModel(application) {
     fun theme(value: String) { preference { it.copy(theme = value) } }
     fun dynamicColor(value: Boolean) { preference { it.copy(dynamicColor = value) } }
     fun addPaymentMethod(method: PaymentMethod, onSuccess: () -> Unit) = work("Tarjeta guardada", onSuccess, true) { repository.addPaymentMethod(method) }
+    fun addExpenseCategory(name: String, icon: String, onSuccess: () -> Unit) = work("Categoría guardada", onSuccess, true) { repository.addExpenseCategory(name, icon) }
     fun save(refuel: Refuel, onSuccess: () -> Unit) = work("Llenado guardado", onSuccess, true) { repository.save(refuel) }
     fun save(expense: Expense, onSuccess: () -> Unit) = work("Gasto guardado", onSuccess, true) { repository.save(expense) }
     fun save(vehicle: Vehicle, onSuccess: () -> Unit) = work("Vehículo guardado", onSuccess, true) {

@@ -17,6 +17,7 @@ data class BackupDocument(
     val expenses: List<Expense>,
     val appearance: Preferences,
     val paymentMethods: List<PaymentMethod> = listOf(PaymentMethod.Cash),
+    val expenseCategories: List<ExpenseCategory> = ExpenseCategory.Defaults,
 )
 
 data class LocalBackup(val document: BackupDocument, val bytes: ByteArray) {
@@ -36,7 +37,7 @@ object BackupCodec {
         validate(payload)
         val envelope = JsonObject().apply {
             addProperty("format", "fuelstatus-backup")
-            addProperty("version", 3)
+            addProperty("version", 4)
             addProperty("sha256", sha256(gson.toJson(payload).toByteArray(Charsets.UTF_8)))
             add("data", payload)
         }
@@ -51,7 +52,7 @@ object BackupCodec {
             val root = JsonParser.parseString(bytes.toString(Charsets.UTF_8)).asJsonObject
             require(root.string("format") == "fuelstatus-backup") { "No es una copia de FuelStatus." }
             val version = root.long("version")
-            require(version in 1L..3L) { "Esta copia necesita otra versión de FuelStatus." }
+            require(version in 1L..4L) { "Esta copia necesita otra versión de FuelStatus." }
             val payload = root.getAsJsonObject("data") ?: error("Faltan los datos del respaldo.")
             require(root.string("sha256") == sha256(gson.toJson(payload).toByteArray(Charsets.UTF_8))) { "La copia está incompleta o su contenido fue modificado." }
             if (version == 1L) {
@@ -65,6 +66,10 @@ object BackupCodec {
             if (version < 3L) {
                 payload.add("paymentMethods", gson.toJsonTree(listOf(PaymentMethod.Cash)))
                 payload.getAsJsonArray("refuels")?.forEach { row -> row.asJsonObject.add("paymentMethodId", JsonNull.INSTANCE) }
+            }
+            if (version < 4L) {
+                val names = payload.getAsJsonArray("expenses")?.map { it.asJsonObject.string("category") }.orEmpty()
+                payload.add("expenseCategories", gson.toJsonTree(ExpenseCategory.forLegacyExpenses(names)))
             }
             validate(payload)
             return gson.fromJson(payload, BackupDocument::class.java)
@@ -84,6 +89,18 @@ object BackupCodec {
             }
         }
         val vehicles = rows("vehicles")
+        val categoriesArray = data.getAsJsonArray("expenseCategories") ?: error("Faltan las categorías de gastos.")
+        require(categoriesArray.size() <= 50_000) { "Demasiadas categorías de gastos." }
+        val categories = categoriesArray.map { it.asJsonObject }
+        val categoryNames = categories.map { it.string("name") }
+        require(categoryNames.none(String::isBlank) && categoryNames.distinct().size == categoryNames.size) { "Nombres de categorías inválidos o duplicados." }
+        categories.forEach {
+            require(CategoryIcon.fromCode(it.string("icon")) != null) { "Icono de categoría inválido." }
+            require(it.long("sortOrder") in 0..Int.MAX_VALUE.toLong()) { "Orden de categoría inválido." }
+        }
+        require(ExpenseCategory.Defaults.all { default -> categories.any {
+            it.string("name") == default.name && it.string("icon") == default.icon && it.long("sortOrder") == default.sortOrder.toLong()
+        } }) { "Faltan categorías predeterminadas o fueron modificadas." }
         val methods = rows("paymentMethods")
         val methodIds = methods.map { it.string("id") }.toSet()
         require(methods.any { it.string("id") == PaymentMethod.Cash.id &&
@@ -115,6 +132,7 @@ object BackupCodec {
             require(it.string("vehicleId") in ids) { "Un gasto hace referencia a un vehículo inexistente." }
             require(it.long("timestamp") > 0 && it.long("costCents") > 0 && it.string("category").isNotBlank()) { "Gasto con valores inválidos." }
             it.string("notes")
+            require(it.string("category") in categoryNames) { "Un gasto hace referencia a una categoría inexistente." }
         }
         val appearance = data.getAsJsonObject("appearance") ?: error("Faltan los ajustes.")
         require(appearance.string("theme") in listOf("system", "light", "dark")) { "Tema de apariencia inválido." }

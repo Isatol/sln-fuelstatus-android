@@ -1,4 +1,28 @@
-# Validación 0.4.0 · Métodos de pago y Ajustes
+# Validación 0.5.0 · Categorías de gastos
+
+16 de octubre de 2026, America/Monterrey. Rama `20261016-categorias-de-gastos`, Gradle 9.4.1, JDK de Android Studio y emulador Medium Phone API 37 en modo desechable. Gradle y el emulador se ejecutaron por separado para limitar el consumo de memoria.
+
+- **APK debug generado y firmado:** `.local/releases/FuelStatus-0.5.0-categorias-de-gastos.apk` (37 441 266 bytes), paquete `mx.fuelstatus`, versionCode 5.
+- **64 pruebas JVM aprobadas:** 10 de estadísticas, 13 de CSV, 30 del motor de respaldo, 3 de métodos de pago, 4 del contrato REST de Drive y 4 de categorías/búsqueda/copias. Se omitió únicamente la comprobación opcional que requiere proporcionar un CSV privado; 65 casos registrados, cero errores y cero fallos.
+- **27 casos Android aprobados:** 10 de Room general, 3 de métodos de pago, 3 de categorías y migración, 5 de diálogos, 2 de Ajustes de Drive, 3 de interfaz de categorías y 1 recorrido completo. La ejecución de suite aprobó los 26 casos independientes; NavigationTest se aprobó por separado después de corregir sus selectores y esperas. También se repitieron y aprobaron los tres casos de interfaz con el tamaño de texto real de Android al 130 %.
+- **Android Lint:** cero errores y 19 avisos existentes.
+- **Firma compatible con entregas anteriores:** SHA-1 `81:BA:D0:FD:EB:A0:29:7E:6B:3E:F9:04:FF:6B:1D:AD:80:33:1F:36`.
+- **SHA-256 del APK:** `e4b0452cc2a08089a338ac6c5e96234d839040c2d45933d44a78446db74a018d`.
+- Se verificaron los 30 recursos vectoriales y sus licencias dentro del APK. No contiene CSV, bases de datos, historiales ni archivos de firma privados.
+
+La migración 4→5 conserva gastos, nombres históricos, importes y notas; incorpora las siete categorías predeterminadas y los nombres antiguos adicionales con un icono genérico. Las pruebas anteriores también verifican las rutas 1→5, 2→5 y 3→5. Se comprobó persistencia al reabrir Room, orden de creación antes de Otros, rechazo de nombres vacíos/duplicados con distintas mayúsculas o acentos, límite de nombre, iconos desconocidos, referencias inválidas y revisión de respaldo sin cambios después de operaciones rechazadas.
+
+Las copias de formato 4 conservan categorías, iconos y gastos. Se verificó la adaptación del formato 3, manteniendo las pruebas de formatos 1 y 2; las categorías históricas conservan sus nombres. La restauración y el borrado se comprobaron junto con métodos de pago e historial: borrar elimina las personalizadas y deja las siete categorías iniciales.
+
+El recorrido crea una categoría, busca un icono por su sinónimo “neumático”, conserva nombre e icono al recrear la Activity, crea un gasto y cambia su categoría al editarlo. Después borra los datos y verifica la desaparición de la categoría personalizada. La prueba se ajustó para seleccionar el campo dentro del formulario de edición, evitando confundirlo con el texto del historial, y para esperar a que desaparezca el aviso temporal antes de pulsar el botón de borrado.
+
+Se revisaron las capturas reales en `.local/qa/categorias-gastos/`: lista, selector de iconos, búsqueda, formulario de gasto, Ajustes y confirmación de borrado. Las celdas del catálogo se ampliaron para evitar partir nombres largos; las comprobaciones de claro, oscuro y texto al 130 % verifican su legibilidad. El almacenamiento de las sesiones de emulador fue desechable y se cerraron al terminar.
+
+**Límite de esta validación:** Drive usa un servicio simulado en las pruebas. Se comprobaron serialización y restauración sin modificar copias de la cuenta real. La instalación en el teléfono se realiza con el APK indicado, conservando el paquete y la firma.
+
+---
+
+# Validación histórica 0.4.0 · Métodos de pago y Ajustes
 
 16 de octubre de 2026. Rama `20261016-metodos-pago-ajustes`, Gradle 9.4.1, JDK integrado de Android Studio, emulador Medium Phone API 37 en modo desechable.
 

@@ -10,3 +10,6 @@ Icons: route, water_drop, payments, speed, water_full, water_medium.
 Original SVG geometry converted to Android VectorDrawable with a Y translation.
 
 Additional icons: palette, cloud_sync, upload_file, delete_forever, account_balance_wallet, add_card, arrow_back, keyboard_arrow_down, chevron_right.
+
+Expense category catalog (Material Symbols Rounded, 24px): build, settings, verified_user, local_parking, toll, local_car_wash, more_horiz, directions_car, battery_charging_full, tire_repair, oil_barrel, speed, key, lightbulb, ac_unit, auto_awesome, format_paint, local_gas_station, receipt_long, account_balance_wallet, warning, local_shipping, two_wheeler, location_on, route, calendar_month, fact_check, inventory_2, sell, handyman.
+Source: https://github.com/google/material-design-icons/tree/master/symbols/web
