@@ -96,3 +96,7 @@ Se usa el método **tanque lleno a tanque lleno**. La primera carga completa fij
 - El CSV incluye **llenados**; el respaldo JSON de Drive incluye también vehículos, gastos y apariencia. Desinstalar elimina los datos y copias locales, pero conserva las copias ya confirmadas en Drive.
 
 El alcance y las decisiones pendientes se detallan en [docs/DEFINICION.md](docs/DEFINICION.md). El contrato del archivo está en [docs/IMPORTACION.md](docs/IMPORTACION.md).
+
+## Estadísticas de consumo (0.8.0)
+
+Tendencia del consumo con comparación de fechas, distancia media entre cargas y frecuencia en días, por vehículo y con iconos en las cards. Las cargas parciales, excluidas y faltantes se contemplan sin alterar los datos existentes. Consulta las fórmulas y los umbrales en [docs/ESTADISTICAS.md](docs/ESTADISTICAS.md).

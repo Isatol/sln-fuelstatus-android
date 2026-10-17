@@ -1,4 +1,24 @@
-# Validación 0.6.0 · Métodos de pago en gastos
+# Validación 0.8.0 · Estadísticas de consumo
+
+16 de octubre de 2026, America/Monterrey. Rama `20261016-estadisticas-de-consumo`, Gradle 9.4.1, JDK de Android Studio y emulador Medium Phone API 37 desechable. Gradle y el emulador se ejecutaron por separado.
+
+- **APK debug generado y firmado:** `.local/releases/FuelStatus-0.8.0-estadisticas.apk` (37 543 034 bytes), paquete `mx.fuelstatus`, versionCode 8.
+- **82 pruebas JVM aprobadas:** se añadieron 15 casos para las nuevas métricas. Se omitió únicamente la comprobación opcional que requiere un CSV privado; 83 casos registrados, cero fallos y cero errores.
+- **4 pruebas Android aprobadas en la ejecución dirigida:** tres nuevas de estadísticas y el recorrido general de navegación. Se adaptó el desplazamiento de este último a la lista ampliada; no se repitió la suite Android completa.
+- **Texto al 130 %:** se repitieron y aprobaron los tres casos de estadísticas con el tamaño real de texto de Android.
+- **Android Lint:** cero errores y 12 avisos existentes en el análisis local sin conexión.
+- **Firma compatible con entregas anteriores:** SHA-1 `81:BA:D0:FD:EB:A0:29:7E:6B:3E:F9:04:FF:6B:1D:AD:80:33:1F:36`.
+- **SHA-256 del APK:** `c42bb4e9ad2784fffa54ed9ffe2942cb2409ffc714bebb5b21f6e5a0b38f3f38`.
+
+Los casos de cálculo comprueban la ponderación por distancia, acumulación de cargas parciales, exclusión del tanque inicial, mínimo de seis intervalos completos y comparación de los seis más recientes. Cubren los cuatro estados, límites y redondeo del porcentaje, fechas compartidas entre periodos, interrupciones por cargas faltantes/excluidas o retrocesos del odómetro y una carga parcial con fecha inconsistente. También verifican distancia entre cargas usando N−1 intervalos, medias de días de calendario, cargas el mismo día, cambio de horario y separación por vehículo.
+
+La interfaz comprueba porcentajes y fechas legibles, actualización al editar o eliminar cargas, cambio de medias al seleccionar otro vehículo, estados sin datos y los textos de las métricas existentes. Se revisaron capturas en claro, oscuro y texto al 130 % en `.local/qa/estadisticas/`; las parejas de cards se apilan con texto ampliado. El emulador desechable se cerró al terminar.
+
+Room permanece en versión 6 y el respaldo en formato 5; no se modifican datos guardados ni migraciones. Se verificó que el APK no incluye CSV, bases de datos, historiales ni archivos privados de firma. Las pruebas del motor de Drive utilizan servicios simulados; no se modificó la cuenta real.
+
+---
+
+# Validación histórica 0.6.0 · Métodos de pago en gastos
 
 16 de octubre de 2026, America/Monterrey. Rama `20261016-metodos-de-pago-en-gastos`, Gradle 9.4.1, JDK de Android Studio y emulador Medium Phone API 37 en modo desechable. Gradle y el emulador se ejecutaron por separado.
 

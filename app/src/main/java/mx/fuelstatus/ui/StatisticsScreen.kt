@@ -1,0 +1,137 @@
+package mx.fuelstatus.ui
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import mx.fuelstatus.FuelState
+import mx.fuelstatus.R
+import mx.fuelstatus.domain.*
+import kotlin.math.abs
+
+@Composable
+internal fun StatisticsScreen(state: FuelState) {
+    val stats = remember(state.selectedRefuels) { statistics(state.selectedRefuels) }
+    LazyColumn(contentPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 24.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        item { Hero(if (state.selectedVehicle?.name == "Mazda 3") "ASÍ SE MUEVE TU MAZDA" else "ASÍ SE MUEVE TU AUTO",
+            stats.kmPerLiter?.let { number(it) } ?: "—", "km/L", "Rendimiento ponderado entre tanques llenos", R.drawable.ic_speed) }
+        item { ConsumptionTrendCard(stats.trend) }
+        item { StatisticsPair(
+            { modifier -> StatisticsMetric("Distancia media entre cargas", stats.averageDistanceBetweenRefuels?.let { "${number(it, 1)} km" } ?: "—",
+                R.drawable.ic_route, modifier, if (stats.refuelIntervals.isEmpty()) "Necesitas dos cargas consecutivas válidas." else "Incluye las cargas parciales.") },
+            { modifier -> StatisticsMetric("Frecuencia de carga", stats.averageDaysBetweenRefuels?.let {
+                when (it) { 0.0 -> "El mismo día"; 1.0 -> "Cada 1 día"; else -> "Cada ${number(it, 1)} días" }
+            } ?: "—",
+                R.drawable.ic_category_calendar_month, modifier, if (stats.refuelIntervals.isEmpty()) "Necesitas dos cargas consecutivas válidas."
+                else if (stats.minimumDaysBetweenRefuels == stats.maximumDaysBetweenRefuels)
+                    "${stats.minimumDaysBetweenRefuels} ${if (stats.minimumDaysBetweenRefuels == 1L) "día" else "días"} entre cargas."
+                else "Entre ${stats.minimumDaysBetweenRefuels} y ${stats.maximumDaysBetweenRefuels} días entre cargas.") }) }
+        item { StatisticsPair(
+            { StatisticsMetric("Costo / km", stats.costPerKm?.let(::money) ?: "—", R.drawable.ic_payments, it) },
+            { StatisticsMetric("Precio medio / L", stats.averagePrice?.let(::money) ?: "—", R.drawable.ic_category_sell, it) }) }
+        item { StatisticsPair(
+            { StatisticsMetric("Litros registrados", "${number(stats.liters)} L", R.drawable.ic_water_drop, it) },
+            { StatisticsMetric("Km evaluados", number(stats.distanceKm, 0), R.drawable.ic_car, it) }) }
+        item { StatisticsMetric("Combustible + otros gastos", money(stats.fuelCost + state.selectedExpenses.sumOf { it.costCents } / 100.0),
+            R.drawable.ic_receipt, Modifier.fillMaxWidth()) }
+        if (stats.periods.isNotEmpty()) item {
+            val recent = stats.periods.takeLast(8)
+            val max = recent.maxOf { it.kmPerLiter }.coerceAtLeast(1.0)
+            Card(shape = RoundedCornerShape(24.dp)) {
+                Column(Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    SettingsTitle(R.drawable.ic_chart, "Últimos intervalos", style = MaterialTheme.typography.titleMedium)
+                    Text("Rendimiento en km/L", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    recent.forEach { period ->
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text(date(period.endTimestamp), style = MaterialTheme.typography.labelMedium, modifier = Modifier.weight(1f))
+                            Text(number(period.kmPerLiter), style = MaterialTheme.typography.labelLarge)
+                        }
+                        LinearProgressIndicator(progress = { (period.kmPerLiter / max).toFloat() },
+                            modifier = Modifier.fillMaxWidth().height(8.dp).clip(CircleShape))
+                    }
+                }
+            }
+        }
+        item { Explanation("Cómo calculamos",
+            "El primer tanque lleno establece el punto de partida. Sumamos las cargas parciales hasta el siguiente tanque lleno para calcular el rendimiento. " +
+                "La tendencia compara los tres últimos intervalos completos con los tres anteriores, usando litros por cada 100 km: menos es mejor. " +
+                "Una variación menor al 5 % se considera estable; desde un 15 % de aumento se destaca como importante. " +
+                "Las medias entre cargas incluyen las parciales y se dividen entre los intervalos válidos, no entre el número de cargas. " +
+                "Los días se cuentan según las fechas locales; dos cargas el mismo día cuentan como cero días. " +
+                "Una carga faltante, excluida o un retroceso del odómetro interrumpe la secuencia para estas nuevas métricas.", R.drawable.ic_category_fact_check) }
+    }
+}
+
+@Composable
+private fun ConsumptionTrendCard(trend: ConsumptionTrend?) {
+    Card(shape = RoundedCornerShape(24.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)) {
+        Column(Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            SettingsTitle(R.drawable.ic_chart, "Tendencia de consumo")
+            if (trend == null) {
+                Text("Aún no hay suficientes datos", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Text("Necesitas seis intervalos completos entre tanques llenos, sin cargas faltantes o excluidas entre ellos.",
+                    style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            } else {
+                val title = when (trend.status) {
+                    ConsumptionTrendStatus.Improving -> "Consumo en mejora"
+                    ConsumptionTrendStatus.Stable -> "Consumo estable"
+                    ConsumptionTrendStatus.Increasing -> "Consumo en aumento"
+                    ConsumptionTrendStatus.MarkedIncrease -> "Aumento importante del consumo"
+                }
+                val color = when (trend.status) {
+                    ConsumptionTrendStatus.MarkedIncrease -> MaterialTheme.colorScheme.error
+                    ConsumptionTrendStatus.Increasing -> MaterialTheme.colorScheme.tertiary
+                    else -> MaterialTheme.colorScheme.primary
+                }
+                Text(title, color = color, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                Text(if (trend.status == ConsumptionTrendStatus.Stable)
+                    "Tu consumo se mantiene similar al periodo anterior (variación: ${if (trend.changePercent > 0) "+" else ""}${number(trend.changePercent, 1)} %)."
+                else "Consumiste un ${number(abs(trend.changePercent), 1)} % ${if (trend.changePercent > 0) "más" else "menos"} combustible por kilómetro que en el periodo anterior.",
+                    style = MaterialTheme.typography.bodyMedium)
+                HorizontalDivider()
+                TrendDates("Periodo reciente", trend.recent)
+                TrendDates("Periodo anterior", trend.previous)
+            }
+        }
+    }
+}
+
+@Composable
+private fun TrendDates(label: String, window: ConsumptionWindow) {
+    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text("${date(window.startTimestamp)} — ${date(window.endTimestamp)}", style = MaterialTheme.typography.bodyMedium)
+    }
+}
+
+@Composable
+private fun StatisticsPair(first: @Composable (Modifier) -> Unit, second: @Composable (Modifier) -> Unit) {
+    val largeText = LocalDensity.current.fontScale > 1.15f
+    BoxWithConstraints(Modifier.fillMaxWidth()) {
+        if (maxWidth < 340.dp || largeText) Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            first(Modifier.fillMaxWidth()); second(Modifier.fillMaxWidth())
+        } else Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            first(Modifier.weight(1f).fillMaxHeight()); second(Modifier.weight(1f).fillMaxHeight())
+        }
+    }
+}
+
+@Composable
+private fun StatisticsMetric(label: String, value: String, icon: Int, modifier: Modifier = Modifier, detail: String? = null) {
+    Surface(modifier, shape = RoundedCornerShape(24.dp), color = MaterialTheme.colorScheme.surfaceContainerLow) {
+        Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            SettingsTitle(icon, label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(value, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+            detail?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+        }
+    }
+}
