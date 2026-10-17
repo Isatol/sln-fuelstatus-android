@@ -58,6 +58,7 @@ fun FuelApp(model: FuelViewModel, onConnectDrive: () -> Unit) {
         var editor by rememberSaveable { mutableStateOf<String?>(null) }
         var editingId by rememberSaveable { mutableStateOf<String?>(null) }
         var dataPage by rememberSaveable { mutableStateOf<String?>(null) }
+        val refuelFilter = rememberRefuelHistoryFilter()
         val snackbar = remember { SnackbarHostState() }
         val haptic = LocalHapticFeedback.current
         val importFile = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
@@ -156,7 +157,7 @@ fun FuelApp(model: FuelViewModel, onConnectDrive: () -> Unit) {
                             slideOutOfContainer(direction, tween(300, easing = FastOutSlowInEasing))).using(null)
                     }) { page ->
                     when (page) {
-                        Destination.Refuels -> RefuelsScreen(state, { openEditor("refuel", it.id) }, { importFile.launch(arrayOf("text/*", "application/csv", "application/octet-stream")) })
+                        Destination.Refuels -> RefuelsScreen(state, { openEditor("refuel", it.id) }, { importFile.launch(arrayOf("text/*", "application/csv", "application/octet-stream")) }, refuelFilter)
                         Destination.Expenses -> ExpensesScreen(state) { openEditor("expense", it.id) }
                         Destination.Statistics -> StatisticsScreen(state)
                         Destination.Vehicles -> VehiclesScreen(state, model::selectVehicle) { openEditor("vehicle", it.id) }
@@ -168,7 +169,7 @@ fun FuelApp(model: FuelViewModel, onConnectDrive: () -> Unit) {
                             backupContent = { DriveBackupCard(backup, busy || driveBusy, onConnectDrive,
                                 model::syncDrive, model::disconnectDrive, model::reviewDriveCopy, model::useLocalHistory) },
                             deleteContent = { DeleteDataCard(backup, busy || driveBusy) { deleteDrive ->
-                                model.resetData(deleteDrive) { destination = Destination.Refuels; editor = null; editingId = null }
+                                model.resetData(deleteDrive) { destination = Destination.Refuels; editor = null; editingId = null; refuelFilter.reset() }
                             } })
                     }
                 }
@@ -200,10 +201,13 @@ fun FuelIcon(resource: Int, description: String? = null, modifier: Modifier = Mo
     Icon(painterResource(resource), contentDescription = description, modifier = modifier.size(24.dp))
 
 @Composable
-private fun RefuelsScreen(state: FuelState, onEdit: (Refuel) -> Unit, onImport: () -> Unit) {
+internal fun RefuelsScreen(state: FuelState, onEdit: (Refuel) -> Unit, onImport: () -> Unit,
+    filter: RefuelHistoryFilterState, calendar: RefuelCalendar = rememberRefuelCalendar()) {
     val refuels = state.selectedRefuels
     val stats = remember(refuels) { statistics(refuels) }
     val periods = remember(stats) { stats.periods.associateBy { it.endId } }
+    val range = filter.period.range(calendar.today, filter.customRange)
+    val visible = remember(refuels, range, calendar.zone) { filterRefuelsByDate(refuels, range, calendar.zone) }
     LazyColumn(contentPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 104.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Hero("TU RENDIMIENTO", stats.kmPerLiter?.let { number(it) } ?: "—", "km/L",
             if (stats.periods.isEmpty()) "Aparecerá después de dos tanques llenos." else "Promedio de ${stats.periods.size} intervalos completos") }
@@ -213,11 +217,16 @@ private fun RefuelsScreen(state: FuelState, onEdit: (Refuel) -> Unit, onImport: 
                 Metric("Historial", "${refuels.size} llenados", Modifier.weight(1f))
             }
         }
+        item { Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            SectionLabel("TODOS LOS LLENADOS", "Toca una carga para editar")
+            RefuelHistoryFilter(filter, range, visible.size, refuels.size)
+        } }
         if (refuels.isEmpty()) item { EmptyState(R.drawable.ic_pump, "Aquí empieza tu historial",
             "Registra tu primer llenado o trae las cargas que ya tienes en Fuel.", "Importar CSV de Fuel", onImport) }
         else {
-            item { SectionLabel("TODOS LOS LLENADOS", "Toca una carga para editar") }
-            items(refuels, key = { it.id }) { refuel ->
+            if (visible.isEmpty()) item { EmptyState(R.drawable.ic_filter_list, "No hay llenados en este periodo",
+                "Elige otro periodo o un rango personalizado para consultar tu historial.") }
+            items(visible, key = { it.id }) { refuel ->
                 Card(onClick = { onEdit(refuel) }, shape = RoundedCornerShape(24.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)) {
                     Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
