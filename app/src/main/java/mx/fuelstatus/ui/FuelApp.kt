@@ -293,44 +293,6 @@ private fun ExpensesScreen(state: FuelState, onEdit: (Expense) -> Unit) {
 }
 
 @Composable
-private fun StatisticsScreen(state: FuelState) {
-    val stats = remember(state.selectedRefuels) { statistics(state.selectedRefuels) }
-    LazyColumn(contentPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { Hero("ASÍ SE MUEVE TU MAZDA".let { if (state.selectedVehicle?.name == "Mazda 3") it else "ASÍ SE MUEVE TU AUTO" },
-            stats.kmPerLiter?.let { number(it) } ?: "—", "km/L", "Rendimiento ponderado entre tanques llenos") }
-        item { Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            Metric("Costo / km", stats.costPerKm?.let(::money) ?: "—", Modifier.weight(1f))
-            Metric("Precio medio / L", stats.averagePrice?.let(::money) ?: "—", Modifier.weight(1f))
-        } }
-        item { Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            Metric("Litros registrados", "${number(stats.liters)} L", Modifier.weight(1f))
-            Metric("Km evaluados", number(stats.distanceKm, 0), Modifier.weight(1f))
-        } }
-        item { Metric("Combustible + otros gastos", money(stats.fuelCost + state.selectedExpenses.sumOf { it.costCents } / 100.0), Modifier.fillMaxWidth()) }
-        if (stats.periods.isNotEmpty()) {
-            item { SectionLabel("ÚLTIMOS INTERVALOS", "km/L") }
-            val recent = stats.periods.takeLast(8)
-            val max = recent.maxOf { it.kmPerLiter }.coerceAtLeast(1.0)
-            item {
-                Card(shape = RoundedCornerShape(24.dp)) {
-                    Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                        recent.forEach { period ->
-                            val refuel = state.selectedRefuels.first { it.id == period.endId }
-                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                Text(date(refuel.timestamp), style = MaterialTheme.typography.labelMedium)
-                                Text(number(period.kmPerLiter), style = MaterialTheme.typography.labelLarge)
-                            }
-                            LinearProgressIndicator(progress = { (period.kmPerLiter / max).toFloat() }, modifier = Modifier.fillMaxWidth().height(8.dp).clip(CircleShape))
-                        }
-                    }
-                }
-            }
-        }
-        item { Explanation("Cómo calculamos", "El primer tanque lleno establece el punto de partida. Sumamos las cargas parciales hasta el siguiente tanque lleno y dividimos los kilómetros entre esos litros. Los promedios se ponderan por litros; una carga faltante o excluida interrumpe el intervalo.") }
-    }
-}
-
-@Composable
 private fun VehiclesScreen(state: FuelState, onSelect: (String) -> Unit, onEdit: (Vehicle) -> Unit) {
     LazyColumn(contentPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 104.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         item { Text("Un historial para cada camino.", style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(bottom = 8.dp)) }
@@ -412,15 +374,16 @@ private fun SettingsScreen(preferences: Preferences, busy: Boolean, onTheme: (St
         }
         item { deleteContent() }
         item { Explanation("Tu auto, tus datos", "Todo se guarda en este teléfono, con copias opcionales en tu Google Drive. Sin anuncios ni suscripción. Los importes se muestran en pesos mexicanos y las distancias en kilómetros.") }
-        item { Text("FuelStatus · 0.7.0\nHecha para Android", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(8.dp)) }
+        item { Text("FuelStatus · 0.8.0\nHecha para Android", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(8.dp)) }
     }
 }
 
 @Composable
-private fun Hero(title: String, value: String, unit: String, subtitle: String) {
+internal fun Hero(title: String, value: String, unit: String, subtitle: String, icon: Int? = null) {
     Surface(color = MaterialTheme.colorScheme.primaryContainer, shape = RoundedCornerShape(32.dp), modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(title, style = MaterialTheme.typography.labelMedium, letterSpacing = 1.sp)
+            if (icon == null) Text(title, style = MaterialTheme.typography.labelMedium, letterSpacing = 1.sp)
+            else SettingsTitle(icon, title, style = MaterialTheme.typography.labelMedium.copy(letterSpacing = 1.sp))
             Row(verticalAlignment = Alignment.Bottom) {
                 Text(value, style = MaterialTheme.typography.displayLarge.copy(fontSize = if (value.length > 9) 36.sp else 56.sp), fontWeight = FontWeight.Bold,
                     modifier = Modifier.weight(1f, fill = false))
@@ -477,9 +440,10 @@ private fun EmptyState(icon: Int, title: String, text: String, action: String? =
     }
 }
 @Composable
-private fun Explanation(title: String, text: String) {
+internal fun Explanation(title: String, text: String, icon: Int? = null) {
     Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(title, style = MaterialTheme.typography.titleMedium)
+        if (icon == null) Text(title, style = MaterialTheme.typography.titleMedium)
+        else SettingsTitle(icon, title)
         Text(text, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
