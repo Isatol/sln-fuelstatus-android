@@ -10,6 +10,18 @@ class FuelRepository(val database: FuelDatabase) {
     suspend fun initialize() = database.withTransaction {
         dao.initializeRevision(BackupRevision())
         dao.initializeCash(PaymentMethod.Cash)
+        dao.initializeCategories(ExpenseCategory.Defaults)
+    }
+    suspend fun addExpenseCategory(name: String, icon: String) = change {
+        val trimmed = name.trim()
+        require(trimmed.isNotEmpty() && trimmed.length <= ExpenseCategory.MAX_NAME_LENGTH) { "Escribe un nombre de hasta ${ExpenseCategory.MAX_NAME_LENGTH} caracteres." }
+        require(CategoryIcon.fromCode(icon) != null) { "Selecciona un icono del catálogo." }
+        val categories = dao.allExpenseCategories()
+        require(categories.none { categorySearchKey(it.name) == categorySearchKey(trimmed) }) { "Ya existe una categoría con ese nombre." }
+        val lastOrder = categories.filter { it.name != ExpenseCategory.OTHER_NAME }.maxOfOrNull { it.sortOrder } ?: 5
+        require(lastOrder < Int.MAX_VALUE - 1) { "El catálogo alcanzó su límite de categorías." }
+        val order = lastOrder + 1
+        dao.insertExpenseCategories(listOf(ExpenseCategory(trimmed, icon, order)))
     }
     suspend fun addPaymentMethod(value: PaymentMethod) = change {
         require(value.id.isNotBlank() && value.id != PaymentMethod.Cash.id) { "Identificador de tarjeta inválido." }
@@ -21,12 +33,16 @@ class FuelRepository(val database: FuelDatabase) {
     }
     suspend fun save(value: Refuel) = change { dao.save(value) }
     suspend fun save(value: Vehicle) = change { dao.save(value) }
-    suspend fun save(value: Expense) = change { dao.save(value) }
+    suspend fun save(value: Expense) = change {
+        require(dao.allExpenseCategories().any { it.name == value.category }) { "La categoría elegida ya no existe. Vuelve a seleccionarla." }
+        dao.save(value)
+    }
     suspend fun delete(value: Refuel) = change { dao.delete(value) }
     suspend fun delete(value: Expense) = change { dao.delete(value) }
     suspend fun reset() = database.withTransaction {
         dao.deleteAllRefuels(); dao.deleteAllExpenses(); dao.deleteAllVehicles(); dao.deleteRevision()
         dao.deleteAllPaymentMethods(); dao.initializeCash(PaymentMethod.Cash)
+        dao.deleteAllExpenseCategories(); dao.initializeCategories(ExpenseCategory.Defaults)
         dao.initializeRevision(BackupRevision())
     }
     suspend fun settingsChanged() = change { }

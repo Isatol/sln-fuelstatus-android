@@ -31,7 +31,7 @@ class BackupTest {
         assertThrows(IllegalArgumentException::class.java) { BackupCodec.decode(text.toByteArray()) }
     }
     @Test fun unsupportedVersionAndTruncatedFilesAreRejected() {
-        val text = BackupCodec.encode(document()).toString(Charsets.UTF_8).replace("\"version\":3", "\"version\":9")
+        val text = BackupCodec.encode(document()).toString(Charsets.UTF_8).replace("\"version\":4", "\"version\":9")
         assertThrows(IllegalArgumentException::class.java) { BackupCodec.decode(text.toByteArray()) }
         assertThrows(IllegalArgumentException::class.java) { BackupCodec.decode("{bad".toByteArray()) }
     }

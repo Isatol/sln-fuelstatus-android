@@ -13,6 +13,11 @@ interface FuelDao {
     @Query("SELECT * FROM refuels") suspend fun allRefuels(): List<Refuel>
     @Query("SELECT * FROM expenses ORDER BY timestamp DESC") fun expenses(): Flow<List<Expense>>
     @Query("SELECT * FROM expenses") suspend fun allExpenses(): List<Expense>
+    @Query("SELECT * FROM expense_categories ORDER BY CASE WHEN name = 'Otros' THEN 1 ELSE 0 END, sortOrder, name COLLATE NOCASE") fun expenseCategories(): Flow<List<ExpenseCategory>>
+    @Query("SELECT * FROM expense_categories ORDER BY CASE WHEN name = 'Otros' THEN 1 ELSE 0 END, sortOrder, name COLLATE NOCASE") suspend fun allExpenseCategories(): List<ExpenseCategory>
+    @Query("DELETE FROM expense_categories") suspend fun deleteAllExpenseCategories()
+    @Insert(onConflict = OnConflictStrategy.IGNORE) suspend fun initializeCategories(values: List<ExpenseCategory>)
+    @Insert suspend fun insertExpenseCategories(values: List<ExpenseCategory>)
     @Query("SELECT * FROM payment_methods ORDER BY CASE WHEN id = 'cash' THEN 0 ELSE 1 END, name COLLATE NOCASE") fun paymentMethods(): Flow<List<PaymentMethod>>
     @Query("SELECT * FROM payment_methods ORDER BY CASE WHEN id = 'cash' THEN 0 ELSE 1 END, name COLLATE NOCASE") suspend fun allPaymentMethods(): List<PaymentMethod>
     @Query("SELECT revision FROM backup_revision WHERE id = 1") suspend fun revision(): Long?
@@ -36,10 +41,25 @@ interface FuelDao {
     @Delete suspend fun delete(expense: Expense)
 }
 
-@Database(entities = [Vehicle::class, Refuel::class, Expense::class, BackupRevision::class, PaymentMethod::class], version = 4, exportSchema = true)
+@Database(entities = [Vehicle::class, Refuel::class, Expense::class, BackupRevision::class, PaymentMethod::class, ExpenseCategory::class], version = 5, exportSchema = true)
 abstract class FuelDatabase : RoomDatabase() {
     abstract fun dao(): FuelDao
     companion object {
+        val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("CREATE TABLE IF NOT EXISTS expense_categories (name TEXT NOT NULL, icon TEXT NOT NULL, sortOrder INTEGER NOT NULL, PRIMARY KEY(name))")
+                val names = db.query("SELECT DISTINCT category FROM expenses").use { cursor ->
+                    buildList { while (cursor.moveToNext()) add(cursor.getString(0)) }
+                }
+                ExpenseCategory.forLegacyExpenses(names).forEach { category ->
+                    db.execSQL("INSERT INTO expense_categories (name, icon, sortOrder) VALUES (?, ?, ?)",
+                        arrayOf<Any>(category.name, category.icon, category.sortOrder))
+                }
+                // The next local/Drive snapshot must include the new catalog even without a new expense.
+                db.execSQL("UPDATE backup_revision SET revision = revision + 1 WHERE id = 1")
+            }
+        }
+
         val MIGRATION_3_4 = object : Migration(3, 4) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("CREATE TABLE IF NOT EXISTS payment_methods (id TEXT NOT NULL, name TEXT NOT NULL, brand TEXT NOT NULL, PRIMARY KEY(id))")

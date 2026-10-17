@@ -78,7 +78,7 @@ fun RefuelEditor(vehicle: Vehicle, records: List<Refuel>, existing: Refuel?, bus
 
 @Composable
 fun ExpenseEditor(vehicle: Vehicle, existing: Expense?, busy: Boolean, onDismiss: () -> Unit,
-    onSave: (Expense) -> Unit, onDelete: (Expense) -> Unit) {
+    onSave: (Expense) -> Unit, onDelete: (Expense) -> Unit, categories: List<ExpenseCategory> = ExpenseCategory.Defaults) {
     val key = existing?.id ?: "new-expense"
     var timestamp by rememberSaveable(key) { mutableLongStateOf(existing?.timestamp ?: System.currentTimeMillis()) }
     var category by rememberSaveable(key) { mutableStateOf(existing?.category ?: "Servicio") }
@@ -88,15 +88,7 @@ fun ExpenseEditor(vehicle: Vehicle, existing: Expense?, busy: Boolean, onDismiss
     var deleteConfirmation by remember { mutableStateOf(false) }
     EditorSheet(if (existing == null) "Nuevo gasto" else "Editar gasto", vehicle.label, busy, onDismiss) {
         DateField(timestamp) { timestamp = it }
-        var expanded by remember { mutableStateOf(false) }
-        Box {
-            OutlinedButton(onClick = { expanded = true }, modifier = Modifier.fillMaxWidth()) { Text("Categoría: $category") }
-            DropdownMenu(expanded, onDismissRequest = { expanded = false }) {
-                listOf("Servicio", "Mantenimiento", "Seguro", "Estacionamiento", "Peaje", "Lavado", "Otros").forEach { name ->
-                    DropdownMenuItem(text = { Text(name) }, onClick = { category = name; expanded = false })
-                }
-            }
-        }
+        ExpenseCategorySelector(categories, category, { category = it }, enabled = !busy)
         NumberField("Total pagado ($)", total, { total = it })
         OutlinedTextField(notes, { notes = it }, label = { Text("Notas (opcional)") }, minLines = 2, modifier = Modifier.fillMaxWidth())
         error?.let { Text(it, color = MaterialTheme.colorScheme.error) }

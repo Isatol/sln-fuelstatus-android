@@ -25,7 +25,7 @@ fun DeleteDataCard(state: SyncState, busy: Boolean, onDelete: (Boolean) -> Unit)
     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer), modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SettingsTitle(R.drawable.ic_delete_forever, "Borrar datos", MaterialTheme.typography.titleLarge, MaterialTheme.colorScheme.onErrorContainer)
-            Text("Elimina vehículos, llenados, gastos, tarjetas guardadas y copias locales. Restablece la apariencia y desconecta Drive, como al comenzar de nuevo.",
+            Text("Elimina vehículos, llenados, gastos, tarjetas guardadas, categorías personalizadas y copias locales. Restablece la apariencia y desconecta Drive, como al comenzar de nuevo.",
                 color = MaterialTheme.colorScheme.onErrorContainer)
             if (state.connected) {
                 Row(Modifier.fillMaxWidth().toggleable(deleteDrive, enabled = !busy, role = Role.Checkbox,
@@ -44,7 +44,7 @@ fun DeleteDataCard(state: SyncState, busy: Boolean, onDelete: (Boolean) -> Unit)
     }
     if (confirmation) AlertDialog(onDismissRequest = { if (!busy) confirmation = false },
         title = { Text("¿Borrar todos los datos?") },
-        text = { Text("Se eliminarán todos los vehículos, llenados, gastos, tarjetas guardadas y copias locales de recuperación. Los ajustes volverán a sus valores iniciales y se desconectará Drive. Esta eliminación local no se puede deshacer.\n\n" +
+        text = { Text("Se eliminarán todos los vehículos, llenados, gastos, tarjetas guardadas, categorías personalizadas y copias locales de recuperación. Los ajustes volverán a sus valores iniciales y se desconectará Drive. Esta eliminación local no se puede deshacer.\n\n" +
             if (deleteDrive && state.connected) "También se enviarán a la papelera todas las copias de FuelStatus de ${state.email}. Necesitas conexión. Si Drive falla, los datos locales se conservan."
             else "Las copias existentes en Drive se conservarán.") },
         confirmButton = { TextButton(enabled = !busy, onClick = { confirmation = false; onDelete(deleteDrive && state.connected) }) {

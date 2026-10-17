@@ -78,15 +78,15 @@ class DatabaseTest {
             old.version = 1
         }
         val database = Room.databaseBuilder(context, FuelDatabase::class.java, name)
-            .addMigrations(FuelDatabase.MIGRATION_1_2, FuelDatabase.MIGRATION_2_3, FuelDatabase.MIGRATION_3_4).build()
+            .addMigrations(FuelDatabase.MIGRATION_1_2, FuelDatabase.MIGRATION_2_3, FuelDatabase.MIGRATION_3_4, FuelDatabase.MIGRATION_4_5).build()
         try {
             assertEquals(1, database.dao().allVehicles().size)
             assertEquals("Original", database.dao().allRefuels().single().notes)
             assertEquals(50000L, database.dao().allExpenses().single().costCents)
-            assertEquals(1L, database.dao().revision())
+            assertEquals(2L, database.dao().revision())
             val repository = FuelRepository(database)
             repository.save(database.dao().allExpenses().single().copy(costCents = 60000))
-            assertEquals(2L, database.dao().revision())
+            assertEquals(3L, database.dao().revision())
         } finally { database.close(); context.deleteDatabase(name) }
     }
 
@@ -137,13 +137,13 @@ class DatabaseTest {
             old.execSQL("INSERT INTO backup_revision VALUES (1, 9)")
             old.version = 2
         }
-        val database = Room.databaseBuilder(context, FuelDatabase::class.java, name).addMigrations(FuelDatabase.MIGRATION_2_3, FuelDatabase.MIGRATION_3_4).build()
+        val database = Room.databaseBuilder(context, FuelDatabase::class.java, name).addMigrations(FuelDatabase.MIGRATION_2_3, FuelDatabase.MIGRATION_3_4, FuelDatabase.MIGRATION_4_5).build()
         try {
             assertEquals(FuelType.Magna.code, database.dao().allVehicles().single().fuelType)
             assertEquals(FuelType.Unspecified.code, database.dao().allRefuels().single().fuelType)
             assertEquals(100000L, database.dao().allRefuels().single().costCents)
             assertEquals("Original", database.dao().allRefuels().single().notes)
-            assertEquals(9L, database.dao().revision())
+            assertEquals(10L, database.dao().revision())
         } finally { database.close(); context.deleteDatabase(name) }
     }
 

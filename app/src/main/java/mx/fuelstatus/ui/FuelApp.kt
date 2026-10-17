@@ -66,12 +66,22 @@ fun FuelApp(model: FuelViewModel, onConnectDrive: () -> Unit) {
         val exportFile = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { uri -> uri?.let(model::exportCsv) }
         LaunchedEffect(model) { model.messages.collect { snackbar.showSnackbar(it) } }
         if (dataPage != null) {
-            val back = { if (!busy && !driveBusy) dataPage = if (dataPage == "add-payment") "payments" else null }
+            val back = { if (!busy && !driveBusy) dataPage = when (dataPage) {
+                "add-payment" -> "payments"
+                "add-category" -> "categories"
+                else -> null
+            } }
             BackHandler(onBack = back)
-            if (dataPage == "payments") PaymentMethodsScreen(state.paymentMethods, busy || driveBusy, snackbar, back,
-                onAdd = { dataPage = "add-payment" })
-            else AddPaymentMethodScreen(state.paymentMethods, busy || driveBusy, snackbar, back,
-                onSave = { method -> model.addPaymentMethod(method) { dataPage = "payments" } })
+            when (dataPage) {
+                "payments" -> PaymentMethodsScreen(state.paymentMethods, busy || driveBusy, snackbar, back,
+                    onAdd = { dataPage = "add-payment" })
+                "add-payment" -> AddPaymentMethodScreen(state.paymentMethods, busy || driveBusy, snackbar, back,
+                    onSave = { method -> model.addPaymentMethod(method) { dataPage = "payments" } })
+                "categories" -> ExpenseCategoriesScreen(state.expenseCategories, busy || driveBusy, snackbar, back,
+                    onAdd = { dataPage = "add-category" })
+                "add-category" -> AddExpenseCategoryScreen(state.expenseCategories, busy || driveBusy, snackbar, back,
+                    onSave = { name, icon -> model.addExpenseCategory(name, icon) { dataPage = "categories" } })
+            }
             return@FuelTheme
         }
         BackHandler(destination != Destination.Refuels && editor == null) { destination = Destination.Refuels }
@@ -154,6 +164,7 @@ fun FuelApp(model: FuelViewModel, onConnectDrive: () -> Unit) {
                             onImport = { importFile.launch(arrayOf("text/*", "application/csv", "application/octet-stream")) },
                             onExport = { exportFile.launch("FuelStatus_llenados.csv") },
                             onPaymentMethods = { dataPage = "payments" },
+                            onExpenseCategories = { dataPage = "categories" },
                             backupContent = { DriveBackupCard(backup, busy || driveBusy, onConnectDrive,
                                 model::syncDrive, model::disconnectDrive, model::reviewDriveCopy, model::useLocalHistory) },
                             deleteContent = { DeleteDataCard(backup, busy || driveBusy) { deleteDrive ->
@@ -176,7 +187,7 @@ fun FuelApp(model: FuelViewModel, onConnectDrive: () -> Unit) {
                 onDelete = { model.delete(it, close) }, paymentMethods = state.paymentMethods) }
             "expense" -> state.selectedVehicle?.let { vehicle -> ExpenseEditor(vehicle,
                 state.expenses.firstOrNull { it.id == editingId }, busy, close,
-                onSave = { model.save(it, close) }, onDelete = { model.delete(it, close) }) }
+                onSave = { model.save(it, close) }, onDelete = { model.delete(it, close) }, categories = state.expenseCategories) }
             "vehicle" -> VehicleEditor(state.vehicles.firstOrNull { it.id == editingId }, state.vehicles, busy, close,
                 onSave = { model.save(it, close) })
         }
@@ -338,7 +349,7 @@ private fun VehiclesScreen(state: FuelState, onSelect: (String) -> Unit, onEdit:
 
 @Composable
 private fun SettingsScreen(preferences: Preferences, busy: Boolean, onTheme: (String) -> Unit, onDynamic: (Boolean) -> Unit, onImport: () -> Unit, onExport: () -> Unit,
-    onPaymentMethods: () -> Unit, backupContent: @Composable () -> Unit, deleteContent: @Composable () -> Unit) {
+    onPaymentMethods: () -> Unit, onExpenseCategories: () -> Unit, backupContent: @Composable () -> Unit, deleteContent: @Composable () -> Unit) {
     LazyColumn(contentPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         item { SectionLabel("APARIENCIA", "A tu manera") }
         item { Card(shape = RoundedCornerShape(24.dp)) {
@@ -378,9 +389,16 @@ private fun SettingsScreen(preferences: Preferences, busy: Boolean, onTheme: (St
                 FuelIcon(R.drawable.ic_chevron_right)
             }
         }
+        item {
+            FilledTonalButton(onClick = onExpenseCategories, enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 64.dp)) {
+                FuelIcon(R.drawable.ic_category_sell)
+                Text("Categorías de gastos", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f).padding(horizontal = 12.dp))
+                FuelIcon(R.drawable.ic_chevron_right)
+            }
+        }
         item { deleteContent() }
         item { Explanation("Tu auto, tus datos", "Todo se guarda en este teléfono, con copias opcionales en tu Google Drive. Sin anuncios ni suscripción. Los importes se muestran en pesos mexicanos y las distancias en kilómetros.") }
-        item { Text("FuelStatus · 0.4.0\nHecha para Android", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(8.dp)) }
+        item { Text("FuelStatus · 0.5.0\nHecha para Android", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(8.dp)) }
     }
 }
 
