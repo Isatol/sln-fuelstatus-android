@@ -13,3 +13,5 @@ Additional icons: palette, cloud_sync, upload_file, delete_forever, account_bala
 
 Expense category catalog (Material Symbols Rounded, 24px): build, settings, verified_user, local_parking, toll, local_car_wash, more_horiz, directions_car, battery_charging_full, tire_repair, oil_barrel, speed, key, lightbulb, ac_unit, auto_awesome, format_paint, local_gas_station, receipt_long, account_balance_wallet, warning, local_shipping, two_wheeler, location_on, route, calendar_month, fact_check, inventory_2, sell, handyman.
 Source: https://github.com/google/material-design-icons/tree/master/symbols/web
+
+Refuel form and history: filter_list, notes (Material Symbols Rounded, 24px).

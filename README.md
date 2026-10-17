@@ -4,7 +4,11 @@ Repositorio: [Isatol/sln-fuelstatus-android](https://github.com/Isatol/sln-fuels
 
 Aplicación personal de combustible y gastos de vehículos inspirada en Fuel, con interfaz nativa para Android. Nombre anterior de trabajo: **FuelDroid**.
 
-## Versión 0.6
+## Versión 0.7
+
+Iconos en los campos y opciones del formulario de llenados, y filtro de historial por tres meses (predeterminado), seis meses, un año o fechas personalizadas. Los indicadores conservan el cálculo sobre el historial completo. No cambia la base de datos ni las copias. Detalles en [docs/LLENADOS_Y_FILTROS.md](docs/LLENADOS_Y_FILTROS.md).
+
+### Funcionalidad de 0.6
 
 Métodos de pago en Nuevo gasto y Editar gasto, con Efectivo por defecto, tarjetas guardadas y logo/nombre en el historial. Los gastos anteriores conservan Sin especificar. Las asignaciones se incluyen en las copias completas y la migración conserva los datos existentes. Detalles en [docs/PAGOS_EN_GASTOS.md](docs/PAGOS_EN_GASTOS.md).
 
@@ -42,7 +46,7 @@ La base de la implementación contiene las cinco secciones, formularios, Room, c
 
 Se utiliza un CSV privado externo al proyecto como comprobación local opcional; no se copia al repositorio. La comparación visual con Fuel y sus totales sigue pendiente de verificar en el teléfono.
 
-**Validado en 0.6:** APK debug compilado y firmado, 67 pruebas JVM y 32 pruebas Android aprobadas, Android Lint sin errores (19 avisos). Se comprobaron las migraciones hasta Room 6, pago de gastos y llenados, categorías, importación, restauración y reinicio completo. Se omitió la prueba CSV privada opcional. Drive usa un servicio simulado; no se modificaron copias de la cuenta real. Detalles en [docs/VALIDACION.md](docs/VALIDACION.md).
+**Validado en 0.7:** APK debug compilado y firmado, 74 pruebas JVM y 37 pruebas Android aprobadas, Android Lint sin errores (19 avisos). Se comprobaron los iconos y el formulario de llenados, filtro de periodos y fechas personalizadas, conservación de indicadores, datos, pagos, categorías, copias y reinicio. Se omitió la prueba CSV privada opcional. Drive usa un servicio simulado; no se modificaron copias de la cuenta real. Detalles en [docs/VALIDACION.md](docs/VALIDACION.md).
 
 ## Abrir y ejecutar
 

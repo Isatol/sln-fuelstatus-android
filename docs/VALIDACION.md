@@ -1,4 +1,25 @@
-# Validación 0.6.0 · Métodos de pago en gastos
+# Validación 0.7.0 · Iconos y filtro de llenados
+
+16 de octubre de 2026, America/Monterrey. Rama `20261016-iconos-y-filtro-de-llenados`, Gradle 9.4.1, JDK de Android Studio y emulador Medium Phone API 37 en modo desechable. Gradle y el emulador se ejecutaron por separado.
+
+- **APK debug generado y firmado:** `.local/releases/FuelStatus-0.7.0-iconos-filtro-llenados.apk` (37 605 034 bytes), paquete `mx.fuelstatus`, versionCode 7.
+- **74 pruebas JVM aprobadas:** las 67 anteriores y 7 de rangos de fechas. Se omitió únicamente la comprobación opcional que requiere un CSV privado; 75 casos registrados, cero fallos y cero errores.
+- **37 pruebas Android aprobadas en la suite completa:** las 32 anteriores y 5 de formulario, periodos, rango personalizado, cancelación y restauración del estado.
+- **Android Lint:** cero errores y 19 avisos existentes.
+- **Firma compatible con las entregas anteriores:** SHA-1 `81:BA:D0:FD:EB:A0:29:7E:6B:3E:F9:04:FF:6B:1D:AD:80:33:1F:36`.
+- **SHA-256 del APK:** `866d9e4d337c3526970b5220f12e5db66262de50180ef7c80422efc3f49e0eaf`.
+
+Las pruebas de rangos verifican meses de calendario, años bisiestos, límites exactos de inicio y fin, un solo día, zona horaria local y cambios de horario estacional. Se rechazan rangos invertidos y se conserva el orden de los registros, sin mutarlos ni cambiar sus cálculos de consumo.
+
+La interfaz comprueba tres meses por defecto, seis meses y un año; el conteo visible cambia mientras los indicadores conservan los totales completos. El rango personalizado se aplica mediante entrada de fechas y se conserva al restaurar el estado de la pantalla. Fechas inválidas deshabilitan Aplicar; cancelar conserva el filtro anterior. Un periodo vacío muestra una explicación y permite recuperar el historial eligiendo otro rango. El formulario sigue guardando odómetro, litros, importe, gasolinera, notas y los tres interruptores con sus valores correctos.
+
+Se revisaron las capturas del calendario, selector, rango aplicado y formulario en `.local/qa/iconos-filtro-llenados/`. La revisión inicial detectó que el icono reducía el espacio de Total pagado en teléfonos; se amplió la distribución vertical de Litros y Total. Después del ajuste se repitieron y aprobaron la navegación y los cinco casos nuevos con el APK final; también se aprobaron los cinco casos nuevos con el tamaño de texto real de Android al 130 %. Se comprobaron temas claro y oscuro. Los iconos son recursos locales; los nuevos de filtro y notas son Material Symbols Rounded con su aviso Apache 2.0 incluido. Las sesiones de emulador se cerraron y su almacenamiento fue desechable.
+
+No cambia Room (6), ni el formato de respaldo (5), ni la importación o exportación. El filtro no recorta las copias ni modifica el historial guardado. Las pruebas de Drive siguen usando un servicio simulado, sin operar sobre las copias de la cuenta real.
+
+---
+
+# Validación histórica 0.6.0 · Métodos de pago en gastos
 
 16 de octubre de 2026, America/Monterrey. Rama `20261016-metodos-de-pago-en-gastos`, Gradle 9.4.1, JDK de Android Studio y emulador Medium Phone API 37 en modo desechable. Gradle y el emulador se ejecutaron por separado.
 
