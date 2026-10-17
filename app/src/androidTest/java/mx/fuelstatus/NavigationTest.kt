@@ -63,14 +63,14 @@ class NavigationTest {
         compose.onNodeWithContentDescription("Llenados").performClick()
         compose.waitUntil(15000) { compose.onAllNodesWithContentDescription("Nuevo llenado").fetchSemanticsNodes().isNotEmpty() }
         compose.onNodeWithContentDescription("Nuevo llenado").performClick()
-        compose.onNodeWithText("Combustible: Premium · 91 octanos").assertIsDisplayed().performClick()
+        compose.onNodeWithText("Premium · 91 octanos").assertIsDisplayed().performClick()
         compose.onNodeWithText("Magna · 87 octanos").performClick()
         compose.onNodeWithText("Efectivo").assertIsDisplayed().performClick()
         compose.onNodeWithText("Visa personal").performClick()
         capture("nuevo-llenado-pago")
         compose.onNodeWithText("Odómetro (km)").performTextInput("55555")
-        compose.onNodeWithText("Litros").performTextInput("40")
-        compose.onNodeWithText("Total pagado ($)").performTextInput("1000")
+        compose.onNodeWithContentDescription("Litros").performTextInput("40")
+        compose.onNodeWithContentDescription("Total pagado ($)").performTextInput("1000")
         compose.onNodeWithText("Guardar llenado").performScrollTo().performClick()
         compose.waitUntil(15000) { compose.onAllNodesWithText("Llenado guardado").fetchSemanticsNodes().isNotEmpty() }
         compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("Visa personal"))
