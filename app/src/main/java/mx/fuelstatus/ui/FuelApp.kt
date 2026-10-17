@@ -187,7 +187,8 @@ fun FuelApp(model: FuelViewModel, onConnectDrive: () -> Unit) {
                 onDelete = { model.delete(it, close) }, paymentMethods = state.paymentMethods) }
             "expense" -> state.selectedVehicle?.let { vehicle -> ExpenseEditor(vehicle,
                 state.expenses.firstOrNull { it.id == editingId }, busy, close,
-                onSave = { model.save(it, close) }, onDelete = { model.delete(it, close) }, categories = state.expenseCategories) }
+                onSave = { model.save(it, close) }, onDelete = { model.delete(it, close) }, categories = state.expenseCategories,
+                paymentMethods = state.paymentMethods) }
             "vehicle" -> VehicleEditor(state.vehicles.firstOrNull { it.id == editingId }, state.vehicles, busy, close,
                 onSave = { model.save(it, close) })
         }
@@ -271,7 +272,11 @@ private fun ExpensesScreen(state: FuelState, onEdit: (Expense) -> Unit) {
                         Text(date(expense.timestamp), style = MaterialTheme.typography.bodySmall)
                         if (expense.notes.isNotBlank()) Text(expense.notes, style = MaterialTheme.typography.bodySmall)
                     }
-                    Text(money(expense.costCents / 100.0), fontWeight = FontWeight.Bold)
+                    Column(Modifier.widthIn(max = 132.dp), horizontalAlignment = Alignment.End,
+                        verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Text(money(expense.costCents / 100.0), fontWeight = FontWeight.Bold)
+                        PaymentMethodBadge(state.paymentMethods.firstOrNull { it.id == expense.paymentMethodId })
+                    }
                 }
             }
         }
@@ -398,7 +403,7 @@ private fun SettingsScreen(preferences: Preferences, busy: Boolean, onTheme: (St
         }
         item { deleteContent() }
         item { Explanation("Tu auto, tus datos", "Todo se guarda en este teléfono, con copias opcionales en tu Google Drive. Sin anuncios ni suscripción. Los importes se muestran en pesos mexicanos y las distancias en kilómetros.") }
-        item { Text("FuelStatus · 0.5.0\nHecha para Android", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(8.dp)) }
+        item { Text("FuelStatus · 0.6.0\nHecha para Android", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(8.dp)) }
     }
 }
 

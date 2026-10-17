@@ -15,7 +15,7 @@ class CategoryBackupTest {
     @Test fun catalogAndAssignedExpensesRoundTripWithoutLosingAmounts() {
         val original = document()
         assertEquals(original, BackupCodec.decode(BackupCodec.encode(original)))
-        assertEquals(4, JsonParser.parseString(BackupCodec.encode(original).toString(Charsets.UTF_8)).asJsonObject.get("version").asInt)
+        assertEquals(5, JsonParser.parseString(BackupCodec.encode(original).toString(Charsets.UTF_8)).asJsonObject.get("version").asInt)
     }
 
     @Test fun versionThreeBackupBuildsCatalogFromOriginalExpenseNames() {

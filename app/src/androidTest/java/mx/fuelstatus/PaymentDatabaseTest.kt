@@ -37,16 +37,16 @@ class PaymentDatabaseTest {
             old.execSQL("INSERT INTO backup_revision VALUES (1, 9)")
             old.version = 3
         }
-        val db = Room.databaseBuilder(context, FuelDatabase::class.java, name).addMigrations(FuelDatabase.MIGRATION_3_4, FuelDatabase.MIGRATION_4_5).build()
+        val db = Room.databaseBuilder(context, FuelDatabase::class.java, name).addMigrations(FuelDatabase.MIGRATION_3_4, FuelDatabase.MIGRATION_4_5, FuelDatabase.MIGRATION_5_6).build()
         try {
             assertEquals(listOf(PaymentMethod.Cash), db.dao().allPaymentMethods())
             val fill = db.dao().allRefuels().single()
             assertNull(fill.paymentMethodId)
             assertEquals("Original", fill.notes); assertEquals("premium", fill.fuelType); assertEquals(100000L, fill.costCents)
-            assertEquals(10L, db.dao().revision())
+            assertEquals(11L, db.dao().revision())
             try { FuelRepository(db).save(fill.copy(paymentMethodId = "missing")); fail("Expected foreign key failure") }
             catch (_: android.database.sqlite.SQLiteConstraintException) { }
-            assertEquals(10L, db.dao().revision())
+            assertEquals(11L, db.dao().revision())
         } finally { db.close(); context.deleteDatabase(name) }
     }
 

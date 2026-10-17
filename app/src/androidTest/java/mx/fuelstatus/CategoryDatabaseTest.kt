@@ -35,7 +35,7 @@ class CategoryDatabaseTest {
             old.execSQL("INSERT INTO backup_revision VALUES (1, 9)")
             old.version = 4
         }
-        val db = Room.databaseBuilder(context, FuelDatabase::class.java, name).addMigrations(FuelDatabase.MIGRATION_4_5).build()
+        val db = Room.databaseBuilder(context, FuelDatabase::class.java, name).addMigrations(FuelDatabase.MIGRATION_4_5, FuelDatabase.MIGRATION_5_6).build()
         try {
             val expenses = db.dao().allExpenses()
             assertEquals(2, expenses.size)
@@ -45,7 +45,7 @@ class CategoryDatabaseTest {
             assertTrue(categories.containsAll(ExpenseCategory.Defaults))
             assertEquals(CategoryIcon.Tag.code, categories.single { it.name == "Categoría antigua" }.icon)
             assertEquals("Otros", categories.last().name)
-            assertEquals(10L, db.dao().revision())
+            assertEquals(11L, db.dao().revision())
             FuelRepository(db).save(expenses.single { it.id == "custom" }.copy(costCents = 70000))
             assertEquals(70000L, db.dao().allExpenses().single { it.id == "custom" }.costCents)
         } finally { db.close(); context.deleteDatabase(name) }

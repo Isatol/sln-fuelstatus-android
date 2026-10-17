@@ -45,8 +45,9 @@ data class Refuel(
 }
 
 @Entity(tableName = "expenses", foreignKeys = [ForeignKey(entity = Vehicle::class,
-    parentColumns = ["id"], childColumns = ["vehicleId"], onDelete = ForeignKey.CASCADE)],
-    indices = [Index("vehicleId")])
+    parentColumns = ["id"], childColumns = ["vehicleId"], onDelete = ForeignKey.CASCADE),
+    ForeignKey(entity = PaymentMethod::class, parentColumns = ["id"], childColumns = ["paymentMethodId"], onDelete = ForeignKey.RESTRICT)],
+    indices = [Index("vehicleId"), Index("paymentMethodId")])
 data class Expense(
     @PrimaryKey val id: String = UUID.randomUUID().toString(),
     val vehicleId: String,
@@ -54,6 +55,7 @@ data class Expense(
     val category: String,
     val costCents: Long,
     val notes: String = "",
+    @ColumnInfo(defaultValue = "NULL") val paymentMethodId: String? = null,
 )
 
 @Entity(tableName = "backup_revision")
