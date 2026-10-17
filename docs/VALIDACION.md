@@ -1,4 +1,26 @@
-# Validación 0.5.0 · Categorías de gastos
+# Validación 0.6.0 · Métodos de pago en gastos
+
+16 de octubre de 2026, America/Monterrey. Rama `20261016-metodos-de-pago-en-gastos`, Gradle 9.4.1, JDK de Android Studio y emulador Medium Phone API 37 en modo desechable. Gradle y el emulador se ejecutaron por separado.
+
+- **APK debug generado y firmado:** `.local/releases/FuelStatus-0.6.0-pagos-en-gastos.apk` (36 691 291 bytes), paquete `mx.fuelstatus`, versionCode 6.
+- **67 pruebas JVM aprobadas:** 10 de estadísticas, 13 de CSV, 30 del motor de respaldo, 3 de métodos de pago, 4 de categorías, 3 de pagos en gastos y 4 del contrato REST de Drive. Se omitió únicamente la comprobación opcional que requiere un CSV privado; 68 casos registrados, cero fallos y cero errores.
+- **32 pruebas Android aprobadas en la suite completa**, incluidas dos nuevas de migración/persistencia de pagos en gastos y tres de sus formularios.
+- **Android Lint:** cero errores y 19 avisos existentes.
+- **Firma compatible con las entregas anteriores:** SHA-1 `81:BA:D0:FD:EB:A0:29:7E:6B:3E:F9:04:FF:6B:1D:AD:80:33:1F:36`.
+- **SHA-256 del APK:** `ca65428b200a34f9ed69d01cfa48a768ff14fc800ebde004d37f6d66d3264098`.
+- Se comprobó que el APK no incluye CSV, bases de datos, historiales ni archivos de firma privados.
+
+La migración 5→6 conserva los gastos originales y deja su pago sin especificar; las migraciones anteriores se mantienen y se probaron las rutas 1→6, 2→6, 3→6 y 4→6. Se verificaron asignaciones a tarjetas y Efectivo, persistencia al reabrir Room, cambio o eliminación explícita de una asignación, rechazo de métodos inexistentes sin avanzar la revisión y protección de tarjetas referenciadas. La restauración repone métodos y gastos conjuntamente; el borrado elimina sus referencias y conserva Efectivo al reiniciar.
+
+El formato de respaldo 5 conserva pagos de gastos con tarjeta, Efectivo y Sin especificar. Se verificó la lectura de formatos 1 a 4 sin inferir pagos históricos ni cambiar importes, categorías o notas, y el rechazo de referencias de pago inválidas.
+
+Los formularios comprobaron Efectivo por defecto, tarjeta elegida, conservación de pagos al editar notas y selección explícita de Sin especificar. El recorrido completo crea un gasto con una tarjeta, recrea la Activity antes de guardarlo, comprueba el nombre del método en el historial, edita su categoría y pago a Efectivo, y comprueba el borrado de datos. También se repitieron y aprobaron los tres casos de formulario con el tamaño de texto real de Android al 130 %. Se revisaron las capturas de claro, oscuro e historial en `.local/qa/pagos-en-gastos/`; las sesiones de emulador se cerraron y su almacenamiento fue desechable.
+
+**Límite de esta validación:** Drive usa un servicio simulado. Se verificaron serialización y restauración sin modificar las copias de la cuenta real. El APK mantiene paquete y firma para actualizar la instalación anterior.
+
+---
+
+# Validación histórica 0.5.0 · Categorías de gastos
 
 16 de octubre de 2026, America/Monterrey. Rama `20261016-categorias-de-gastos`, Gradle 9.4.1, JDK de Android Studio y emulador Medium Phone API 37 en modo desechable. Gradle y el emulador se ejecutaron por separado para limitar el consumo de memoria.
 

@@ -78,10 +78,12 @@ fun RefuelEditor(vehicle: Vehicle, records: List<Refuel>, existing: Refuel?, bus
 
 @Composable
 fun ExpenseEditor(vehicle: Vehicle, existing: Expense?, busy: Boolean, onDismiss: () -> Unit,
-    onSave: (Expense) -> Unit, onDelete: (Expense) -> Unit, categories: List<ExpenseCategory> = ExpenseCategory.Defaults) {
+    onSave: (Expense) -> Unit, onDelete: (Expense) -> Unit, categories: List<ExpenseCategory> = ExpenseCategory.Defaults,
+    paymentMethods: List<PaymentMethod> = listOf(PaymentMethod.Cash)) {
     val key = existing?.id ?: "new-expense"
     var timestamp by rememberSaveable(key) { mutableLongStateOf(existing?.timestamp ?: System.currentTimeMillis()) }
     var category by rememberSaveable(key) { mutableStateOf(existing?.category ?: "Servicio") }
+    var paymentMethodId by rememberSaveable(key) { mutableStateOf(if (existing != null) existing.paymentMethodId else PaymentMethod.Cash.id) }
     var total by rememberSaveable(key) { mutableStateOf(existing?.let { inputNumber(it.costCents, 2) }.orEmpty()) }
     var notes by rememberSaveable(key) { mutableStateOf(existing?.notes.orEmpty()) }
     var error by rememberSaveable(key) { mutableStateOf<String?>(null) }
@@ -89,13 +91,14 @@ fun ExpenseEditor(vehicle: Vehicle, existing: Expense?, busy: Boolean, onDismiss
     EditorSheet(if (existing == null) "Nuevo gasto" else "Editar gasto", vehicle.label, busy, onDismiss) {
         DateField(timestamp) { timestamp = it }
         ExpenseCategorySelector(categories, category, { category = it }, enabled = !busy)
+        PaymentMethodSelector(paymentMethods, paymentMethodId, { paymentMethodId = it }, enabled = !busy, allowUnspecified = existing != null)
         NumberField("Total pagado ($)", total, { total = it })
         OutlinedTextField(notes, { notes = it }, label = { Text("Notas (opcional)") }, minLines = 2, modifier = Modifier.fillMaxWidth())
         error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
         Button(enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp), onClick = {
             val amount = scaledInput(total, 2)
             if (amount == null || amount <= 0) error = "El total pagado debe ser mayor a cero."
-            else onSave(Expense(existing?.id ?: UUID.randomUUID().toString(), vehicle.id, timestamp, category, amount, notes.trim()))
+            else onSave(Expense(existing?.id ?: UUID.randomUUID().toString(), vehicle.id, timestamp, category, amount, notes.trim(), paymentMethodId))
         }) { Text("Guardar gasto") }
         if (existing != null) TextButton(onClick = { deleteConfirmation = true }, enabled = !busy, modifier = Modifier.fillMaxWidth()) {
             Text("Eliminar gasto", color = MaterialTheme.colorScheme.error)

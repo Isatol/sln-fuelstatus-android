@@ -20,7 +20,7 @@ Los llenados guardados antes de esta versión se muestran como **Sin especificar
 
 La migración de Room 3→4 crea `payment_methods` con Efectivo y añade una referencia opcional en `refuels`. Conserva todos los valores del historial anterior. La referencia se valida mediante una clave foránea e índice; no se pueden guardar llenados que apunten a métodos inexistentes.
 
-El respaldo JSON usa el formato 3 e incluye los métodos y sus referencias. FuelStatus 0.4 sigue leyendo los formatos 1 y 2: incorpora Efectivo en la lista y conserva el método de los llenados antiguos como Sin especificar. Los respaldos nuevos requieren una versión que entienda el formato 3. La restauración reemplaza métodos, vehículos, llenados y gastos dentro de la misma transacción.
+Desde FuelStatus 0.6, el respaldo JSON usa el formato 5 e incluye los métodos y sus referencias en llenados y gastos. Se siguen leyendo los formatos 1 a 4: las copias anteriores al formato 3 incorporan Efectivo y conservan el pago histórico de llenados como Sin especificar; las anteriores al formato 5 conservan el pago de gastos como Sin especificar. La restauración reemplaza métodos, categorías, vehículos, llenados y gastos dentro de la misma transacción. Detalles del selector de gastos en [PAGOS_EN_GASTOS.md](PAGOS_EN_GASTOS.md).
 
 El CSV exportado incluye las columnas `paymentMethodName` y `paymentMethodBrand`; los registros sin especificar dejan ambos campos vacíos. El lector acepta las exportaciones anteriores sin estas columnas. La importación desde la interfaz aplica el método seleccionado en el diálogo. La lectura del CSV también conserva los metadatos para herramientas de recuperación y comprobaciones de exportación/importación.
 

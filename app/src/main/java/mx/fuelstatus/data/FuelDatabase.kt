@@ -41,10 +41,18 @@ interface FuelDao {
     @Delete suspend fun delete(expense: Expense)
 }
 
-@Database(entities = [Vehicle::class, Refuel::class, Expense::class, BackupRevision::class, PaymentMethod::class, ExpenseCategory::class], version = 5, exportSchema = true)
+@Database(entities = [Vehicle::class, Refuel::class, Expense::class, BackupRevision::class, PaymentMethod::class, ExpenseCategory::class], version = 6, exportSchema = true)
 abstract class FuelDatabase : RoomDatabase() {
     abstract fun dao(): FuelDao
     companion object {
+        val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE expenses ADD COLUMN paymentMethodId TEXT DEFAULT NULL REFERENCES payment_methods(id) ON UPDATE NO ACTION ON DELETE RESTRICT")
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_expenses_paymentMethodId ON expenses(paymentMethodId)")
+                db.execSQL("UPDATE backup_revision SET revision = revision + 1 WHERE id = 1")
+            }
+        }
+
         val MIGRATION_4_5 = object : Migration(4, 5) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("CREATE TABLE IF NOT EXISTS expense_categories (name TEXT NOT NULL, icon TEXT NOT NULL, sortOrder INTEGER NOT NULL, PRIMARY KEY(name))")

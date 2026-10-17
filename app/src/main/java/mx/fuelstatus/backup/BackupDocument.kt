@@ -37,7 +37,7 @@ object BackupCodec {
         validate(payload)
         val envelope = JsonObject().apply {
             addProperty("format", "fuelstatus-backup")
-            addProperty("version", 4)
+            addProperty("version", 5)
             addProperty("sha256", sha256(gson.toJson(payload).toByteArray(Charsets.UTF_8)))
             add("data", payload)
         }
@@ -52,7 +52,7 @@ object BackupCodec {
             val root = JsonParser.parseString(bytes.toString(Charsets.UTF_8)).asJsonObject
             require(root.string("format") == "fuelstatus-backup") { "No es una copia de FuelStatus." }
             val version = root.long("version")
-            require(version in 1L..4L) { "Esta copia necesita otra versión de FuelStatus." }
+            require(version in 1L..5L) { "Esta copia necesita otra versión de FuelStatus." }
             val payload = root.getAsJsonObject("data") ?: error("Faltan los datos del respaldo.")
             require(root.string("sha256") == sha256(gson.toJson(payload).toByteArray(Charsets.UTF_8))) { "La copia está incompleta o su contenido fue modificado." }
             if (version == 1L) {
@@ -70,6 +70,9 @@ object BackupCodec {
             if (version < 4L) {
                 val names = payload.getAsJsonArray("expenses")?.map { it.asJsonObject.string("category") }.orEmpty()
                 payload.add("expenseCategories", gson.toJsonTree(ExpenseCategory.forLegacyExpenses(names)))
+            }
+            if (version < 5L) {
+                payload.getAsJsonArray("expenses")?.forEach { row -> row.asJsonObject.add("paymentMethodId", JsonNull.INSTANCE) }
             }
             validate(payload)
             return gson.fromJson(payload, BackupDocument::class.java)
@@ -133,6 +136,10 @@ object BackupCodec {
             require(it.long("timestamp") > 0 && it.long("costCents") > 0 && it.string("category").isNotBlank()) { "Gasto con valores inválidos." }
             it.string("notes")
             require(it.string("category") in categoryNames) { "Un gasto hace referencia a una categoría inexistente." }
+            val methodId = it.get("paymentMethodId")
+            if (methodId != null && !methodId.isJsonNull) {
+                require(it.string("paymentMethodId") in methodIds) { "Un gasto hace referencia a un método de pago inexistente." }
+            }
         }
         val appearance = data.getAsJsonObject("appearance") ?: error("Faltan los ajustes.")
         require(appearance.string("theme") in listOf("system", "light", "dark")) { "Tema de apariencia inválido." }
