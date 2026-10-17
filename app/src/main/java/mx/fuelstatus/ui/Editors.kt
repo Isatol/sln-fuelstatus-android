@@ -9,6 +9,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -36,24 +38,32 @@ fun RefuelEditor(vehicle: Vehicle, records: List<Refuel>, existing: Refuel?, bus
     var error by rememberSaveable(key) { mutableStateOf<String?>(null) }
     var deleteConfirmation by remember { mutableStateOf(false) }
     EditorSheet(if (existing == null) "Nuevo llenado" else "Editar llenado", vehicle.label, busy, onDismiss) {
-        FuelSelector(fuelType, { fuelType = it }, allowUnspecified = existing != null)
+        FuelSelector(fuelType, { fuelType = it }, allowUnspecified = existing != null, enabled = !busy, icon = R.drawable.ic_pump)
         PaymentMethodSelector(paymentMethods, paymentMethodId, { paymentMethodId = it }, enabled = !busy, allowUnspecified = existing != null)
-        DateField(timestamp) { timestamp = it }
-        NumberField("Odómetro (km)", odometer, { odometer = it }, "Último: ${records.maxOfOrNull { it.km }?.let { number(it, 0) } ?: "—"} km")
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            NumberField("Litros", liters, { liters = it }, modifier = Modifier.weight(1f))
-            NumberField("Total pagado ($)", total, { total = it }, modifier = Modifier.weight(1f))
+        DateField(timestamp, icon = R.drawable.ic_category_calendar_month) { timestamp = it }
+        NumberField("Odómetro (km)", odometer, { odometer = it }, "Último: ${records.maxOfOrNull { it.km }?.let { number(it, 0) } ?: "—"} km", icon = R.drawable.ic_speed)
+        val largeText = LocalDensity.current.fontScale > 1.15f
+        BoxWithConstraints(Modifier.fillMaxWidth()) {
+            if (maxWidth < 400.dp || largeText) Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                NumberField("Litros", liters, { liters = it }, icon = R.drawable.ic_water_drop)
+                NumberField("Total pagado ($)", total, { total = it }, icon = R.drawable.ic_payments)
+            } else Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                NumberField("Litros", liters, { liters = it }, modifier = Modifier.weight(1f), icon = R.drawable.ic_water_drop)
+                NumberField("Total pagado ($)", total, { total = it }, modifier = Modifier.weight(1f), icon = R.drawable.ic_payments)
+            }
         }
         val volume = scaledInput(liters, 3)
         val cents = scaledInput(total, 2)
         if (volume != null && volume > 0 && cents != null && cents > 0) {
             Text("Precio calculado: ${money(cents / 100.0 / (volume / 1000.0))} / L", style = MaterialTheme.typography.bodyMedium)
         }
-        ToggleRow("Tanque lleno", "Desactívalo si fue una carga parcial.", full) { full = it }
-        ToggleRow("Incluir en estadísticas", "Cuenta esta carga en totales y promedios.", included) { included = it }
-        ToggleRow("Falta una carga anterior", "Reinicia el cálculo de consumo desde aquí.", missed) { missed = it }
-        OutlinedTextField(station, { station = it }, label = { Text("Gasolinera (opcional)") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
-        OutlinedTextField(notes, { notes = it }, label = { Text("Notas (opcional)") }, modifier = Modifier.fillMaxWidth(), minLines = 2)
+        ToggleRow("Tanque lleno", "Desactívalo si fue una carga parcial.", full, R.drawable.ic_water_full) { full = it }
+        ToggleRow("Incluir en estadísticas", "Cuenta esta carga en totales y promedios.", included, R.drawable.ic_chart) { included = it }
+        ToggleRow("Falta una carga anterior", "Reinicia el cálculo de consumo desde aquí.", missed, R.drawable.ic_category_warning) { missed = it }
+        OutlinedTextField(station, { station = it }, label = { Text("Gasolinera (opcional)") }, leadingIcon = { FuelIcon(R.drawable.ic_category_local_gas_station) },
+            modifier = Modifier.fillMaxWidth(), singleLine = true)
+        OutlinedTextField(notes, { notes = it }, label = { Text("Notas (opcional)") }, leadingIcon = { FuelIcon(R.drawable.ic_notes) },
+            modifier = Modifier.fillMaxWidth(), minLines = 2)
         error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
         Button(enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp), onClick = {
             val meters = scaledInput(odometer, 3)
@@ -136,10 +146,11 @@ fun VehicleEditor(existing: Vehicle?, vehicles: List<Vehicle>, busy: Boolean, on
 }
 
 @Composable
-fun FuelSelector(value: String, onChange: (String) -> Unit, allowUnspecified: Boolean = false, enabled: Boolean = true) {
+fun FuelSelector(value: String, onChange: (String) -> Unit, allowUnspecified: Boolean = false, enabled: Boolean = true, icon: Int? = null) {
     var expanded by remember { mutableStateOf(false) }
     Box {
         OutlinedButton(onClick = { expanded = true }, enabled = enabled, modifier = Modifier.fillMaxWidth()) {
+            if (icon != null) { FuelIcon(icon); Spacer(Modifier.width(10.dp)) }
             Text("Combustible: ${FuelType.fromCode(value).label}")
         }
         DropdownMenu(expanded, onDismissRequest = { expanded = false }) {
@@ -166,14 +177,16 @@ private fun EditorSheet(title: String, subtitle: String, busy: Boolean, onDismis
 }
 
 @Composable
-private fun NumberField(label: String, value: String, onChange: (String) -> Unit, supporting: String? = null, modifier: Modifier = Modifier) {
+private fun NumberField(label: String, value: String, onChange: (String) -> Unit, supporting: String? = null, modifier: Modifier = Modifier, icon: Int? = null) {
     OutlinedTextField(value, onChange, modifier = modifier.fillMaxWidth(), label = { Text(label) }, singleLine = true,
+        leadingIcon = icon?.let { { FuelIcon(it) } },
         supportingText = supporting?.let { { Text(it) } }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal))
 }
 
 @Composable
-private fun ToggleRow(title: String, subtitle: String, value: Boolean, onChange: (Boolean) -> Unit) {
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+private fun ToggleRow(title: String, subtitle: String, value: Boolean, icon: Int? = null, onChange: (Boolean) -> Unit) {
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        if (icon != null) FuelIcon(icon)
         Column(Modifier.weight(1f)) {
             Text(title, style = MaterialTheme.typography.titleSmall)
             Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -183,9 +196,12 @@ private fun ToggleRow(title: String, subtitle: String, value: Boolean, onChange:
 }
 
 @Composable
-private fun DateField(timestamp: Long, onChange: (Long) -> Unit) {
+private fun DateField(timestamp: Long, icon: Int? = null, onChange: (Long) -> Unit) {
     var show by remember { mutableStateOf(false) }
-    OutlinedButton(onClick = { show = true }, modifier = Modifier.fillMaxWidth()) { Text("Fecha: ${date(timestamp)}") }
+    OutlinedButton(onClick = { show = true }, modifier = Modifier.fillMaxWidth()) {
+        if (icon != null) { FuelIcon(icon); Spacer(Modifier.width(10.dp)) }
+        Text("Fecha: ${date(timestamp)}")
+    }
     if (show) {
         val localDate = Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDate()
         val state = rememberDatePickerState(initialSelectedDateMillis = localDate.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli())
