@@ -113,8 +113,8 @@ class RefuelHistoryTest {
         } }
         capture("formulario-inicio", true)
         compose.onNodeWithText("Odómetro (km)").performScrollTo().performTextInput("50000")
-        compose.onNodeWithText("Litros").performScrollTo().performTextInput("40")
-        compose.onNodeWithText("Total pagado ($)").performScrollTo().performTextInput("1000")
+        compose.onNodeWithContentDescription("Litros").performScrollTo().performTextInput("40")
+        compose.onNodeWithContentDescription("Total pagado ($)").performScrollTo().performTextInput("1000")
         compose.onAllNodes(isToggleable())[0].performScrollTo().performClick().assertIsOff()
         compose.onAllNodes(isToggleable())[1].performScrollTo().performClick().assertIsOff()
         compose.onAllNodes(isToggleable())[2].performScrollTo().performClick().assertIsOn()

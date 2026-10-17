@@ -10,7 +10,8 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -38,19 +39,17 @@ fun RefuelEditor(vehicle: Vehicle, records: List<Refuel>, existing: Refuel?, bus
     var error by rememberSaveable(key) { mutableStateOf<String?>(null) }
     var deleteConfirmation by remember { mutableStateOf(false) }
     EditorSheet(if (existing == null) "Nuevo llenado" else "Editar llenado", vehicle.label, busy, onDismiss) {
-        FuelSelector(fuelType, { fuelType = it }, allowUnspecified = existing != null, enabled = !busy, icon = R.drawable.ic_pump)
-        PaymentMethodSelector(paymentMethods, paymentMethodId, { paymentMethodId = it }, enabled = !busy, allowUnspecified = existing != null)
+        Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            FuelSelector(fuelType, { fuelType = it }, allowUnspecified = existing != null, enabled = !busy,
+                icon = R.drawable.ic_pump, modifier = Modifier.weight(1f).fillMaxHeight(), compact = true)
+            PaymentMethodSelector(paymentMethods, paymentMethodId, { paymentMethodId = it }, enabled = !busy,
+                allowUnspecified = existing != null, modifier = Modifier.weight(1f).fillMaxHeight(), compact = true)
+        }
         DateField(timestamp, icon = R.drawable.ic_category_calendar_month) { timestamp = it }
-        NumberField("Odómetro (km)", odometer, { odometer = it }, "Último: ${records.maxOfOrNull { it.km }?.let { number(it, 0) } ?: "—"} km", icon = R.drawable.ic_speed)
-        val largeText = LocalDensity.current.fontScale > 1.15f
-        BoxWithConstraints(Modifier.fillMaxWidth()) {
-            if (maxWidth < 400.dp || largeText) Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                NumberField("Litros", liters, { liters = it }, icon = R.drawable.ic_water_drop)
-                NumberField("Total pagado ($)", total, { total = it }, icon = R.drawable.ic_payments)
-            } else Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                NumberField("Litros", liters, { liters = it }, modifier = Modifier.weight(1f), icon = R.drawable.ic_water_drop)
-                NumberField("Total pagado ($)", total, { total = it }, modifier = Modifier.weight(1f), icon = R.drawable.ic_payments)
-            }
+        NumberField("Odómetro (km)", odometer, { odometer = it }, supporting = "Último: ${records.maxOfOrNull { it.km }?.let { number(it, 0) } ?: "—"} km", icon = R.drawable.ic_speed)
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            NumberField("Litros", liters, { liters = it }, modifier = Modifier.weight(1f), icon = R.drawable.ic_water_drop, labelAbove = true)
+            NumberField("Total pagado ($)", total, { total = it }, modifier = Modifier.weight(1f), icon = R.drawable.ic_payments, labelAbove = true)
         }
         val volume = scaledInput(liters, 3)
         val cents = scaledInput(total, 2)
@@ -146,16 +145,22 @@ fun VehicleEditor(existing: Vehicle?, vehicles: List<Vehicle>, busy: Boolean, on
 }
 
 @Composable
-fun FuelSelector(value: String, onChange: (String) -> Unit, allowUnspecified: Boolean = false, enabled: Boolean = true, icon: Int? = null) {
+fun FuelSelector(value: String, onChange: (String) -> Unit, modifier: Modifier = Modifier,
+    allowUnspecified: Boolean = false, enabled: Boolean = true, icon: Int? = null, compact: Boolean = false) {
     var expanded by remember { mutableStateOf(false) }
-    Box {
-        OutlinedButton(onClick = { expanded = true }, enabled = enabled, modifier = Modifier.fillMaxWidth()) {
-            if (icon != null) { FuelIcon(icon); Spacer(Modifier.width(10.dp)) }
-            Text("Combustible: ${FuelType.fromCode(value).label}")
-        }
-        DropdownMenu(expanded, onDismissRequest = { expanded = false }) {
-            FuelType.entries.filter { allowUnspecified || it != FuelType.Unspecified }.forEach { fuel ->
-                DropdownMenuItem(text = { Text(fuel.label) }, onClick = { onChange(fuel.code); expanded = false })
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        if (compact) Text("Combustible", style = MaterialTheme.typography.labelLarge)
+        Box(if (compact) Modifier.fillMaxWidth().weight(1f) else Modifier) {
+            OutlinedButton(onClick = { expanded = true }, enabled = enabled,
+                modifier = if (compact) Modifier.fillMaxSize().heightIn(min = 56.dp) else Modifier.fillMaxWidth(),
+                contentPadding = if (compact) PaddingValues(horizontal = 12.dp, vertical = 8.dp) else ButtonDefaults.ContentPadding) {
+                if (icon != null) { FuelIcon(icon); Spacer(Modifier.width(if (compact) 6.dp else 10.dp)) }
+                Text(if (compact) FuelType.fromCode(value).label else "Combustible: ${FuelType.fromCode(value).label}")
+            }
+            DropdownMenu(expanded && enabled, onDismissRequest = { expanded = false }) {
+                FuelType.entries.filter { allowUnspecified || it != FuelType.Unspecified }.forEach { fuel ->
+                    DropdownMenuItem(text = { Text(fuel.label) }, onClick = { onChange(fuel.code); expanded = false })
+                }
             }
         }
     }
@@ -177,10 +182,16 @@ private fun EditorSheet(title: String, subtitle: String, busy: Boolean, onDismis
 }
 
 @Composable
-private fun NumberField(label: String, value: String, onChange: (String) -> Unit, supporting: String? = null, modifier: Modifier = Modifier, icon: Int? = null) {
-    OutlinedTextField(value, onChange, modifier = modifier.fillMaxWidth(), label = { Text(label) }, singleLine = true,
-        leadingIcon = icon?.let { { FuelIcon(it) } },
-        supportingText = supporting?.let { { Text(it) } }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal))
+private fun NumberField(label: String, value: String, onChange: (String) -> Unit, modifier: Modifier = Modifier,
+    supporting: String? = null, icon: Int? = null, labelAbove: Boolean = false) {
+    Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        if (labelAbove) Text(label, style = MaterialTheme.typography.labelLarge)
+        OutlinedTextField(value, onChange,
+            modifier = Modifier.fillMaxWidth().then(if (labelAbove) Modifier.semantics { contentDescription = label } else Modifier),
+            label = if (labelAbove) null else { { Text(label) } }, singleLine = true,
+            leadingIcon = icon?.let { { FuelIcon(it) } },
+            supportingText = supporting?.let { { Text(it) } }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal))
+    }
 }
 
 @Composable

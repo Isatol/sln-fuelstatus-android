@@ -1,6 +1,8 @@
 # Iconos y filtro de llenados · 0.7.0
 
-El formulario de Nuevo llenado y Editar llenado incorpora iconos en Combustible, Fecha, Odómetro, Litros, Total pagado, Tanque lleno, Incluir en estadísticas, Falta una carga anterior, Gasolinera y Notas. Los iconos usan los colores del tema y los textos conservan sus etiquetas para accesibilidad. Litros y Total se muestran uno debajo del otro en pantallas estrechas o con texto ampliado.
+El formulario de Nuevo llenado y Editar llenado incorpora iconos en Combustible, Fecha, Odómetro, Litros, Total pagado, Tanque lleno, Incluir en estadísticas, Falta una carga anterior, Gasolinera y Notas. Los iconos usan los colores del tema y los textos conservan sus etiquetas para accesibilidad.
+
+Combustible y Método de pago comparten una fila con dos columnas del mismo ancho. Litros y Total pagado comparten otra fila, también en teléfonos y con texto ampliado. Los cuatro controles muestran sus etiquetas arriba para aprovechar el ancho disponible. Los selectores conservan las opciones completas en sus menús; los nombres largos de métodos de pago se abrevian visualmente en el botón.
 
 En **Llenados → TODOS LOS LLENADOS** aparece un selector con icono de filtro:
 

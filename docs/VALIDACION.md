@@ -1,4 +1,18 @@
-# Validación 0.8.0 · Estadísticas de consumo
+# Validación 0.8.0 · Formulario de llenados en filas
+
+17 de octubre de 2026, America/Monterrey. Rama `20261017-formulario-llenados-en-filas`. El formulario compartido por Nuevo llenado y Editar llenado coloca Combustible y Método de pago en una fila, y Litros y Total pagado en otra. Las etiquetas aparecen encima de los cuatro controles.
+
+- **Compilación y Android Lint aprobados:** cero errores y 11 avisos. Se generaron los APK de la aplicación y de pruebas, con Gradle y el emulador ejecutados por separado.
+- **Prueba dirigida aprobada en la versión final:** `RefuelHistoryTest#refuelFormStillSavesInputsAndSwitchesWithIcons`, una vez con texto normal y otra con texto Android al 130 %. Comprueba entradas, opciones, notas y guardado de importes. No se añadieron casos nuevos ni se repitieron las pruebas JVM o la suite Android completa.
+- **Revisión visual:** las capturas de ambas escalas muestran las dos parejas completas y alineadas. Archivos locales en `.local/qa/formulario-llenados-filas/`. Emulador Medium Phone API 37 en modo read-only, sin snapshots, cerrado al terminar.
+- **Límite de validación:** el recorrido general `NavigationTest` falló en dos intentos durante las iteraciones previas al esperar `Vehículo guardado` (`NavigationTest.kt:28`), antes de abrir Llenados. No se considera aprobado ese recorrido ni se ha determinado la causa de la espera agotada.
+- **APK:** `.local/releases/FuelStatus-0.8.0-formulario-llenados-filas.apk`, versión 0.8.0, versionCode 8. SHA-256: `7c9269631d44e1ae50c08d2931c29088604d751d956a0a04faa5ae55c71207c6`.
+
+No se modifican cálculos, datos, Room (versión 6), migraciones ni formato de respaldo (5).
+
+---
+
+# Validación histórica 0.8.0 · Estadísticas de consumo
 
 16 de octubre de 2026, America/Monterrey. Rama `20261016-estadisticas-de-consumo`, Gradle 9.4.1, JDK de Android Studio y emulador Medium Phone API 37 desechable. Gradle y el emulador se ejecutaron por separado.
 

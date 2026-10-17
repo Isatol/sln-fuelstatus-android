@@ -65,17 +65,21 @@ fun PaymentMethodBadge(method: PaymentMethod?, modifier: Modifier = Modifier) {
 
 @Composable
 fun PaymentMethodSelector(methods: List<PaymentMethod>, value: String?, onChange: (String?) -> Unit,
-    enabled: Boolean = true, allowUnspecified: Boolean = false, label: String = "Método de pago") {
+    modifier: Modifier = Modifier, enabled: Boolean = true, allowUnspecified: Boolean = false,
+    label: String = "Método de pago", compact: Boolean = false) {
     var expanded by remember { mutableStateOf(false) }
     val choices = (listOf(PaymentMethod.Cash) + methods).distinctBy { it.id }
     val selected = choices.firstOrNull { it.id == value }
-    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(label, style = MaterialTheme.typography.labelLarge)
-        Box(Modifier.fillMaxWidth()) {
-            OutlinedButton(onClick = { expanded = true }, enabled = enabled, modifier = Modifier.fillMaxWidth()) {
-                PaymentLogo(selected?.brand)
-                Text(selected?.name ?: "Sin especificar", modifier = Modifier.weight(1f).padding(horizontal = 12.dp), maxLines = 2)
-                FuelIcon(R.drawable.ic_keyboard_arrow_down)
+        Box(if (compact) Modifier.fillMaxWidth().weight(1f) else Modifier.fillMaxWidth()) {
+            OutlinedButton(onClick = { expanded = true }, enabled = enabled,
+                modifier = if (compact) Modifier.fillMaxSize().heightIn(min = 56.dp) else Modifier.fillMaxWidth(),
+                contentPadding = if (compact) PaddingValues(horizontal = 12.dp, vertical = 8.dp) else ButtonDefaults.ContentPadding) {
+                PaymentLogo(selected?.brand, if (compact) 28.dp else 36.dp, if (compact) 20.dp else 26.dp)
+                Text(selected?.name ?: "Sin especificar", modifier = Modifier.weight(1f).padding(horizontal = if (compact) 6.dp else 12.dp),
+                    maxLines = 2, overflow = TextOverflow.Ellipsis)
+                FuelIcon(R.drawable.ic_keyboard_arrow_down, modifier = Modifier.size(if (compact) 20.dp else 24.dp))
             }
             DropdownMenu(expanded && enabled, onDismissRequest = { expanded = false }) {
                 if (allowUnspecified) DropdownMenuItem(text = { Text("Sin especificar") },
