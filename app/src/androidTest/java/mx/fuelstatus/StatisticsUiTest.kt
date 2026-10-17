@@ -98,9 +98,12 @@ class StatisticsUiTest {
             }
         } }
         scroll("Distancia media entre cargas")
+        scroll("400.0 km")
         compose.onNodeWithText("400.0 km").assertIsDisplayed()
         scroll("Frecuencia de carga")
+        scroll("Cada 5.0 días")
         compose.onNodeWithText("Cada 5.0 días").assertIsDisplayed()
+        scroll("5 días entre cargas.")
         compose.onNodeWithText("5 días entre cargas.").assertIsDisplayed()
         capture("medias-oscuro")
         scroll("Costo / km"); compose.onNodeWithText("Precio medio / L").assertExists()
@@ -111,6 +114,7 @@ class StatisticsUiTest {
         scroll("Cómo calculamos"); compose.onNodeWithText("Cómo calculamos").assertIsDisplayed()
         compose.runOnIdle { selected = "other" }
         scroll("Distancia media entre cargas")
+        scroll("100.0 km")
         compose.onNodeWithText("100.0 km").assertIsDisplayed()
         scroll("Aún no hay suficientes datos")
         compose.onNodeWithText("Consumo en aumento").assertDoesNotExist()

@@ -15,6 +15,7 @@ data class FuelStatistics(
     val periods: List<ConsumptionPeriod>,
     val refuelIntervals: List<RefuelInterval>,
     val trend: ConsumptionTrend?,
+    val comparablePeriods: List<ConsumptionPeriod> = emptyList(),
 ) {
     val averageDistanceBetweenRefuels: Double? get() = refuelIntervals.takeIf { it.isNotEmpty() }?.map { it.distanceKm }?.average()
     val averageDaysBetweenRefuels: Double? get() = refuelIntervals.takeIf { it.isNotEmpty() }?.map { it.days.toDouble() }?.average()
@@ -82,7 +83,7 @@ fun statistics(refuels: List<Refuel>, zone: ZoneId = ZoneId.systemDefault()): Fu
         val lastSix = comparable.takeLast(6)
         ConsumptionTrend(ConsumptionWindow.from(lastSix.take(3)), ConsumptionWindow.from(lastSix.takeLast(3)))
     }
-    return FuelStatistics(included.size, included.sumOf { it.liters }, included.sumOf { it.cost }, periods, intervals, trend)
+    return FuelStatistics(included.size, included.sumOf { it.liters }, included.sumOf { it.cost }, periods, intervals, trend, comparable)
 }
 
 /** Calendar-day gaps between consecutive recorded visits, including partial refuels. */

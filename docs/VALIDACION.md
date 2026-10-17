@@ -1,4 +1,18 @@
-# Validación 0.8.0 · Equivalencias de tendencia de consumo
+# Validación 0.8.0 · Proyecciones y métricas recientes
+
+17 de octubre de 2026, America/Monterrey. Rama `20261017-proyecciones-estadisticas`. Se incorporan seis tarjetas: próximo llenado estimado, alcance de una carga habitual, costo reciente por 100 km, tendencia del precio por litro, ahorro potencial y gasto estimado del mes. Costo y precio comparten fila cuando hay espacio; las explicaciones largas ocupan una fila completa.
+
+- **109 pruebas JVM aprobadas:** 110 registradas, una omitida por requerir el CSV privado. Los 16 casos nuevos verifican ponderación, volumen habitual con cargas parciales, frecuencia y rango de fechas, mediana de los últimos seis intervalos, huecos/exclusiones/retrocesos, cero días, cambio de horario, zona local, registros futuros, combustible comparable, ahorro/mejora/estabilidad, meses bisiestos, inicio del historial y cierre mensual.
+- **7 pruebas Android dirigidas aprobadas con texto normal** (tres nuevas de proyecciones y cuatro existentes de Estadísticas) y **las mismas 7 aprobadas con texto Android al 130 % en la repetición final**. Se ajustó el desplazamiento de la prueba de frecuencia para llevar cada valor a la vista antes de comprobarlo. No se repitió la suite Android completa ni la navegación general.
+- **Compilación y Android Lint aprobados:** cero errores y 11 avisos existentes. Gradle y el emulador se ejecutaron por separado.
+- **Revisión visual:** claro, oscuro, tarjetas de costo/precio en una fila y adaptación a una columna al 130 %. Capturas y registros locales en `.local/qa/proyecciones/`. Emulador Medium Phone API 37 read-only, sin snapshots, cerrado al terminar.
+- **APK:** `.local/releases/FuelStatus-0.8.0-proyecciones.apk`, versión 0.8.0, versionCode 8. SHA-256: `ee8a24de93a9c341add0ce93624eb8dc744f80da2940cd1317ae394afc33ed9e`.
+
+Las proyecciones son condicionales a los hábitos registrados. No se infiere combustible restante ni capacidad del tanque; los rangos de fechas no se presentan como probabilidades. Se conservan datos, migraciones, Room 6 y respaldo 5. Las pruebas usan datos sintéticos y servicios de respaldo simulados, sin operaciones sobre Drive real.
+
+---
+
+# Validación histórica 0.8.0 · Equivalencias de tendencia de consumo
 
 17 de octubre de 2026, America/Monterrey. Rama `20261017-equivalencias-tendencia-consumo`. La tarjeta de tendencia muestra el rendimiento anterior y reciente en km/L, la diferencia estimada de litros para la distancia reciente y la comparación de kilómetros dentro de la misma tarjeta, conservando las fechas de ambos periodos.
 

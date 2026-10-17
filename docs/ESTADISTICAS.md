@@ -54,3 +54,45 @@ Para ambas medias se ordena el historial por fecha y odómetro y se examinan par
 ## Presentación
 
 Todas las cards de Estadísticas incorporan iconos Material: rendimiento, tendencia, distancia media, frecuencia, costo/km, precio medio/L, litros, kilómetros evaluados, gastos totales, últimos intervalos y explicación del cálculo. En pantallas estrechas o con texto ampliado, las parejas de cards se apilan para conservar legibilidad.
+
+## Proyecciones y métricas recientes
+
+Se añaden seis tarjetas debajo de Tendencia de consumo. Próximo llenado, Alcance de una carga habitual, Ahorro potencial y Gasto estimado del mes ocupan una fila completa. Costo reciente / 100 km y Tendencia del precio / L comparten fila cuando el ancho y el tamaño de texto lo permiten.
+
+Todas las proyecciones usan el vehículo seleccionado y excluyen registros fechados después del día local actual. La fecha y la zona horaria se actualizan al volver a la pantalla y al cambiar el día. Editar, eliminar o importar registros y cambiar de vehículo recalcula los resultados. Son escenarios basados en hábitos registrados: no extrapolan indefinidamente una mejora o un aumento de consumo.
+
+### Próximo llenado estimado
+
+Requiere al menos tres intervalos completos válidos del bloque más reciente, sin atravesar cargas excluidas, faltantes ni retrocesos del odómetro. Usa como máximo los seis intervalos más recientes entre tanques llenos, contando días de calendario local. El mínimo y máximo de días observados, sumados a la fecha del último tanque lleno, forman un rango orientativo; la mediana de días, redondeada hacia arriba, proporciona la fecha habitual. El rango no representa un intervalo de confianza estadístico.
+
+El rango visible comienza como mínimo hoy. Si ya terminó, la tarjeta pide actualizar el historial y conserva la fecha estimada original: no inventa una nueva fecha futura. Una carga parcial posterior se señala expresamente. Si la mediana es cero días, se pide una frecuencia en días distintos. Se muestra cuántos intervalos respaldan la estimación; no se infieren litros restantes ni capacidad del tanque.
+
+### Alcance de una carga habitual
+
+Requiere tres intervalos completos válidos. Los litros de referencia son la mediana de las cantidades **compradas en las últimas tres cargas con tanque lleno**. Las cargas parciales se suman para obtener el rendimiento del intervalo, pero no se confunden con el volumen de una sola carga habitual.
+
+`Alcance estimado = litros habituales × (km totales / litros consumidos de los tres intervalos recientes)`.
+
+Con seis intervalos válidos se compara también el alcance para **esos mismos litros** usando el rendimiento de los tres intervalos anteriores. El texto indica cuántos km más, menos o similares se podrían recorrer si se mantiene el consumo reciente. Se muestran fecha y número de intervalos de referencia. El alcance describe esa cantidad de combustible, no la autonomía restante del vehículo.
+
+### Costo reciente / 100 km y tendencia del precio / L
+
+El costo reciente usa `costo acumulado / km acumulados × 100` de hasta tres intervalos completos válidos; necesita al menos uno. Se muestran cantidad de intervalos y fecha final.
+
+El precio compara las últimas tres compras incluidas con las tres anteriores del **mismo combustible identificado que la última compra incluida**, ponderando cada grupo por litros (`importe total / litros totales`). Magna, Premium y Diésel no se mezclan para inferir una subida de precio; Sin especificar no permite esta comparación. Se requieren seis compras comparables y se muestran el combustible, ambos precios, variación y fechas. Esta métrica de precios no requiere continuidad del odómetro.
+
+### Ahorro potencial
+
+Requiere los seis intervalos de una tendencia válida. Compara el combustible necesario para 500 km con el consumo reciente y anterior. Si el consumo aumentó, presenta el ahorro posible al recuperar el rendimiento anterior. Si mejoró, indica los litros que ya se usarían de menos al mantenerlo. Una diferencia que redondea a cero a un decimal se muestra como menor a 0.1 L.
+
+La equivalencia monetaria usa el precio ponderado por litros consumidos en los tres intervalos recientes y supone mantener ese precio. Es una estimación, no una promesa de ahorro.
+
+### Gasto estimado del mes
+
+Proyecta el cierre del mes calendario actual sumando combustible incluido y otros gastos del vehículo. Requiere registros de ese mes y al menos siete días de observación. La observación comienza el día más reciente entre el inicio de mes y el primer movimiento histórico disponible del vehículo; cuenta hasta hoy inclusive.
+
+`Estimación de cada componente = acumulado registrado + (acumulado / días observados) × días restantes del mes`.
+
+Se muestran por separado combustible y otros gastos, acumulado, días observados y días restantes. Si el historial comenzó a mitad del mes, no se inventan gastos anteriores a ese inicio. Los gastos puntuales también forman parte del ritmo registrado; el resultado es condicional a que ese ritmo continúe. Sin movimientos actuales o sin siete días se explica el requisito, sin publicar una proyección ficticia. El último día del mes, la estimación coincide con el acumulado.
+
+Estas tarjetas se calculan en memoria a partir de los datos existentes: no cambian Room 6, migraciones, importación ni respaldo 5.

@@ -19,13 +19,17 @@ import kotlin.math.abs
 import kotlin.math.round
 
 @Composable
-internal fun StatisticsScreen(state: FuelState) {
+internal fun StatisticsScreen(state: FuelState, calendar: RefuelCalendar = rememberRefuelCalendar()) {
     val stats = remember(state.selectedRefuels) { statistics(state.selectedRefuels) }
+    val forecast = remember(state.selectedRefuels, state.selectedExpenses, calendar) {
+        projections(state.selectedRefuels, state.selectedExpenses, calendar.today, calendar.zone)
+    }
     LazyColumn(contentPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 24.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Hero(if (state.selectedVehicle?.name == "Mazda 3") "ASÍ SE MUEVE TU MAZDA" else "ASÍ SE MUEVE TU AUTO",
             stats.kmPerLiter?.let { number(it) } ?: "—", "km/L", "Rendimiento ponderado entre tanques llenos", R.drawable.ic_speed) }
         item { ConsumptionTrendCard(stats.trend) }
+        projectionCards(forecast, calendar)
         item { StatisticsPair(
             { modifier -> StatisticsMetric("Distancia media entre cargas", stats.averageDistanceBetweenRefuels?.let { "${number(it, 1)} km" } ?: "—",
                 R.drawable.ic_route, modifier, if (stats.refuelIntervals.isEmpty()) "Necesitas dos cargas consecutivas válidas." else "Incluye las cargas parciales.") },
@@ -67,6 +71,10 @@ internal fun StatisticsScreen(state: FuelState) {
                 "La tendencia compara los tres últimos intervalos completos con los tres anteriores, usando litros por cada 100 km: menos es mejor. " +
                 "La equivalencia muestra el rendimiento en km/L. Los litros adicionales o de ahorro se estiman para los kilómetros del periodo reciente, usando el consumo anterior como referencia. " +
                 "La distancia compara esos mismos periodos, que pueden tener distinta duración. " +
+                "La próxima carga es una orientación basada en los días entre tus últimos llenados completos; su rango refleja el mínimo y máximo observados. " +
+                "El alcance usa los litros habituales de tus últimas tres cargas completas y el consumo reciente. " +
+                "El precio compara dos grupos de tres cargas del mismo combustible. El ahorro potencial mantiene una referencia de 500 km. " +
+                "El gasto de cierre del mes suma lo registrado y lo que resultaría de mantener ese ritmo en los días restantes; requiere al menos siete días de observación. " +
                 "Una variación menor al 5 % se considera estable; desde un 15 % de aumento se destaca como importante. " +
                 "Las medias entre cargas incluyen las parciales y se dividen entre los intervalos válidos, no entre el número de cargas. " +
                 "Los días se cuentan según las fechas locales; dos cargas el mismo día cuentan como cero días. " +
@@ -138,7 +146,7 @@ private fun TrendDates(label: String, window: ConsumptionWindow) {
 }
 
 @Composable
-private fun StatisticsPair(first: @Composable (Modifier) -> Unit, second: @Composable (Modifier) -> Unit) {
+internal fun StatisticsPair(first: @Composable (Modifier) -> Unit, second: @Composable (Modifier) -> Unit) {
     val largeText = LocalDensity.current.fontScale > 1.15f
     BoxWithConstraints(Modifier.fillMaxWidth()) {
         if (maxWidth < 340.dp || largeText) Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
