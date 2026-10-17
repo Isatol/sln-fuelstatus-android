@@ -83,6 +83,44 @@ class RefuelInsightsTest {
         assertEquals(10.0, trend.previous.litersPer100Km, .000001)
         assertEquals(10.0, trend.recent.litersPer100Km, .000001)
         assertEquals(ConsumptionTrendStatus.Stable, trend.status)
+        assertEquals(10.0, trend.previous.kmPerLiter, .000001)
+        assertEquals(10.0, trend.recent.kmPerLiter, .000001)
+    }
+
+    @Test fun fuelEquivalentUsesRecentDistanceEvenWhenFewerLitersWereConsumedOverall() {
+        val trend = ConsumptionTrend(ConsumptionWindow(1, 2, 1500.0, 120.0), ConsumptionWindow(2, 3, 1200.0, 105.6))
+        assertEquals(10.0, trend.changePercent, .000001)
+        assertEquals(12.5, trend.previous.kmPerLiter, .000001)
+        assertEquals(100.0 / 8.8, trend.recent.kmPerLiter, .000001)
+        assertEquals(9.6, trend.equivalentLitersDifference, .000001)
+        assertEquals(-300.0, trend.distanceDifferenceKm, .000001)
+        assertEquals(-20.0, trend.distanceChangePercent, .000001)
+        assertTrue(trend.recent.liters < trend.previous.liters)
+    }
+
+    @Test fun fuelSavingsCanCoexistWithMoreDistanceAndMoreTotalLiters() {
+        val trend = ConsumptionTrend(ConsumptionWindow(1, 2, 1500.0, 120.0), ConsumptionWindow(2, 3, 1800.0, 129.6))
+        assertEquals(-10.0, trend.changePercent, .000001)
+        assertEquals(100.0 / 7.2, trend.recent.kmPerLiter, .000001)
+        assertEquals(-14.4, trend.equivalentLitersDifference, .000001)
+        assertEquals(300.0, trend.distanceDifferenceKm, .000001)
+        assertEquals(20.0, trend.distanceChangePercent, .000001)
+        assertTrue(trend.recent.liters > trend.previous.liters)
+    }
+
+    @Test fun equalEfficiencyProducesNoFuelDifferenceEvenWithDifferentDistances() {
+        val trend = ConsumptionTrend(ConsumptionWindow(1, 2, 1500.0, 120.0), ConsumptionWindow(2, 3, 1200.0, 96.0))
+        assertEquals(0.0, trend.equivalentLitersDifference, .000001)
+        assertEquals(trend.previous.kmPerLiter, trend.recent.kmPerLiter, .000001)
+        val equalDistance = trend.copy(recent = trend.recent.copy(distanceKm = 1500.0))
+        assertEquals(0.0, equalDistance.distanceDifferenceKm, .000001)
+        assertEquals(0.0, equalDistance.distanceChangePercent, .000001)
+    }
+
+    @Test fun fuelEquivalentDoesNotUseTheRoundedConsumptionPercentage() {
+        val trend = ConsumptionTrend(ConsumptionWindow(1, 2, 1000.0, 80.0), ConsumptionWindow(2, 3, 1000.0, 83.999))
+        assertEquals(5.0, trend.changePercent, .000001)
+        assertEquals(3.999, trend.equivalentLitersDifference, .000001)
     }
 
     @Test fun trendAccumulatesPartialLitersAndIgnoresTrailingIncompleteConsumption() {

@@ -1,4 +1,18 @@
-# Validación 0.8.0 · Formulario de llenados en filas
+# Validación 0.8.0 · Equivalencias de tendencia de consumo
+
+17 de octubre de 2026, America/Monterrey. Rama `20261017-equivalencias-tendencia-consumo`. La tarjeta de tendencia muestra el rendimiento anterior y reciente en km/L, la diferencia estimada de litros para la distancia reciente y la comparación de kilómetros dentro de la misma tarjeta, conservando las fechas de ambos periodos.
+
+- **93 pruebas JVM aprobadas:** 94 registradas, una omitida por requerir el CSV privado, cero fallos y errores. Los cuatro casos nuevos comprueban litros equivalentes con distancias diferentes, ahorro con más litros totales, rendimientos iguales y uso de cifras sin redondear el porcentaje; también se amplió el caso de ponderación para km/L.
+- **4 pruebas Android dirigidas aprobadas**, repetidas y aprobadas con texto Android al 130 %: ocho ejecuciones en total. Comprueban la redacción en km/L, litros adicionales y de ahorro, distancias iguales/mayores/menores, fechas, recálculo al editar/eliminar, vehículo seleccionado y estados sin datos, estable y aumento importante. No se repitió la suite Android completa ni la navegación general.
+- **Compilación y Android Lint aprobados:** cero errores y 11 avisos existentes. Gradle y el emulador se ejecutaron por separado.
+- **Revisión visual:** claro, oscuro y texto al 130 %, con capturas en `.local/qa/equivalencias-tendencia/`. Emulador Medium Phone API 37 read-only, sin snapshots, cerrado al terminar.
+- **APK:** `.local/releases/FuelStatus-0.8.0-equivalencias-tendencia.apk`, versión 0.8.0, versionCode 8. SHA-256: `6d588e07c4aa52d6dd541036fb7aa0d4a6a37d2c7e780be03af3541ad0e93ec3`.
+
+Se conservan los umbrales y periodos de la tendencia. No se modifican datos guardados, migraciones, Room 6 ni formato de respaldo 5. Las pruebas usan datos sintéticos; no se realizaron operaciones sobre Drive real.
+
+---
+
+# Validación histórica 0.8.0 · Formulario de llenados en filas
 
 17 de octubre de 2026, America/Monterrey. Rama `20261017-formulario-llenados-en-filas`. El formulario compartido por Nuevo llenado y Editar llenado coloca Combustible y Método de pago en una fila, y Litros y Total pagado en otra. Las etiquetas aparecen encima de los cuatro controles.
 

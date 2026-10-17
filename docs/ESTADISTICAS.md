@@ -19,6 +19,20 @@ La variación es `(consumo reciente / consumo anterior − 1) × 100`, redondead
 
 Son umbrales descriptivos acordados para la aplicación, no un diagnóstico mecánico ni una comparación universal entre vehículos. El porcentaje se acompaña de texto y de las fechas reales de **Periodo reciente** y **Periodo anterior**. La carga que cierra un periodo establece el punto de partida del siguiente: ambos rangos pueden compartir una fecha.
 
+### Equivalencia en km/L, litros y distancia
+
+La misma tarjeta añade el rendimiento ponderado de cada periodo en **km/L** (`kilómetros totales / litros totales`). Por ejemplo: «Tu consumo aumentó un 10.0 % (tu rendimiento bajó de 12.5 a 11.4 km/L) respecto al periodo anterior». El porcentaje sigue midiendo el cambio en combustible por kilómetro; no se interpreta como un cambio del mismo porcentaje en km/L. Si ambos rendimientos se muestran iguales a un decimal, el texto indica que se mantuvo ese rendimiento.
+
+Los litros adicionales o de ahorro son una estimación para **la distancia del periodo reciente**, calculada sin redondear el porcentaje:
+
+`Diferencia de litros = litros recientes − (litros anteriores / km anteriores) × km recientes`.
+
+Un resultado positivo representa litros adicionales frente a mantener el consumo anterior; uno negativo representa menos litros. Por ejemplo, 120 L en 1,500 km antes y 105.6 L en 1,200 km recientes equivalen a 9.6 L adicionales para esos 1,200 km, aunque el total de litros registrados sea menor. La diferencia se muestra aproximadamente a un decimal; si redondea a cero, se indica que es menor a 0.1 L.
+
+El apartado **Distancia recorrida**, dentro de la misma tarjeta, compara los kilómetros de esos dos periodos: diferencia en km y `(km recientes / km anteriores − 1) × 100`. Muestra ambos totales y conserva las fechas al pie. Los periodos pueden durar distinto número de días: esta comparación no representa kilómetros por día. Diferencias que redondean a cero se describen como prácticamente la misma distancia.
+
+Las equivalencias y la comparación de distancia solo aparecen cuando existe una tendencia válida. No requieren campos nuevos, migraciones ni cambios al formato de respaldo.
+
 Se necesitan seis intervalos completos consecutivos (como mínimo siete cargas con tanque lleno). Una carga excluida, una carga faltante o un retroceso del odómetro según las fechas reinicia la secuencia comparable. Las cargas parciales posteriores al último tanque lleno no distorsionan una comparación ya completada. Si no hay datos suficientes, se explica en la card, sin asignar un estado de consumo.
 
 Se conservan los cálculos históricos de rendimiento, precio y costo por kilómetro. Para la tendencia se comprueba además que todas las cargas del intervalo pertenezcan a la secuencia cronológica válida, incluidas las parciales.

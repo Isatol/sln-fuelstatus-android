@@ -90,6 +90,7 @@ data class RefuelInterval(val distanceKm: Double, val days: Long)
 
 data class ConsumptionWindow(val startTimestamp: Long, val endTimestamp: Long, val distanceKm: Double, val liters: Double) {
     val litersPer100Km get() = liters / distanceKm * 100
+    val kmPerLiter get() = distanceKm / liters
     companion object {
         fun from(periods: List<ConsumptionPeriod>) = ConsumptionWindow(periods.first().startTimestamp,
             periods.last().endTimestamp, periods.sumOf { it.distanceKm }, periods.sumOf { it.liters })
@@ -99,6 +100,10 @@ data class ConsumptionWindow(val startTimestamp: Long, val endTimestamp: Long, v
 enum class ConsumptionTrendStatus { Improving, Stable, Increasing, MarkedIncrease }
 
 data class ConsumptionTrend(val previous: ConsumptionWindow, val recent: ConsumptionWindow) {
+    // Compare fuel over the recent distance, even when the two windows cover different kilometers.
+    val equivalentLitersDifference get() = recent.liters - previous.liters / previous.distanceKm * recent.distanceKm
+    val distanceDifferenceKm get() = recent.distanceKm - previous.distanceKm
+    val distanceChangePercent get() = distanceDifferenceKm / previous.distanceKm * 100
     // Classify the displayed precision, so a rounded 5.0% cannot be labelled stable.
     val changePercent: Double get() {
         val rounded = round((recent.litersPer100Km / previous.litersPer100Km - 1) * 1000) / 10

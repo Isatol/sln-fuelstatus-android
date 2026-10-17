@@ -16,6 +16,7 @@ import mx.fuelstatus.FuelState
 import mx.fuelstatus.R
 import mx.fuelstatus.domain.*
 import kotlin.math.abs
+import kotlin.math.round
 
 @Composable
 internal fun StatisticsScreen(state: FuelState) {
@@ -64,6 +65,8 @@ internal fun StatisticsScreen(state: FuelState) {
         item { Explanation("Cómo calculamos",
             "El primer tanque lleno establece el punto de partida. Sumamos las cargas parciales hasta el siguiente tanque lleno para calcular el rendimiento. " +
                 "La tendencia compara los tres últimos intervalos completos con los tres anteriores, usando litros por cada 100 km: menos es mejor. " +
+                "La equivalencia muestra el rendimiento en km/L. Los litros adicionales o de ahorro se estiman para los kilómetros del periodo reciente, usando el consumo anterior como referencia. " +
+                "La distancia compara esos mismos periodos, que pueden tener distinta duración. " +
                 "Una variación menor al 5 % se considera estable; desde un 15 % de aumento se destaca como importante. " +
                 "Las medias entre cargas incluyen las parciales y se dividen entre los intervalos válidos, no entre el número de cargas. " +
                 "Los días se cuentan según las fechas locales; dos cargas el mismo día cuentan como cero días. " +
@@ -93,10 +96,31 @@ private fun ConsumptionTrendCard(trend: ConsumptionTrend?) {
                     else -> MaterialTheme.colorScheme.primary
                 }
                 Text(title, color = color, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                val previousEfficiency = number(trend.previous.kmPerLiter, 1)
+                val recentEfficiency = number(trend.recent.kmPerLiter, 1)
+                val performance = if (previousEfficiency == recentEfficiency) "tu rendimiento se mantuvo en $recentEfficiency km/L"
+                    else "tu rendimiento ${if (trend.recent.kmPerLiter < trend.previous.kmPerLiter) "bajó" else "subió"} de $previousEfficiency a $recentEfficiency km/L"
                 Text(if (trend.status == ConsumptionTrendStatus.Stable)
-                    "Tu consumo se mantiene similar al periodo anterior (variación: ${if (trend.changePercent > 0) "+" else ""}${number(trend.changePercent, 1)} %)."
-                else "Consumiste un ${number(abs(trend.changePercent), 1)} % ${if (trend.changePercent > 0) "más" else "menos"} combustible por kilómetro que en el periodo anterior.",
+                    "Tu consumo se mantiene similar al periodo anterior (variación: ${if (trend.changePercent > 0) "+" else ""}${number(trend.changePercent, 1)} %; $performance)."
+                else "Tu consumo ${if (trend.changePercent > 0) "aumentó" else "disminuyó"} un ${number(abs(trend.changePercent), 1)} % ($performance) respecto al periodo anterior.",
                     style = MaterialTheme.typography.bodyMedium)
+                val recentDistance = number(trend.recent.distanceKm, 1)
+                val litersDifference = round(trend.equivalentLitersDifference * 10) / 10
+                Text(if (litersDifference == 0.0)
+                    "En los $recentDistance km del periodo reciente, la diferencia estimada de combustible es menor a 0.1 L respecto a mantener el consumo anterior."
+                else "En los $recentDistance km del periodo reciente, equivale a unos ${number(abs(litersDifference), 1)} L ${if (litersDifference > 0) "adicionales" else "menos"} respecto a mantener el consumo anterior.",
+                    style = MaterialTheme.typography.bodyMedium)
+                HorizontalDivider()
+                SettingsTitle(R.drawable.ic_route, "Distancia recorrida", style = MaterialTheme.typography.titleSmall)
+                val distanceDifference = round(trend.distanceDifferenceKm * 10) / 10
+                Text(if (distanceDifference == 0.0) "Recorriste prácticamente la misma distancia."
+                    else "Recorriste ${number(abs(distanceDifference), 1)} km ${if (distanceDifference > 0) "más" else "menos"}.",
+                    style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Text("$recentDistance km frente a ${number(trend.previous.distanceKm, 1)} km en el periodo anterior" +
+                    if (distanceDifference == 0.0) "." else ": un ${number(abs(trend.distanceChangePercent), 1)} % ${if (distanceDifference > 0) "más" else "menos"}.",
+                    style = MaterialTheme.typography.bodyMedium)
+                Text("En los mismos periodos de la tendencia; pueden tener distinta duración.",
+                    style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 HorizontalDivider()
                 TrendDates("Periodo reciente", trend.recent)
                 TrendDates("Periodo anterior", trend.previous)
