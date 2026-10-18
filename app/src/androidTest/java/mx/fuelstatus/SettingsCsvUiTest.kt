@@ -43,19 +43,20 @@ class SettingsCsvUiTest {
                 }
             }
         }
-        compose.onNodeWithText("TUS DATOS").performScrollTo().assertIsDisplayed()
+        settingsNode("TUS DATOS")
         capture("tus-datos-claro", false)
-        compose.onNodeWithText("Importar CSV de Fuel").performScrollTo().performClick()
-        assertEquals(1, fuel); assertEquals(0, native); assertEquals(0, exports)
-        compose.onNodeWithText("Importar llenados de FuelStatus").performScrollTo().performClick()
-        compose.onNodeWithText("Exportar llenados a CSV").performScrollTo().performClick()
-        assertEquals(1, native); assertEquals(1, exports)
+        settingsNode("Importar CSV de Fuel").performClick()
+        compose.runOnIdle { assertEquals(1, fuel); assertEquals(0, native); assertEquals(0, exports) }
+        settingsNode("Importar llenados de FuelStatus").performClick()
+        compose.runOnIdle { assertEquals("Importar FuelStatus", 1, native) }
+        settingsNode("Exportar llenados a CSV").performClick()
+        compose.runOnIdle { assertEquals("Exportar FuelStatus", 1, exports) }
         capture("csv-claro", false)
         compose.runOnIdle { theme = "dark"; scale = 1.3f; busy = true }
-        compose.onNodeWithText("Exportar llenados a CSV").performScrollTo().assertIsNotEnabled()
-        compose.onNodeWithText("Importar llenados de FuelStatus").performScrollTo().assertIsNotEnabled()
+        settingsNode("Exportar llenados a CSV").assertIsNotEnabled()
+        settingsNode("Importar llenados de FuelStatus").assertIsNotEnabled()
         compose.runOnIdle { busy = false }
-        compose.onNodeWithText("Llenados de FuelStatus").performScrollTo()
+        settingsNode("Llenados de FuelStatus")
         capture("csv-oscuro-texto130", false)
     }
 
@@ -89,6 +90,13 @@ class SettingsCsvUiTest {
         assertFalse(created.useVehicleFuel)
         compose.onNodeWithText("Cancelar").performClick()
         assertTrue(canceled)
+    }
+
+    private fun settingsNode(text: String): SemanticsNodeInteraction {
+        // Search through the lazy list, including items not laid out yet.
+        compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText(text))
+        compose.waitForIdle()
+        return compose.onNodeWithText(text).assertIsDisplayed()
     }
 
     private fun capture(name: String, dialog: Boolean) {

@@ -30,6 +30,25 @@ class BackupTest {
         val text = BackupCodec.encode(document()).toString(Charsets.UTF_8).replace("98765", "98766")
         assertThrows(IllegalArgumentException::class.java) { BackupCodec.decode(text.toByteArray()) }
     }
+    @Test fun customPaletteRoundTripsWithBackupVersionFive() {
+        val original = document().let { it.copy(appearance = it.appearance.copy(colorPalette = "violet")) }
+        val bytes = BackupCodec.encode(original)
+        assertEquals(5, JsonParser.parseString(bytes.toString(Charsets.UTF_8)).asJsonObject.get("version").asInt)
+        assertEquals(original, BackupCodec.decode(bytes))
+        assertThrows(IllegalArgumentException::class.java) {
+            BackupCodec.encode(original.copy(appearance = original.appearance.copy(colorPalette = "unknown")))
+        }
+    }
+    @Test fun oldBackupsKeepTheirDynamicChoiceAndDefaultToFuelStatusGreen() {
+        for (dynamic in listOf(true, false)) {
+            val original = document().let { it.copy(appearance = it.appearance.copy(dynamicColor = dynamic)) }
+            val root = JsonParser.parseString(BackupCodec.encode(original).toString(Charsets.UTF_8)).asJsonObject
+            val data = root.getAsJsonObject("data")
+            data.getAsJsonObject("appearance").remove("colorPalette")
+            root.addProperty("sha256", sha256(data.toString().toByteArray()))
+            assertEquals(original, BackupCodec.decode(root.toString().toByteArray()))
+        }
+    }
     @Test fun unsupportedVersionAndTruncatedFilesAreRejected() {
         val text = BackupCodec.encode(document()).toString(Charsets.UTF_8).replace("\"version\":5", "\"version\":9")
         assertThrows(IllegalArgumentException::class.java) { BackupCodec.decode(text.toByteArray()) }
