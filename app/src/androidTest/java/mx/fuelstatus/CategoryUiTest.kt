@@ -70,7 +70,7 @@ class CategoryUiTest {
             val density = LocalDensity.current.density
             CompositionLocalProvider(LocalDensity provides Density(density, 1.3f)) {
                 FuelTheme(Preferences("dark", false)) { ExpenseCategoriesScreen(
-                    ExpenseCategory.Defaults.dropLast(1) + custom + ExpenseCategory.Defaults.last(), false, remember { SnackbarHostState() }, {}, {}) }
+                    ExpenseCategory.Defaults.dropLast(1) + custom + ExpenseCategory.Defaults.last(), false, remember { SnackbarHostState() }, {}, {}, emptyList(), { _, _ -> }) }
             }
         }
         compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText(custom.name))

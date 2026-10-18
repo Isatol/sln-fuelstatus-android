@@ -30,6 +30,14 @@ class CategoryBackupTest {
         assertEquals(CategoryIcon.Tag.code, restored.expenseCategories.single { it.name == custom.name }.icon)
     }
 
+    @Test fun deletedDefaultCategoriesStayAbsentAfterBackupRoundTrip() {
+        val original = document().copy(expenseCategories = listOf(custom, ExpenseCategory.Other))
+        assertEquals(original, BackupCodec.decode(BackupCodec.encode(original)))
+        val onlyOther = original.copy(expenses = original.expenses.map { it.copy(category = ExpenseCategory.OTHER_NAME) },
+            expenseCategories = listOf(ExpenseCategory.Other))
+        assertEquals(onlyOther, BackupCodec.decode(BackupCodec.encode(onlyOther)))
+    }
+
     @Test fun brokenReferencesDuplicateNamesAndInvalidIconsAreRejected() {
         val original = document()
         assertThrows(IllegalArgumentException::class.java) { BackupCodec.encode(original.copy(expenseCategories = ExpenseCategory.Defaults)) }

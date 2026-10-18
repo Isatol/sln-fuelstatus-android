@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -25,6 +26,8 @@ import androidx.compose.ui.unit.dp
 import mx.fuelstatus.R
 import mx.fuelstatus.data.PaymentBrand
 import mx.fuelstatus.data.PaymentMethod
+import mx.fuelstatus.data.Refuel
+import mx.fuelstatus.data.Expense
 
 @Composable
 fun SettingsTitle(icon: Int, title: String, style: TextStyle = MaterialTheme.typography.titleMedium,
@@ -97,8 +100,11 @@ fun PaymentMethodSelector(methods: List<PaymentMethod>, value: String?, onChange
 
 @Composable
 fun PaymentMethodsScreen(methods: List<PaymentMethod>, busy: Boolean, snackbar: SnackbarHostState,
-    onBack: () -> Unit, onAdd: () -> Unit) {
+    onBack: () -> Unit, onAdd: () -> Unit, refuels: List<Refuel>, expenses: List<Expense>,
+    onDelete: (PaymentMethod, () -> Unit) -> Unit) {
     val entries = (listOf(PaymentMethod.Cash) + methods).distinctBy { it.id }
+    var deletingId by rememberSaveable { mutableStateOf<String?>(null) }
+    val deleting = entries.firstOrNull { it.id == deletingId && it.id != PaymentMethod.Cash.id }
     Scaffold(topBar = { TopAppBar(title = { Text("Mis métodos de pago") }, navigationIcon = {
         IconButton(onClick = onBack, enabled = !busy) { FuelIcon(R.drawable.ic_arrow_back, "Volver a Ajustes") }
     }) }, snackbarHost = { SnackbarHost(snackbar) }, bottomBar = {
@@ -108,18 +114,32 @@ fun PaymentMethodsScreen(methods: List<PaymentMethod>, busy: Boolean, snackbar: 
         } }
     }) { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            item { Text("Tus opciones para registrar cada llenado", color = MaterialTheme.colorScheme.onSurfaceVariant) }
-            items(entries, key = { it.id }) { method -> Card(modifier = Modifier.fillMaxWidth()) {
-                Row(Modifier.padding(20.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    PaymentLogo(method.brand, 46.dp, 34.dp)
-                    Column {
-                        Text(method.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                        Text(if (method.id == PaymentMethod.Cash.id) "Disponible por defecto" else PaymentBrand.fromCode(method.brand)?.label.orEmpty(),
-                            style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            item { Text("Tus opciones para registrar llenados y gastos. Desliza una tarjeta hacia la izquierda para eliminarla.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+            items(entries, key = { it.id }) { method ->
+                CatalogSwipeToDelete(method.name, protected = method.id == PaymentMethod.Cash.id, enabled = !busy && deleting == null,
+                    onRequest = { deletingId = method.id }) {
+                    Card(modifier = Modifier.fillMaxWidth().testTag("payment-${method.id}")) {
+                        Row(Modifier.padding(20.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                            FuelIcon(if (method.id == PaymentMethod.Cash.id) R.drawable.ic_payments else R.drawable.ic_credit_card,
+                                modifier = Modifier.size(34.dp))
+                            Column {
+                                Text(method.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                                Text(if (method.id == PaymentMethod.Cash.id) "Disponible por defecto" else PaymentBrand.fromCode(method.brand)?.label.orEmpty(),
+                                    style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                        }
                     }
                 }
-            } }
+            }
         }
+    }
+    if (deleting != null) {
+        val fills = refuels.count { it.paymentMethodId == deleting.id }
+        val costs = expenses.count { it.paymentMethodId == deleting.id }
+        CatalogDeleteDialog("¿Eliminar tarjeta?", "Se eliminará «${deleting.name}».\n\n" +
+            if (fills + costs > 0) "Esta tarjeta está asociada a $fills ${if (fills == 1) "llenado" else "llenados"} y $costs ${if (costs == 1) "gasto" else "gastos"}. Todos los registros asociados, de todos tus vehículos, pasarán a Efectivo. Se conservarán sus demás datos."
+            else "No tiene llenados ni gastos asociados.", busy,
+            onDismiss = { deletingId = null }, onConfirm = { onDelete(deleting) { deletingId = null } })
     }
 }
 

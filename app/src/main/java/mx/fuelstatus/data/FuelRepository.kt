@@ -10,7 +10,8 @@ class FuelRepository(val database: FuelDatabase) {
     suspend fun initialize() = database.withTransaction {
         dao.initializeRevision(BackupRevision())
         dao.initializeCash(PaymentMethod.Cash)
-        dao.initializeCategories(ExpenseCategory.Defaults)
+        if (dao.allExpenseCategories().isEmpty()) dao.initializeCategories(ExpenseCategory.Defaults)
+        else dao.initializeCategories(listOf(ExpenseCategory.Other))
     }
     suspend fun addExpenseCategory(name: String, icon: String) = change {
         val trimmed = name.trim()
@@ -32,6 +33,21 @@ class FuelRepository(val database: FuelDatabase) {
         dao.insertPaymentMethod(value.copy(name = name))
     }
     suspend fun save(value: Refuel) = change { dao.save(value) }
+    suspend fun deletePaymentMethod(id: String) = change {
+        require(id != PaymentMethod.Cash.id) { "Efectivo no se puede eliminar." }
+        require(dao.allPaymentMethods().any { it.id == id }) { "La tarjeta ya no existe." }
+        dao.initializeCash(PaymentMethod.Cash)
+        dao.replaceRefuelPayment(id, PaymentMethod.Cash.id)
+        dao.replaceExpensePayment(id, PaymentMethod.Cash.id)
+        dao.deletePaymentMethod(id)
+    }
+    suspend fun deleteExpenseCategory(name: String) = change {
+        require(name != ExpenseCategory.OTHER_NAME) { "Otros no se puede eliminar." }
+        require(dao.allExpenseCategories().any { it.name == name }) { "La categoría ya no existe." }
+        dao.initializeCategories(listOf(ExpenseCategory.Other))
+        dao.replaceExpenseCategory(name, ExpenseCategory.OTHER_NAME)
+        dao.deleteExpenseCategory(name)
+    }
     suspend fun save(value: Vehicle) = change { dao.save(value) }
     suspend fun save(value: Expense) = change {
         require(dao.allExpenseCategories().any { it.name == value.category }) { "La categoría elegida ya no existe. Vuelve a seleccionarla." }

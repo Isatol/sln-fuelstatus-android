@@ -101,9 +101,10 @@ object BackupCodec {
             require(CategoryIcon.fromCode(it.string("icon")) != null) { "Icono de categoría inválido." }
             require(it.long("sortOrder") in 0..Int.MAX_VALUE.toLong()) { "Orden de categoría inválido." }
         }
-        require(ExpenseCategory.Defaults.all { default -> categories.any {
-            it.string("name") == default.name && it.string("icon") == default.icon && it.long("sortOrder") == default.sortOrder.toLong()
-        } }) { "Faltan categorías predeterminadas o fueron modificadas." }
+        val other = ExpenseCategory.Other
+        require(categories.any {
+            it.string("name") == other.name && it.string("icon") == other.icon && it.long("sortOrder") == other.sortOrder.toLong()
+        }) { "Falta la categoría Otros o fue modificada." }
         val methods = rows("paymentMethods")
         val methodIds = methods.map { it.string("id") }.toSet()
         require(methods.any { it.string("id") == PaymentMethod.Cash.id &&

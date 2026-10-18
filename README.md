@@ -16,6 +16,8 @@ Métodos de pago en Nuevo gasto y Editar gasto, con Efectivo por defecto, tarjet
 
 Categorías de gastos administrables desde Ajustes, con siete categorías iniciales e iconos distintos, formulario para agregar categorías y catálogo local de 30 iconos con búsqueda en español. Los formularios de gastos muestran nombre e icono en el selector; Otros siempre aparece al final. Las categorías se conservan en Room y en las copias completas. Detalles en [docs/CATEGORIAS_DE_GASTOS.md](docs/CATEGORIAS_DE_GASTOS.md).
 
+En Mis métodos de pago, las tarjetas usan el icono Material de tarjeta de crédito. Tarjetas y categorías admiten deslizar hacia la izquierda para eliminar con confirmación: los llenados y gastos asociados pasan a Efectivo, o los gastos a Otros al eliminar una categoría. Efectivo y Otros están protegidos. Las asignaciones se actualizan para todos los vehículos y se conservan en los respaldos.
+
 ### Funcionalidad de 0.4
 
 Métodos de pago con Efectivo, tarjetas VISA/Mastercard/American Express, pantalla completa de administración, selección por llenado y método común al importar CSV. Los métodos se conservan en Room, copias locales y Drive; los registros antiguos mantienen su método como Sin especificar. Detalles en [docs/METODOS_DE_PAGO.md](docs/METODOS_DE_PAGO.md).

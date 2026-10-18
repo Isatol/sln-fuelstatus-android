@@ -75,11 +75,12 @@ fun FuelApp(model: FuelViewModel, onConnectDrive: () -> Unit) {
             BackHandler(onBack = back)
             when (dataPage) {
                 "payments" -> PaymentMethodsScreen(state.paymentMethods, busy || driveBusy, snackbar, back,
-                    onAdd = { dataPage = "add-payment" })
+                    onAdd = { dataPage = "add-payment" }, refuels = state.refuels, expenses = state.expenses,
+                    onDelete = model::deletePaymentMethod)
                 "add-payment" -> AddPaymentMethodScreen(state.paymentMethods, busy || driveBusy, snackbar, back,
                     onSave = { method -> model.addPaymentMethod(method) { dataPage = "payments" } })
                 "categories" -> ExpenseCategoriesScreen(state.expenseCategories, busy || driveBusy, snackbar, back,
-                    onAdd = { dataPage = "add-category" })
+                    onAdd = { dataPage = "add-category" }, expenses = state.expenses, onDelete = model::deleteExpenseCategory)
                 "add-category" -> AddExpenseCategoryScreen(state.expenseCategories, busy || driveBusy, snackbar, back,
                     onSave = { name, icon -> model.addExpenseCategory(name, icon) { dataPage = "categories" } })
             }

@@ -1,4 +1,23 @@
-# Validación 0.8.0 · Información por tarjeta de Estadísticas
+# Validación 0.8.0 · Eliminar tarjetas y categorías
+
+18 de octubre de 2026, America/Monterrey. Rama `20261018-eliminar-tarjetas-categorias`. Mis métodos de pago usa el icono Material de tarjeta de crédito. Las listas permiten deslizar hacia la izquierda para pedir confirmación de eliminación; el modal muestra asociaciones y explica la reasignación a Efectivo u Otros. Ambas opciones están protegidas.
+
+- **110 pruebas JVM aprobadas:** 111 registradas, una omitida por requerir el CSV privado. Incluye respaldo con categorías iniciales eliminadas y con solo Otros, sin cambiar el formato 5.
+- **22 casos Android dirigidos aprobados:** cuatro nuevos de datos, cuatro nuevos de interfaz y catorce existentes de categorías, pagos, migraciones, persistencia, restauración y formularios. La validación se realizó por grupos, sin repetir la suite Android completa ni la navegación general.
+- **Las cuatro pruebas nuevas de interfaz también aprobaron con el texto de Android al 130 %** en la repetición final. El cierre con Atrás se volvió a comprobar con texto normal tras ajustar el envío de la tecla.
+- **Datos:** reasignación en llenados y gastos de varios vehículos, conservación de todos los demás campos, métodos ajenos y Sin especificar; eliminación sin asociaciones; protección también en repositorio/DAO; una revisión por eliminación; reversión íntegra ante un error provocado; categorías eliminadas ausentes tras reabrir, inicializar y restaurar; borrado completo restablece el catálogo inicial.
+- **Interfaz:** gesto izquierdo, gesto derecho sin eliminación, cancelar y repetir, confirmación explícita, Atrás, bloqueo mientras está ocupado, categorías iniciales y personalizadas, protección de Efectivo/Otros y Nuevo gasto en Otros cuando Servicio ya no existe.
+- **Compilación y Android Lint aprobados:** cero errores y 11 avisos existentes. Room continúa en versión 6; no se cambian columnas ni migraciones.
+- **Revisión visual:** iconos y modales en claro y oscuro, incluido texto ampliado al 130 %. Capturas y registros locales en `.local/qa/eliminar-tarjetas-categorias/`.
+- **APK:** `.local/releases/FuelStatus-0.8.0-eliminar-tarjetas-categorias.apk`, versión 0.8.0, versionCode 8. SHA-256 `f94af7c2df4564080ad50fa267a1106fd6b55b3eb776c7c458447ced726be113`. Firma debug anterior verificada: SHA-1 `81:BA:D0:FD:EB:A0:29:7E:6B:3E:F9:04:FF:6B:1D:AD:80:33:1F:36`.
+
+Las primeras pruebas del modal tuvieron tres fallos por un selector ambiguo que también encontraba el texto del fondo del gesto. Se acotó el selector al diálogo; las cuatro pruebas pasaron después. La repetición ampliada detectó además una pérdida de foco del selector de ventana de Espresso al enviar Atrás; la prueba ahora envía la tecla al sistema.
+
+Las pruebas usan datos sintéticos y un emulador Medium Phone API 37 read-only, sin snapshots, cerrado al terminar. Gradle y el emulador se ejecutan por separado. No se hicieron operaciones sobre Drive real ni dispositivos personales. Esta versión sigue leyendo las copias anteriores; las versiones antiguas que exigían todas las categorías iniciales no admiten restaurar un catálogo reducido.
+
+---
+
+# Validación histórica 0.8.0 · Información por tarjeta de Estadísticas
 
 18 de octubre de 2026, America/Monterrey. Rama `20261018-informacion-estadisticas`. Las 16 tarjetas disponibles de Estadísticas incluyen un botón ⓘ que abre una explicación propia con la fuente de datos, fórmula, requisitos y alcance del cálculo. Se elimina el bloque general “Cómo calculamos” de la lista.
 

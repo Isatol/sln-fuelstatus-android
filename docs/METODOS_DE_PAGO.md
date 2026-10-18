@@ -4,9 +4,15 @@
 
 Los títulos Tema, Copias y Google Drive, Trae tu historial de Fuel y Borrar datos incluyen iconos Material Symbols Rounded. En TUS DATOS, entre importar y borrar, aparece el botón **Mis métodos de pago**.
 
-Este botón abre una pantalla completa con navegación de regreso a Ajustes. Efectivo está disponible desde el inicio. **Agregar tarjeta** abre un formulario para capturar un nombre de hasta 80 caracteres y elegir VISA, Mastercard o American Express. Los selectores y la lista muestran el logo de cada marca. La combinación de nombre y marca no puede repetirse; las validaciones se ejecutan también al guardar en Room.
+Este botón abre una pantalla completa con navegación de regreso a Ajustes. Efectivo está disponible desde el inicio. **Agregar tarjeta** abre un formulario para capturar un nombre de hasta 80 caracteres y elegir VISA, Mastercard o American Express. En **Mis métodos de pago**, las tarjetas muestran el icono Material de tarjeta de crédito y la marca como texto; los selectores y el historial conservan los logos. La combinación de nombre y marca no puede repetirse; las validaciones se ejecutan también al guardar en Room.
 
 Los métodos son compartidos por los vehículos de la app. Cada tarjeta contiene su identificador, nombre y marca. Los logos son recursos locales, disponibles sin conexión y con un fondo claro que conserva su legibilidad en modo oscuro.
+
+## Eliminar tarjetas
+
+Deslizar una tarjeta hacia la izquierda abre una confirmación con su nombre. Si tiene llenados o gastos asociados, muestra el número de cada tipo y avisa que **todos los registros asociados, de todos los vehículos, pasarán a Efectivo**, conservando sus demás datos. Sin asociaciones, el modal lo indica. Cancelar o volver cierra el modal sin cambiar los datos. Efectivo no admite el gesto ni la eliminación. Los lectores de pantalla disponen de la acción «Eliminar [nombre]» en cada tarjeta eliminable.
+
+Confirmar reasigna llenados y gastos y elimina la tarjeta en una única transacción de Room. Si falla, se revierte toda la operación. La revisión del respaldo se incrementa una sola vez y se usa el flujo habitual de copia local y sincronización. El esquema sigue en versión 6 y el formato de respaldo en 5.
 
 ## Llenados e importación
 
