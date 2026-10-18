@@ -4,9 +4,9 @@
 
 Los títulos Tema, Copias y Google Drive, Trae tu historial de Fuel y Borrar datos incluyen iconos Material Symbols Rounded. En TUS DATOS, entre importar y borrar, aparece el botón **Mis métodos de pago**.
 
-Este botón abre una pantalla completa con navegación de regreso a Ajustes. Efectivo está disponible desde el inicio. **Agregar tarjeta** abre un formulario para capturar un nombre de hasta 80 caracteres y elegir VISA, Mastercard o American Express. En **Mis métodos de pago**, las tarjetas muestran el icono Material de tarjeta de crédito y la marca como texto; los selectores y el historial conservan los logos. La combinación de nombre y marca no puede repetirse; las validaciones se ejecutan también al guardar en Room.
+Este botón abre una pantalla completa con navegación de regreso a Ajustes. Efectivo está disponible desde el inicio. **Agregar tarjeta** abre un formulario para capturar un nombre de hasta 80 caracteres y elegir VISA, Mastercard o American Express. En toda la app, las tarjetas muestran el icono Material de tarjeta de crédito y conservan su nombre y marca como texto. Esto incluye administración, alta, selectores e historiales de Llenados y Gastos. La combinación de nombre y marca no puede repetirse; las validaciones se ejecutan también al guardar en Room.
 
-Los métodos son compartidos por los vehículos de la app. Cada tarjeta contiene su identificador, nombre y marca. Los logos son recursos locales, disponibles sin conexión y con un fondo claro que conserva su legibilidad en modo oscuro.
+Los métodos son compartidos por los vehículos de la app. Cada tarjeta contiene su identificador, nombre y marca. Los iconos son vectores locales que respetan el tema claro u oscuro y están disponibles sin conexión.
 
 ## Eliminar tarjetas
 
@@ -28,10 +28,10 @@ La migración de Room 3→4 crea `payment_methods` con Efectivo y añade una ref
 
 Desde FuelStatus 0.6, el respaldo JSON usa el formato 5 e incluye los métodos y sus referencias en llenados y gastos. Se siguen leyendo los formatos 1 a 4: las copias anteriores al formato 3 incorporan Efectivo y conservan el pago histórico de llenados como Sin especificar; las anteriores al formato 5 conservan el pago de gastos como Sin especificar. La restauración reemplaza métodos, categorías, vehículos, llenados y gastos dentro de la misma transacción. Detalles del selector de gastos en [PAGOS_EN_GASTOS.md](PAGOS_EN_GASTOS.md).
 
-El CSV exportado incluye las columnas `paymentMethodName` y `paymentMethodBrand`; los registros sin especificar dejan ambos campos vacíos. El lector acepta las exportaciones anteriores sin estas columnas. La importación desde la interfaz aplica el método seleccionado en el diálogo. La lectura del CSV también conserva los metadatos para herramientas de recuperación y comprobaciones de exportación/importación.
+El CSV exportado incluye las columnas `paymentMethodName` y `paymentMethodBrand`; los registros sin especificar dejan ambos campos vacíos. El lector acepta las exportaciones anteriores sin estas columnas. La importación desde Fuel aplica el método seleccionado en el diálogo. La importación desde la nueva card Llenados de FuelStatus conserva el método de cada fila, reutiliza tarjetas con la misma marca y nombre (sin distinguir mayúsculas), y agrega las que falten. Los registros sin método indicado conservan Sin especificar. La lectura del CSV también conserva los metadatos para herramientas de recuperación y comprobaciones de exportación/importación.
 
 Borrar datos elimina las tarjetas personalizadas y sus asignaciones junto con el resto del historial. Efectivo vuelve a ser la única opción, como en una instalación nueva. Las copias de recuperación y de Drive usan el mismo formato de respaldo completo.
 
 ## Recursos visuales
 
-Los avisos de los iconos y las referencias de los logos se incluyen en `app/src/main/assets/licenses`. Los iconos de Material Symbols y las marcas de pago tienen avisos separados.
+Los avisos y la licencia Apache-2.0 de los iconos Material se incluyen en `app/src/main/assets/licenses`. Se eliminaron los recursos de imagen de las marcas y su aviso específico; las marcas permanecen como texto y datos del catálogo.

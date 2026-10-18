@@ -1,13 +1,10 @@
 @file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 package mx.fuelstatus.ui
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -15,7 +12,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -39,28 +35,22 @@ fun SettingsTitle(icon: Int, title: String, style: TextStyle = MaterialTheme.typ
 }
 
 @Composable
-fun PaymentLogo(brand: String?, width: Dp = 36.dp, height: Dp = 26.dp) {
-    val paymentBrand = brand?.let(PaymentBrand::fromCode)
-    val resource = when (paymentBrand) {
-        PaymentBrand.Visa -> R.drawable.ic_payment_visa
-        PaymentBrand.Mastercard -> R.drawable.ic_payment_mastercard
-        PaymentBrand.Amex -> R.drawable.ic_payment_amex
-        else -> null
+fun PaymentIcon(brand: String?, width: Dp = 36.dp, height: Dp = 26.dp) {
+    val resource = when (brand?.let(PaymentBrand::fromCode)) {
+        PaymentBrand.Cash -> R.drawable.ic_payments
+        PaymentBrand.Visa, PaymentBrand.Mastercard, PaymentBrand.Amex -> R.drawable.ic_credit_card
+        null -> R.drawable.ic_account_balance_wallet
     }
-    if (resource == null) Box(Modifier.size(width, height), contentAlignment = Alignment.Center) {
-        Icon(painterResource(if (paymentBrand == PaymentBrand.Cash) R.drawable.ic_payments else R.drawable.ic_account_balance_wallet),
-            contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(height))
-    } else Surface(color = Color.White, shape = RoundedCornerShape(4.dp), border = BorderStroke(0.5.dp, Color(0xFFD7DBE7)),
-        modifier = Modifier.size(width, height)) {
-        Image(painterResource(resource), contentDescription = null, contentScale = ContentScale.Fit,
-            modifier = Modifier.fillMaxSize().padding(3.dp))
+    Box(Modifier.size(width, height), contentAlignment = Alignment.Center) {
+        Icon(painterResource(resource), contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(height))
     }
 }
 
 @Composable
 fun PaymentMethodBadge(method: PaymentMethod?, modifier: Modifier = Modifier) {
     Row(modifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-        PaymentLogo(method?.brand, 28.dp, 20.dp)
+        PaymentIcon(method?.brand, 28.dp, 20.dp)
         Text(method?.name ?: "Sin especificar", style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 2, overflow = TextOverflow.Ellipsis)
     }
@@ -79,19 +69,19 @@ fun PaymentMethodSelector(methods: List<PaymentMethod>, value: String?, onChange
             OutlinedButton(onClick = { expanded = true }, enabled = enabled,
                 modifier = if (compact) Modifier.fillMaxSize().heightIn(min = 56.dp) else Modifier.fillMaxWidth(),
                 contentPadding = if (compact) PaddingValues(horizontal = 12.dp, vertical = 8.dp) else ButtonDefaults.ContentPadding) {
-                PaymentLogo(selected?.brand, if (compact) 28.dp else 36.dp, if (compact) 20.dp else 26.dp)
+                PaymentIcon(selected?.brand, if (compact) 28.dp else 36.dp, if (compact) 20.dp else 26.dp)
                 Text(selected?.name ?: "Sin especificar", modifier = Modifier.weight(1f).padding(horizontal = if (compact) 6.dp else 12.dp),
                     maxLines = 2, overflow = TextOverflow.Ellipsis)
                 FuelIcon(R.drawable.ic_keyboard_arrow_down, modifier = Modifier.size(if (compact) 20.dp else 24.dp))
             }
             DropdownMenu(expanded && enabled, onDismissRequest = { expanded = false }) {
                 if (allowUnspecified) DropdownMenuItem(text = { Text("Sin especificar") },
-                    leadingIcon = { PaymentLogo(null) }, onClick = { onChange(null); expanded = false })
+                    leadingIcon = { PaymentIcon(null) }, onClick = { onChange(null); expanded = false })
                 choices.forEach { method ->
                     DropdownMenuItem(text = { Column {
                         Text(method.name)
                         if (method.id != PaymentMethod.Cash.id) Text(PaymentBrand.fromCode(method.brand)?.label.orEmpty(), style = MaterialTheme.typography.bodySmall)
-                    } }, leadingIcon = { PaymentLogo(method.brand) }, onClick = { onChange(method.id); expanded = false })
+                    } }, leadingIcon = { PaymentIcon(method.brand) }, onClick = { onChange(method.id); expanded = false })
                 }
             }
         }
@@ -120,8 +110,7 @@ fun PaymentMethodsScreen(methods: List<PaymentMethod>, busy: Boolean, snackbar: 
                     onRequest = { deletingId = method.id }) {
                     Card(modifier = Modifier.fillMaxWidth().testTag("payment-${method.id}")) {
                         Row(Modifier.padding(20.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                            FuelIcon(if (method.id == PaymentMethod.Cash.id) R.drawable.ic_payments else R.drawable.ic_credit_card,
-                                modifier = Modifier.size(34.dp))
+                            PaymentIcon(method.brand, 34.dp, 34.dp)
                             Column {
                                 Text(method.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                                 Text(if (method.id == PaymentMethod.Cash.id) "Disponible por defecto" else PaymentBrand.fromCode(method.brand)?.label.orEmpty(),
@@ -172,13 +161,13 @@ fun AddPaymentMethodScreen(methods: List<PaymentMethod>, busy: Boolean, snackbar
                 Text("Marca de la tarjeta", style = MaterialTheme.typography.labelLarge)
                 Box(Modifier.fillMaxWidth()) {
                     OutlinedButton(onClick = { expanded = true }, enabled = !busy, modifier = Modifier.fillMaxWidth()) {
-                        PaymentLogo(brand)
+                        PaymentIcon(brand)
                         Text(PaymentBrand.fromCode(brand)?.label.orEmpty(), modifier = Modifier.weight(1f).padding(horizontal = 12.dp))
                         FuelIcon(R.drawable.ic_keyboard_arrow_down)
                     }
                     DropdownMenu(expanded && !busy, onDismissRequest = { expanded = false }) {
                         PaymentBrand.entries.filter { it != PaymentBrand.Cash }.forEach { option ->
-                            DropdownMenuItem(text = { Text(option.label) }, leadingIcon = { PaymentLogo(option.code) },
+                            DropdownMenuItem(text = { Text(option.label) }, leadingIcon = { PaymentIcon(option.code) },
                                 onClick = { brand = option.code; expanded = false })
                         }
                     }

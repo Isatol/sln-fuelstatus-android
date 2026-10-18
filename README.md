@@ -10,17 +10,17 @@ Iconos en los campos y opciones del formulario de llenados, y filtro de historia
 
 ### Funcionalidad de 0.6
 
-Métodos de pago en Nuevo gasto y Editar gasto, con Efectivo por defecto, tarjetas guardadas y logo/nombre en el historial. Los gastos anteriores conservan Sin especificar. Las asignaciones se incluyen en las copias completas y la migración conserva los datos existentes. Detalles en [docs/PAGOS_EN_GASTOS.md](docs/PAGOS_EN_GASTOS.md).
+Métodos de pago en Nuevo gasto y Editar gasto, con Efectivo por defecto, tarjetas guardadas e icono Material/nombre en el historial. Los gastos anteriores conservan Sin especificar. Las asignaciones se incluyen en las copias completas y la migración conserva los datos existentes. Detalles en [docs/PAGOS_EN_GASTOS.md](docs/PAGOS_EN_GASTOS.md).
 
 ### Funcionalidad de 0.5
 
 Categorías de gastos administrables desde Ajustes, con siete categorías iniciales e iconos distintos, formulario para agregar categorías y catálogo local de 30 iconos con búsqueda en español. Los formularios de gastos muestran nombre e icono en el selector; Otros siempre aparece al final. Las categorías se conservan en Room y en las copias completas. Detalles en [docs/CATEGORIAS_DE_GASTOS.md](docs/CATEGORIAS_DE_GASTOS.md).
 
-En Mis métodos de pago, las tarjetas usan el icono Material de tarjeta de crédito. Tarjetas y categorías admiten deslizar hacia la izquierda para eliminar con confirmación: los llenados y gastos asociados pasan a Efectivo, o los gastos a Otros al eliminar una categoría. Efectivo y Otros están protegidos. Las asignaciones se actualizan para todos los vehículos y se conservan en los respaldos.
+Las tarjetas usan el icono Material de tarjeta de crédito en toda la app, incluidos Llenados, Gastos, selectores y administración; las marcas permanecen como texto. Tarjetas y categorías admiten deslizar hacia la izquierda para eliminar con confirmación: los llenados y gastos asociados pasan a Efectivo, o los gastos a Otros al eliminar una categoría. Efectivo y Otros están protegidos. Las asignaciones se actualizan para todos los vehículos y se conservan en los respaldos.
 
 ### Funcionalidad de 0.4
 
-Métodos de pago con Efectivo, tarjetas VISA/Mastercard/American Express, pantalla completa de administración, selección por llenado y método común al importar CSV. Los métodos se conservan en Room, copias locales y Drive; los registros antiguos mantienen su método como Sin especificar. Detalles en [docs/METODOS_DE_PAGO.md](docs/METODOS_DE_PAGO.md).
+Métodos de pago con Efectivo, tarjetas VISA/Mastercard/American Express, pantalla completa de administración, selección por llenado y método común al importar CSV de Fuel. Los métodos se conservan en Room, copias locales y Drive; los registros antiguos mantienen su método como Sin especificar. Detalles en [docs/METODOS_DE_PAGO.md](docs/METODOS_DE_PAGO.md).
 
 ### Funcionalidad de 0.3
 
@@ -108,3 +108,5 @@ El alcance y las decisiones pendientes se detallan en [docs/DEFINICION.md](docs/
 Tendencia del consumo con comparación de fechas y equivalencia en km/L, distancia media entre cargas y frecuencia en días, por vehículo y con iconos en las cards. Incluye próximo llenado estimado, alcance de una carga habitual, costo reciente por 100 km, tendencia del precio por litro, ahorro potencial y gasto estimado al cierre del mes. Las proyecciones muestran su base histórica y requisitos; las tarjetas breves comparten fila y se apilan con texto ampliado. Las cargas parciales, excluidas y faltantes se contemplan sin alterar los datos existentes. Consulta las fórmulas y los umbrales en [docs/ESTADISTICAS.md](docs/ESTADISTICAS.md).
 
 Cada tarjeta tiene un botón de información que abre un modal con la explicación de su cálculo o estimación. La ayuda sustituye al bloque general de texto “Cómo calculamos” y está disponible incluso sin datos suficientes.
+
+En Ajustes, **Copias y Google Drive** forma parte de **Tus datos**. **Trae tu historial de Fuel** permite importar desde Fuel; la nueva card **Llenados de FuelStatus** reúne exportación CSV de todos los vehículos e importación conservando combustible y método de pago por registro, con selección de vehículo de origen/destino y omisión de duplicados.

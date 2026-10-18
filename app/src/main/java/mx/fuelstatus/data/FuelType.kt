@@ -20,10 +20,12 @@ enum class FuelType(val code: String, val label: String) {
     }
 }
 
+enum class CsvSource(val label: String) { Fuel("Fuel"), FuelStatus("FuelStatus") }
+
 data class ImportPlan(val sourceVehicleId: String, val targetVehicleId: String? = null,
     val useVehicleFuel: Boolean = true, val newVehicleFuelType: String = FuelType.Magna.code,
-    val paymentMethodId: String = PaymentMethod.Cash.id)
+    val paymentMethodId: String = PaymentMethod.Cash.id, val source: CsvSource = CsvSource.Fuel)
 
-data class ImportPreview(val rows: List<FuelImportRow>) {
+data class ImportPreview(val rows: List<FuelImportRow>, val source: CsvSource = CsvSource.Fuel) {
     val vehicles get() = rows.map { it.vehicle }.distinctBy { it.id }
 }
