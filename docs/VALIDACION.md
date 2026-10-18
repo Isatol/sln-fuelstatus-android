@@ -1,4 +1,21 @@
-# Validación 0.8.0 · Selector de paletas de Tema
+# Validación 0.8.0 · Icono con aro verde ampliado
+
+18 de octubre de 2026, America/Monterrey. Rama `20261018-icono-aro-verde`, creada desde `main` en `6c055c2` (PR #15), verificada contra el remoto SSH personal.
+
+- **Icono aprobado:** surtidor original verde oscuro, aro verde claro sin relleno y margen blanco exterior. El aro ocupa el 80 % del viewport circular nominal y queda dentro de la zona segura del icono adaptable. El manifiesto utiliza el mismo recurso para el icono normal y el redondo; la capa monocromática conserva la ventana transparente del surtidor.
+- **Compilación limpia aprobada:** APK debug 0.8.0, versionCode 8. Se regeneraron los intermediarios después de simplificar las variantes del recurso.
+- **Android Lint aprobado:** cero errores y 11 avisos anteriores, sin avisos nuevos del icono. El análisis final también se repitió después de eliminar las carpetas vacías de las variantes anteriores.
+- **Revisión visual manual en Android 37:** instalación con `-r`, sin borrar datos, y comprobación del icono en el cajón de aplicaciones del launcher. Captura completa `launcher-drawer.png` y recorte sin retoques `launcher-icono.png`, en `.local/qa/icono-aro-verde/`.
+- **Correspondencia del APK final:** las capturas se tomaron antes de unificar las variantes de recursos. Se compararon por SHA-256 los XML binarios del primer plano y del icono adaptable; los recursos del APK final son idénticos a los revisados en Android 37. Los resultados están en `visual-apk-resource-hashes.json` y `final-apk-resource-hashes.json`.
+- **APK:** `.local/releases/FuelStatus-0.8.0-icono-aro-verde.apk`. SHA-256: `2bd528617ba908e41dc13184bc619cd9f6497e69cbad913b7a133fdad662b6af`. Conserva la firma debug anterior, SHA-1 `81:BA:D0:FD:EB:A0:29:7E:6B:3E:F9:04:FF:6B:1D:AD:80:33:1F:36`.
+
+El emulador Medium Phone API 37 se utilizó read-only, sin snapshots y sin conexión; se cerró antes de recompilar. Al arrancar mostró un aviso de System UI sin respuesta, resuelto con Esperar; la captura inicial se conserva como `launcher-system-ui-anr.png`. La revisión del launcher se completó después de esa recuperación.
+
+El cambio solo afecta recursos del icono y referencias del manifiesto. No se añadieron pruebas ni se ejecutaron las suites JVM o Android instrumentadas, navegación o restauraciones. No se verificaron en ejecución Android 12/12L, otros launchers ni la activación de iconos temáticos; la capa monocromática se incluyó y validó durante el empaquetado. No cambian datos, Room 6, respaldo 5, CSV ni el tema dentro de la app. No se operó sobre Drive real ni dispositivos personales. Detalles del recurso en [Icono de FuelStatus](ICONO.md).
+
+---
+
+# Validación histórica 0.8.0 · Selector de paletas de Tema
 
 18 de octubre de 2026, America/Monterrey. Rama `20261018-selector-paletas-tema`, creada desde `main` en `06e0f2b`, verificada contra el remoto SSH personal.
 

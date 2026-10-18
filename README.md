@@ -32,6 +32,7 @@ Las tarjetas de Llenados incluyen iconos Material Symbols Rounded para el kilome
 
 - **Plataforma:** Android nativo con Kotlin y Jetpack Compose; uso principal en un Pixel 10.
 - **Diseño:** Material 3 Expressive y Material You, paleta activa de Android o seis paletas propias con muestras seleccionables, tema del sistema/claro/oscuro, interfaz edge-to-edge, tarjetas, navegación inferior flotante y respuesta háptica al navegar y guardar. Consulta [Tema y colores](docs/APARIENCIA.md).
+- **Icono:** surtidor original con aro verde claro sin relleno y margen blanco, como icono adaptable con soporte para iconos temáticos de Android. Consulta [Icono de FuelStatus](docs/ICONO.md).
 - **Llenados:** alta, consulta, edición y eliminación; fecha, odómetro, litros, importe total, precio por litro calculado, tanque completo/parcial, gasolinera y notas. Opciones para excluir una carga de estadísticas o indicar una carga anterior faltante.
 - **Gastos:** registro, edición y eliminación, con categorías iniciales y personalizadas, iconos seleccionables y métodos de pago compartidos con los llenados.
 - **Estadísticas:** km/L, precio medio por litro, costo de combustible por kilómetro, volumen, combustible pagado y gastos totales; cálculos a partir de datos registrados.

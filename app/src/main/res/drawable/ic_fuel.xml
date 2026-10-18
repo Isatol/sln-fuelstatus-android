@@ -1,5 +1,17 @@
-<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="48dp" android:height="48dp" android:viewportWidth="48" android:viewportHeight="48">
-    <path android:fillColor="#D4EEB1" android:pathData="M0,0h48v48h-48z" />
-    <path android:fillColor="#294B2B" android:pathData="M12,10h18v27h-18zM10,37h22v3h-22zM32,18h3v13h3v-11l-5,-5l2,-2l6,6v13c0,5 -9,5 -9,0z" />
-    <path android:fillColor="#D4EEB1" android:pathData="M15,13h12v9h-12z" />
+<!-- Foreground and monochrome silhouette on Android's 108 dp adaptive canvas.
+     The ring occupies 80% of the central 72 dp viewport, leaving a white margin. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <path android:fillColor="@android:color/transparent"
+        android:strokeColor="#D4EEB1" android:strokeWidth="3.06383"
+        android:pathData="M54,26.731915a27.268085,27.268085 0,1 0,0,54.53617a27.268085,27.268085 0,1 0,0,-54.53617z" />
+    <group android:translateX="33.75" android:translateY="33.75"
+        android:scaleX="0.84375" android:scaleY="0.84375">
+        <!-- A transparent window also preserves its opening when Android tints the silhouette. -->
+        <path android:fillColor="#294B2B" android:fillType="evenOdd"
+            android:pathData="M12,10h18v27h-18zM15,13h12v9h-12z" />
+        <path android:fillColor="#294B2B"
+            android:pathData="M10,37h22v3h-22zM32,18h3v13h3v-11l-5,-5l2,-2l6,6v13c0,5 -9,5 -9,0z" />
+    </group>
 </vector>
