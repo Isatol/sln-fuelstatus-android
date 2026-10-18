@@ -15,3 +15,6 @@ Expense category catalog (Material Symbols Rounded, 24px): build, settings, veri
 Source: https://github.com/google/material-design-icons/tree/master/symbols/web
 
 Refuel form and history: filter_list, notes (Material Symbols Rounded, 24px).
+
+Payment method management: credit_card (Material Icons, 24px), Google, Apache-2.0.
+Source: https://github.com/google/material-design-icons/tree/master/src/action/credit_card/materialicons/24px.svg

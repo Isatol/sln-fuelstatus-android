@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -32,7 +33,9 @@ fun ExpenseCategoryIcon(code: String, modifier: Modifier = Modifier) {
 
 @Composable
 fun ExpenseCategoriesScreen(categories: List<ExpenseCategory>, busy: Boolean, snackbar: SnackbarHostState,
-    onBack: () -> Unit, onAdd: () -> Unit) {
+    onBack: () -> Unit, onAdd: () -> Unit, expenses: List<Expense>, onDelete: (ExpenseCategory, () -> Unit) -> Unit) {
+    var deletingName by rememberSaveable { mutableStateOf<String?>(null) }
+    val deleting = categories.firstOrNull { it.name == deletingName && it.name != ExpenseCategory.OTHER_NAME }
     Scaffold(topBar = { TopAppBar(title = { Text("Categorías de gastos") }, navigationIcon = {
         IconButton(onClick = onBack, enabled = !busy) { FuelIcon(R.drawable.ic_arrow_back, "Volver a Ajustes") }
     }) }, snackbarHost = { SnackbarHost(snackbar) }, bottomBar = {
@@ -43,15 +46,27 @@ fun ExpenseCategoriesScreen(categories: List<ExpenseCategory>, busy: Boolean, sn
     }) { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(20.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            item { Text("Organiza los gastos de tus vehículos", color = MaterialTheme.colorScheme.onSurfaceVariant) }
-            items(categories, key = { it.name }) { category -> Card(Modifier.fillMaxWidth()) {
-                Row(Modifier.padding(20.dp), verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    ExpenseCategoryIcon(category.icon)
-                    Text(category.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            item { Text("Organiza los gastos de tus vehículos. Desliza una categoría hacia la izquierda para eliminarla, excepto Otros.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+            items(categories, key = { it.name }) { category ->
+                CatalogSwipeToDelete(category.name, protected = category.name == ExpenseCategory.OTHER_NAME, enabled = !busy && deleting == null,
+                    onRequest = { deletingName = category.name }) {
+                    Card(Modifier.fillMaxWidth().testTag("category-${category.name}")) {
+                        Row(Modifier.padding(20.dp), verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                            ExpenseCategoryIcon(category.icon)
+                            Text(category.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        }
+                    }
                 }
-            } }
+            }
         }
+    }
+    if (deleting != null) {
+        val count = expenses.count { it.category == deleting.name }
+        CatalogDeleteDialog("¿Eliminar categoría?", "Se eliminará «${deleting.name}».\n\n" +
+            if (count > 0) "Esta categoría está asociada a $count ${if (count == 1) "gasto" else "gastos"}. Todos los gastos asociados, de todos tus vehículos, pasarán a Otros. Se conservarán sus demás datos."
+            else "No tiene gastos asociados.", busy,
+            onDismiss = { deletingName = null }, onConfirm = { onDelete(deleting) { deletingName = null } })
     }
 }
 

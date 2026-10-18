@@ -91,7 +91,7 @@ fun ExpenseEditor(vehicle: Vehicle, existing: Expense?, busy: Boolean, onDismiss
     paymentMethods: List<PaymentMethod> = listOf(PaymentMethod.Cash)) {
     val key = existing?.id ?: "new-expense"
     var timestamp by rememberSaveable(key) { mutableLongStateOf(existing?.timestamp ?: System.currentTimeMillis()) }
-    var category by rememberSaveable(key) { mutableStateOf(existing?.category ?: "Servicio") }
+    var category by rememberSaveable(key) { mutableStateOf(existing?.category ?: if (categories.any { it.name == "Servicio" }) "Servicio" else ExpenseCategory.OTHER_NAME) }
     var paymentMethodId by rememberSaveable(key) { mutableStateOf(if (existing != null) existing.paymentMethodId else PaymentMethod.Cash.id) }
     var total by rememberSaveable(key) { mutableStateOf(existing?.let { inputNumber(it.costCents, 2) }.orEmpty()) }
     var notes by rememberSaveable(key) { mutableStateOf(existing?.notes.orEmpty()) }

@@ -70,6 +70,8 @@ class FuelViewModel(application: Application) : AndroidViewModel(application) {
     fun dynamicColor(value: Boolean) { preference { it.copy(dynamicColor = value) } }
     fun addPaymentMethod(method: PaymentMethod, onSuccess: () -> Unit) = work("Tarjeta guardada", onSuccess, true) { repository.addPaymentMethod(method) }
     fun addExpenseCategory(name: String, icon: String, onSuccess: () -> Unit) = work("Categoría guardada", onSuccess, true) { repository.addExpenseCategory(name, icon) }
+    fun deletePaymentMethod(method: PaymentMethod, onSuccess: () -> Unit) = work("Tarjeta eliminada", onSuccess, true) { repository.deletePaymentMethod(method.id) }
+    fun deleteExpenseCategory(category: ExpenseCategory, onSuccess: () -> Unit) = work("Categoría eliminada", onSuccess, true) { repository.deleteExpenseCategory(category.name) }
     fun save(refuel: Refuel, onSuccess: () -> Unit) = work("Llenado guardado", onSuccess, true) { repository.save(refuel) }
     fun save(expense: Expense, onSuccess: () -> Unit) = work("Gasto guardado", onSuccess, true) { repository.save(expense) }
     fun save(vehicle: Vehicle, onSuccess: () -> Unit) = work("Vehículo guardado", onSuccess, true) {

@@ -49,6 +49,7 @@ data class ExpenseCategory(@PrimaryKey val name: String, val icon: String, val s
     companion object {
         const val MAX_NAME_LENGTH = 50
         const val OTHER_NAME = "Otros"
+        val Other = ExpenseCategory(OTHER_NAME, CategoryIcon.More.code, Int.MAX_VALUE)
         val Defaults = listOf(
             ExpenseCategory("Servicio", CategoryIcon.Build.code, 0),
             ExpenseCategory("Mantenimiento", CategoryIcon.Settings.code, 1),
@@ -56,7 +57,7 @@ data class ExpenseCategory(@PrimaryKey val name: String, val icon: String, val s
             ExpenseCategory("Estacionamiento", CategoryIcon.Parking.code, 3),
             ExpenseCategory("Peaje", CategoryIcon.Toll.code, 4),
             ExpenseCategory("Lavado", CategoryIcon.Wash.code, 5),
-            ExpenseCategory(OTHER_NAME, CategoryIcon.More.code, Int.MAX_VALUE),
+            Other,
         )
 
         // Legacy expenses store the category name. Preserve that name exactly, even for older custom values.
