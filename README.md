@@ -104,3 +104,5 @@ El alcance y las decisiones pendientes se detallan en [docs/DEFINICION.md](docs/
 ## Estadísticas de consumo (0.8.0)
 
 Tendencia del consumo con comparación de fechas y equivalencia en km/L, distancia media entre cargas y frecuencia en días, por vehículo y con iconos en las cards. Incluye próximo llenado estimado, alcance de una carga habitual, costo reciente por 100 km, tendencia del precio por litro, ahorro potencial y gasto estimado al cierre del mes. Las proyecciones muestran su base histórica y requisitos; las tarjetas breves comparten fila y se apilan con texto ampliado. Las cargas parciales, excluidas y faltantes se contemplan sin alterar los datos existentes. Consulta las fórmulas y los umbrales en [docs/ESTADISTICAS.md](docs/ESTADISTICAS.md).
+
+Cada tarjeta tiene un botón de información que abre un modal con la explicación de su cálculo o estimación. La ayuda sustituye al bloque general de texto “Cómo calculamos” y está disponible incluso sin datos suficientes.

@@ -27,13 +27,14 @@ internal fun StatisticsScreen(state: FuelState, calendar: RefuelCalendar = remem
     LazyColumn(contentPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 24.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Hero(if (state.selectedVehicle?.name == "Mazda 3") "ASÍ SE MUEVE TU MAZDA" else "ASÍ SE MUEVE TU AUTO",
-            stats.kmPerLiter?.let { number(it) } ?: "—", "km/L", "Rendimiento ponderado entre tanques llenos", R.drawable.ic_speed) }
+            stats.kmPerLiter?.let { number(it) } ?: "—", "km/L", "Rendimiento ponderado entre tanques llenos", R.drawable.ic_speed,
+            headerAction = { StatisticsInfoButton(StatisticInfo.Efficiency) }) }
         item { ConsumptionTrendCard(stats.trend) }
         projectionCards(forecast, calendar)
         item { StatisticsPair(
-            { modifier -> StatisticsMetric("Distancia media entre cargas", stats.averageDistanceBetweenRefuels?.let { "${number(it, 1)} km" } ?: "—",
+            { modifier -> StatisticsMetric(StatisticInfo.AverageDistance, stats.averageDistanceBetweenRefuels?.let { "${number(it, 1)} km" } ?: "—",
                 R.drawable.ic_route, modifier, if (stats.refuelIntervals.isEmpty()) "Necesitas dos cargas consecutivas válidas." else "Incluye las cargas parciales.") },
-            { modifier -> StatisticsMetric("Frecuencia de carga", stats.averageDaysBetweenRefuels?.let {
+            { modifier -> StatisticsMetric(StatisticInfo.Frequency, stats.averageDaysBetweenRefuels?.let {
                 when (it) { 0.0 -> "El mismo día"; 1.0 -> "Cada 1 día"; else -> "Cada ${number(it, 1)} días" }
             } ?: "—",
                 R.drawable.ic_category_calendar_month, modifier, if (stats.refuelIntervals.isEmpty()) "Necesitas dos cargas consecutivas válidas."
@@ -41,19 +42,19 @@ internal fun StatisticsScreen(state: FuelState, calendar: RefuelCalendar = remem
                     "${stats.minimumDaysBetweenRefuels} ${if (stats.minimumDaysBetweenRefuels == 1L) "día" else "días"} entre cargas."
                 else "Entre ${stats.minimumDaysBetweenRefuels} y ${stats.maximumDaysBetweenRefuels} días entre cargas.") }) }
         item { StatisticsPair(
-            { StatisticsMetric("Costo / km", stats.costPerKm?.let(::money) ?: "—", R.drawable.ic_payments, it) },
-            { StatisticsMetric("Precio medio / L", stats.averagePrice?.let(::money) ?: "—", R.drawable.ic_category_sell, it) }) }
+            { StatisticsMetric(StatisticInfo.CostPerKm, stats.costPerKm?.let(::money) ?: "—", R.drawable.ic_payments, it) },
+            { StatisticsMetric(StatisticInfo.AveragePrice, stats.averagePrice?.let(::money) ?: "—", R.drawable.ic_category_sell, it) }) }
         item { StatisticsPair(
-            { StatisticsMetric("Litros registrados", "${number(stats.liters)} L", R.drawable.ic_water_drop, it) },
-            { StatisticsMetric("Km evaluados", number(stats.distanceKm, 0), R.drawable.ic_car, it) }) }
-        item { StatisticsMetric("Combustible + otros gastos", money(stats.fuelCost + state.selectedExpenses.sumOf { it.costCents } / 100.0),
+            { StatisticsMetric(StatisticInfo.RegisteredLiters, "${number(stats.liters)} L", R.drawable.ic_water_drop, it) },
+            { StatisticsMetric(StatisticInfo.EvaluatedDistance, number(stats.distanceKm, 0), R.drawable.ic_car, it) }) }
+        item { StatisticsMetric(StatisticInfo.TotalSpending, money(stats.fuelCost + state.selectedExpenses.sumOf { it.costCents } / 100.0),
             R.drawable.ic_receipt, Modifier.fillMaxWidth()) }
         if (stats.periods.isNotEmpty()) item {
             val recent = stats.periods.takeLast(8)
             val max = recent.maxOf { it.kmPerLiter }.coerceAtLeast(1.0)
             Card(shape = RoundedCornerShape(24.dp)) {
                 Column(Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    SettingsTitle(R.drawable.ic_chart, "Últimos intervalos", style = MaterialTheme.typography.titleMedium)
+                    StatisticsCardHeader(StatisticInfo.RecentIntervals, R.drawable.ic_chart)
                     Text("Rendimiento en km/L", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     recent.forEach { period ->
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -66,19 +67,6 @@ internal fun StatisticsScreen(state: FuelState, calendar: RefuelCalendar = remem
                 }
             }
         }
-        item { Explanation("Cómo calculamos",
-            "El primer tanque lleno establece el punto de partida. Sumamos las cargas parciales hasta el siguiente tanque lleno para calcular el rendimiento. " +
-                "La tendencia compara los tres últimos intervalos completos con los tres anteriores, usando litros por cada 100 km: menos es mejor. " +
-                "La equivalencia muestra el rendimiento en km/L. Los litros adicionales o de ahorro se estiman para los kilómetros del periodo reciente, usando el consumo anterior como referencia. " +
-                "La distancia compara esos mismos periodos, que pueden tener distinta duración. " +
-                "La próxima carga es una orientación basada en los días entre tus últimos llenados completos; su rango refleja el mínimo y máximo observados. " +
-                "El alcance usa los litros habituales de tus últimas tres cargas completas y el consumo reciente. " +
-                "El precio compara dos grupos de tres cargas del mismo combustible. El ahorro potencial mantiene una referencia de 500 km. " +
-                "El gasto de cierre del mes suma lo registrado y lo que resultaría de mantener ese ritmo en los días restantes; requiere al menos siete días de observación. " +
-                "Una variación menor al 5 % se considera estable; desde un 15 % de aumento se destaca como importante. " +
-                "Las medias entre cargas incluyen las parciales y se dividen entre los intervalos válidos, no entre el número de cargas. " +
-                "Los días se cuentan según las fechas locales; dos cargas el mismo día cuentan como cero días. " +
-                "Una carga faltante, excluida o un retroceso del odómetro interrumpe la secuencia para estas nuevas métricas.", R.drawable.ic_category_fact_check) }
     }
 }
 
@@ -86,7 +74,7 @@ internal fun StatisticsScreen(state: FuelState, calendar: RefuelCalendar = remem
 private fun ConsumptionTrendCard(trend: ConsumptionTrend?) {
     Card(shape = RoundedCornerShape(24.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)) {
         Column(Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            SettingsTitle(R.drawable.ic_chart, "Tendencia de consumo")
+            StatisticsCardHeader(StatisticInfo.ConsumptionTrend, R.drawable.ic_chart)
             if (trend == null) {
                 Text("Aún no hay suficientes datos", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 Text("Necesitas seis intervalos completos entre tanques llenos, sin cargas faltantes o excluidas entre ellos.",
@@ -151,17 +139,19 @@ internal fun StatisticsPair(first: @Composable (Modifier) -> Unit, second: @Comp
     BoxWithConstraints(Modifier.fillMaxWidth()) {
         if (maxWidth < 340.dp || largeText) Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             first(Modifier.fillMaxWidth()); second(Modifier.fillMaxWidth())
-        } else Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            first(Modifier.weight(1f).fillMaxHeight()); second(Modifier.weight(1f).fillMaxHeight())
+        } else CompositionLocalProvider(LocalCompactStatisticsHeader provides true) {
+            Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                first(Modifier.weight(1f).fillMaxHeight()); second(Modifier.weight(1f).fillMaxHeight())
+            }
         }
     }
 }
 
 @Composable
-private fun StatisticsMetric(label: String, value: String, icon: Int, modifier: Modifier = Modifier, detail: String? = null) {
+private fun StatisticsMetric(info: StatisticInfo, value: String, icon: Int, modifier: Modifier = Modifier, detail: String? = null) {
     Surface(modifier, shape = RoundedCornerShape(24.dp), color = MaterialTheme.colorScheme.surfaceContainerLow) {
         Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            SettingsTitle(icon, label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            StatisticsCardHeader(info, icon, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Text(value, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
             detail?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
         }

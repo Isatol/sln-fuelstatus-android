@@ -111,7 +111,8 @@ class StatisticsUiTest {
         scroll("Combustible + otros gastos")
         capture("metricas-oscuro")
         scroll("Últimos intervalos"); capture("intervalos-oscuro")
-        scroll("Cómo calculamos"); compose.onNodeWithText("Cómo calculamos").assertIsDisplayed()
+        scroll("Últimos intervalos"); compose.onNodeWithText("Últimos intervalos").assertIsDisplayed()
+        compose.onNodeWithText("Cómo calculamos").assertDoesNotExist()
         compose.runOnIdle { selected = "other" }
         scroll("Distancia media entre cargas")
         scroll("100.0 km")
