@@ -175,7 +175,7 @@ fun FuelApp(model: FuelViewModel, onConnectDrive: () -> Unit) {
                                 model::syncDrive, model::disconnectDrive, model::reviewDriveCopy, model::useLocalHistory) },
                             deleteContent = { DeleteDataCard(backup, busy || driveBusy) { deleteDrive ->
                                 model.resetData(deleteDrive) { destination = Destination.Refuels; editor = null; editingId = null; refuelFilter.reset() }
-                            } })
+                            } }, onColorPalette = model::colorPalette)
                     }
                 }
             }
@@ -331,26 +331,20 @@ private fun VehiclesScreen(state: FuelState, onSelect: (String) -> Unit, onEdit:
 @Composable
 internal fun SettingsScreen(preferences: Preferences, busy: Boolean, onTheme: (String) -> Unit, onDynamic: (Boolean) -> Unit,
     onImport: () -> Unit, onImportFuelStatus: () -> Unit, onExport: () -> Unit,
-    onPaymentMethods: () -> Unit, onExpenseCategories: () -> Unit, backupContent: @Composable () -> Unit, deleteContent: @Composable () -> Unit) {
+    onPaymentMethods: () -> Unit, onExpenseCategories: () -> Unit, backupContent: @Composable () -> Unit, deleteContent: @Composable () -> Unit,
+    onColorPalette: (String) -> Unit = {}) {
     LazyColumn(contentPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         item { SectionLabel("APARIENCIA", "A tu manera") }
         item { Card(shape = RoundedCornerShape(24.dp)) {
             Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 SettingsTitle(R.drawable.ic_palette, "Tema")
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     listOf("system" to "Sistema", "light" to "Claro", "dark" to "Oscuro").forEach { (key, label) ->
-                        FilterChip(selected = preferences.theme == key, onClick = { onTheme(key) }, label = { Text(label) })
+                        FilterChip(selected = preferences.theme == key, enabled = !busy, onClick = { onTheme(key) }, label = { Text(label) })
                     }
                 }
                 HorizontalDivider()
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Column(Modifier.weight(1f)) {
-                        Text("Color dinámico", fontWeight = FontWeight.Bold)
-                        Text("Material You · colores de tu fondo", style = MaterialTheme.typography.bodySmall)
-                    }
-                    Switch(checked = preferences.dynamicColor, onCheckedChange = onDynamic)
-                }
-                Text("Al desactivarlo se usa la paleta verde de FuelStatus.", style = MaterialTheme.typography.bodySmall)
+                ThemeColorPicker(preferences, !busy, onDynamic, onColorPalette)
             }
         } }
         item { SectionLabel("TUS DATOS") }

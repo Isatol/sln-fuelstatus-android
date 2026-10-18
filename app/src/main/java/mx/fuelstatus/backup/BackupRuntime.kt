@@ -27,12 +27,13 @@ const val DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.file"
 class AppearanceStore(context: Context, name: String = "appearance") {
     private val prefs = context.getSharedPreferences(name, 0)
     private val mutable = MutableStateFlow(Preferences(prefs.getString("theme", "system").orEmpty(),
-        prefs.getBoolean("dynamic", true), prefs.getString("vehicle", "").orEmpty()))
+        prefs.getBoolean("dynamic", true), prefs.getString("vehicle", "").orEmpty(),
+        mx.fuelstatus.domain.ThemePalette.fromCode(prefs.getString("palette", null)).code))
     val state = mutable.asStateFlow()
     @Synchronized fun update(transform: (Preferences) -> Preferences) {
         val value = transform(mutable.value)
         check(prefs.edit().putString("theme", value.theme).putBoolean("dynamic", value.dynamicColor)
-            .putString("vehicle", value.vehicleId).commit()) { "No se pudieron guardar los ajustes." }
+            .putString("vehicle", value.vehicleId).putString("palette", value.colorPalette).commit()) { "No se pudieron guardar los ajustes." }
         mutable.value = value
     }
 }

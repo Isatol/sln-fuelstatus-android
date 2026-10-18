@@ -1,4 +1,21 @@
-# Validación 0.8.0 · Iconos de pago, CSV y Ajustes
+# Validación 0.8.0 · Selector de paletas de Tema
+
+18 de octubre de 2026, America/Monterrey. Rama `20261018-selector-paletas-tema`, creada desde `main` en `06e0f2b`, verificada contra el remoto SSH personal.
+
+- **113 pruebas JVM aprobadas:** 114 registradas, una omitida porque requiere el CSV privado. Los dos casos nuevos verifican la paleta en respaldos de formato 5, el rechazo de códigos inválidos y la restauración de copias anteriores sin perder su elección de color dinámico.
+- **7 casos Android dirigidos aprobados, en ejecuciones separadas:** tres nuevos de paletas, persistencia y contraste; dos de Ajustes/CSV y dos de la interfaz de Drive. Se comprobaron aplicación inmediata de Azul, cambio a oscuro, Gris con texto al 130 %, regreso a la paleta activa de Android, controles deshabilitados, preferencias anteriores y contraste mínimo de 4.5:1 en los pares de texto evaluados para las seis paletas en claro y oscuro.
+- **Compilación y Android Lint aprobados:** APK de aplicación y de pruebas generados, cero errores y 11 avisos existentes. Las paletas están generadas como constantes; no se añaden dependencias en ejecución.
+- **Revisión visual:** cuatro capturas de Android y Azul en claro, Gris en oscuro con texto al 130 % y Android en oscuro al 130 % con controles deshabilitados. Registros y capturas en `.local/qa/selector-paletas/`.
+- **Compatibilidad:** se conservan Room 6 y respaldo 5. `appearance.colorPalette` es opcional para las copias anteriores; los clientes anteriores ignoran ese campo y muestran su verde cuando el color dinámico está desactivado. No cambia el CSV. Detalles en [Tema y colores](APARIENCIA.md).
+- **APK:** `.local/releases/FuelStatus-0.8.0-selector-paletas.apk`, versión 0.8.0, versionCode 8. SHA-256: `5ab4492cf5042d22ff9d1c8c06d8c09351b9467cc7b5a6e75e842dfd89706ba8`. Conserva la firma debug anterior, SHA-1 `81:BA:D0:FD:EB:A0:29:7E:6B:3E:F9:04:FF:6B:1D:AD:80:33:1F:36`.
+
+En las dos ejecuciones iniciales del grupo de siete, seis casos aprobaron y el caso de botones CSV falló al intentar actuar sobre un elemento fuera de pantalla. Se actualizó esa prueba para buscar el botón a través de la lista con `performScrollToNode`, comprobar su visibilidad y leer los contadores con `runOnIdle`. Su repetición final aprobó con `OK (1 test)` en `android-scroll.txt`; los registros de los intentos iniciales se conservan. No se volvió a ejecutar el grupo completo después de ese ajuste exclusivo de la prueba.
+
+Se usaron datos sintéticos, sin operaciones sobre Drive real ni dispositivos personales. El emulador Medium Phone API 37 se ejecutó read-only y sin snapshots, por separado de Gradle, y se cerró al terminar. No se repitieron la suite Android completa ni la navegación general.
+
+---
+
+# Validación histórica 0.8.0 · Iconos de pago, CSV y Ajustes
 
 18 de octubre de 2026, America/Monterrey. Rama `20261018-iconos-tarjetas-csv-ajustes`, creada desde `main` actualizada al merge `85978f9` (PR #13).
 
