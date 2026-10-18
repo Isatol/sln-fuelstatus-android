@@ -49,10 +49,10 @@ class ThemePaletteTest {
                 }
             }
         }
-        compose.onNodeWithText("Android").assertIsSelected()
+        palette("Android").assertIsSelected()
         compose.runOnIdle { assertScheme(android, actual) }
         capture("android-claro")
-        compose.onNodeWithText("Azul").performScrollTo().performClick().assertIsSelected()
+        palette("Azul").performScrollTo().performClick().assertIsSelected()
         compose.runOnIdle {
             assertFalse(preferences.dynamicColor)
             assertScheme(fixedColorScheme(ThemePalette.Blue, false), actual)
@@ -61,12 +61,12 @@ class ThemePaletteTest {
         compose.onNodeWithText("Oscuro").performClick()
         compose.runOnIdle { assertScheme(fixedColorScheme(ThemePalette.Blue, true), actual) }
         compose.runOnIdle { scale = 1.3f }
-        compose.onNodeWithText("Gris").performScrollTo().performClick().assertIsSelected()
+        palette("Gris").performScrollTo().performClick().assertIsSelected()
         capture("gris-oscuro-texto130")
-        compose.onNodeWithText("Android").performScrollTo().performClick().assertIsSelected()
+        palette("Android").performScrollTo().performClick().assertIsSelected()
         compose.runOnIdle { assertScheme(android, actual); busy = true }
         compose.onNodeWithText("Claro").assertIsNotEnabled()
-        compose.onNodeWithText("Android").assertIsNotEnabled()
+        palette("Android").assertIsNotEnabled()
         capture("android-oscuro-texto130")
     }
 
@@ -103,6 +103,8 @@ class ThemePaletteTest {
             }
         }
     }
+
+    private fun palette(text: String) = compose.onNode(hasText(text) and hasAnyAncestor(hasTestTag("app-color-picker")))
 
     private fun capture(name: String) {
         compose.waitForIdle()

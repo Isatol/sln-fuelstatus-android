@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.tasks.await
 import mx.fuelstatus.FuelApplication
 import mx.fuelstatus.Preferences
+import mx.fuelstatus.domain.IconRingColor
 import mx.fuelstatus.data.*
 import java.io.File
 import java.util.UUID
@@ -24,17 +25,28 @@ import java.util.concurrent.TimeUnit
 
 const val DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.file"
 
-class AppearanceStore(context: Context, name: String = "appearance") {
+class AppearanceStore(context: Context, name: String = "appearance", private val onIconColor: (String) -> Unit = {}) {
     private val prefs = context.getSharedPreferences(name, 0)
     private val mutable = MutableStateFlow(Preferences(prefs.getString("theme", "system").orEmpty(),
         prefs.getBoolean("dynamic", true), prefs.getString("vehicle", "").orEmpty(),
-        mx.fuelstatus.domain.ThemePalette.fromCode(prefs.getString("palette", null)).code))
+        mx.fuelstatus.domain.ThemePalette.fromCode(prefs.getString("palette", null)).code,
+        IconRingColor.fromCode(prefs.getString("icon_ring", null)).code))
     val state = mutable.asStateFlow()
+    @Synchronized fun synchronizeIcon() { onIconColor(mutable.value.iconRingColor) }
     @Synchronized fun update(transform: (Preferences) -> Preferences) {
-        val value = transform(mutable.value)
-        check(prefs.edit().putString("theme", value.theme).putBoolean("dynamic", value.dynamicColor)
-            .putString("vehicle", value.vehicleId).putString("palette", value.colorPalette).commit()) { "No se pudieron guardar los ajustes." }
-        mutable.value = value
+        val previous = mutable.value
+        val value = transform(previous)
+        val changedIcon = previous.iconRingColor != value.iconRingColor
+        try {
+            if (changedIcon) onIconColor(value.iconRingColor)
+            check(prefs.edit().putString("theme", value.theme).putBoolean("dynamic", value.dynamicColor)
+                .putString("vehicle", value.vehicleId).putString("palette", value.colorPalette)
+                .putString("icon_ring", value.iconRingColor).commit()) { "No se pudieron guardar los ajustes." }
+            mutable.value = value
+        } catch (failure: Exception) {
+            if (changedIcon) runCatching { onIconColor(previous.iconRingColor) }.onFailure(failure::addSuppressed)
+            throw failure
+        }
     }
 }
 
@@ -65,20 +77,28 @@ class RoomBackupSource(private val repository: FuelRepository, private val appea
         BackupDocument(now, deviceId, revision(), repository.dao.allVehicles(), repository.dao.allRefuels(),
             repository.dao.allExpenses(), appearance.state.value, repository.dao.allPaymentMethods(), repository.dao.allExpenseCategories())
     }
-    override suspend fun reset() {
-        repository.reset()
-        appearance.update { Preferences() }
+    private suspend fun replaceLocal(value: Preferences, change: suspend () -> Unit) {
+        val previous = appearance.state.value
+        try {
+            repository.database.withTransaction {
+                change()
+                appearance.update { value }
+            }
+        } catch (failure: Exception) {
+            if (appearance.state.value != previous) {
+                runCatching { appearance.update { previous } }.onFailure(failure::addSuppressed)
+            }
+            throw failure
+        }
     }
-    override suspend fun restore(document: BackupDocument) {
-        repository.database.withTransaction {
+    override suspend fun reset() = replaceLocal(Preferences()) { repository.reset() }
+    override suspend fun restore(document: BackupDocument) = replaceLocal(document.appearance) {
             val dao = repository.dao
             dao.deleteAllRefuels(); dao.deleteAllExpenses(); dao.deleteAllVehicles()
             dao.deleteAllPaymentMethods(); dao.insertPaymentMethods(document.paymentMethods)
             dao.deleteAllExpenseCategories(); dao.insertExpenseCategories(document.expenseCategories)
             dao.insertVehicles(document.vehicles); dao.insertRefuels(document.refuels); dao.insertExpenses(document.expenses)
             dao.initializeRevision(BackupRevision()); dao.changed()
-        }
-        appearance.update { document.appearance }
     }
 }
 

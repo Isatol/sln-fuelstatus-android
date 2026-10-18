@@ -14,6 +14,6 @@ class FuelApplication : Application() {
 class FuelGraph(application: Application) {
     val repository = FuelRepository(Room.databaseBuilder(application, FuelDatabase::class.java, "fuelstatus.db")
         .addMigrations(FuelDatabase.MIGRATION_1_2, FuelDatabase.MIGRATION_2_3, FuelDatabase.MIGRATION_3_4, FuelDatabase.MIGRATION_4_5, FuelDatabase.MIGRATION_5_6).build())
-    val appearance = AppearanceStore(application)
+    val appearance = AppearanceStore(application, onIconColor = LauncherIcons(application)::apply)
     val backup = BackupRuntime(application, repository, appearance)
 }

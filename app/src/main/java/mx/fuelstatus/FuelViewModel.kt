@@ -12,10 +12,11 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import mx.fuelstatus.data.*
 import mx.fuelstatus.domain.ThemePalette
+import mx.fuelstatus.domain.IconRingColor
 import java.io.ByteArrayOutputStream
 
 data class Preferences(val theme: String = "system", val dynamicColor: Boolean = true, val vehicleId: String = "",
-    val colorPalette: String = ThemePalette.Green.code)
+    val colorPalette: String = ThemePalette.Green.code, val iconRingColor: String = IconRingColor.Android.code)
 data class FuelState(val vehicles: List<Vehicle> = emptyList(), val refuels: List<Refuel> = emptyList(),
     val expenses: List<Expense> = emptyList(), val preferences: Preferences = Preferences(), val loaded: Boolean = false,
     val paymentMethods: List<PaymentMethod> = listOf(PaymentMethod.Cash),
@@ -46,7 +47,7 @@ class FuelViewModel(application: Application) : AndroidViewModel(application) {
     private val _messages = MutableSharedFlow<String>(extraBufferCapacity = 8)
     val messages = _messages.asSharedFlow()
 
-    init { work { repository.initialize(); engine.refreshLocal() } }
+    init { work { graph.appearance.synchronizeIcon(); repository.initialize(); engine.refreshLocal() } }
 
     fun onForeground() {
         if (_driveBusy.value || engine.state.value.phase == "resetting") return
@@ -71,6 +72,7 @@ class FuelViewModel(application: Application) : AndroidViewModel(application) {
     fun theme(value: String) { preference { it.copy(theme = value) } }
     fun dynamicColor(value: Boolean) { preference { it.copy(dynamicColor = value) } }
     fun colorPalette(value: String) { preference { it.copy(dynamicColor = false, colorPalette = ThemePalette.fromCode(value).code) } }
+    fun iconRingColor(value: String) { preference { it.copy(iconRingColor = IconRingColor.fromCode(value).code) } }
     fun addPaymentMethod(method: PaymentMethod, onSuccess: () -> Unit) = work("Tarjeta guardada", onSuccess, true) { repository.addPaymentMethod(method) }
     fun addExpenseCategory(name: String, icon: String, onSuccess: () -> Unit) = work("Categoría guardada", onSuccess, true) { repository.addExpenseCategory(name, icon) }
     fun deletePaymentMethod(method: PaymentMethod, onSuccess: () -> Unit) = work("Tarjeta eliminada", onSuccess, true) { repository.deletePaymentMethod(method.id) }

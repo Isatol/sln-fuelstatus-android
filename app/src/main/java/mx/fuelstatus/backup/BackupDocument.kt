@@ -7,6 +7,7 @@ import com.google.gson.JsonParser
 import mx.fuelstatus.Preferences
 import mx.fuelstatus.data.*
 import mx.fuelstatus.domain.ThemePalette
+import mx.fuelstatus.domain.IconRingColor
 import java.security.MessageDigest
 
 data class BackupDocument(
@@ -78,6 +79,7 @@ object BackupCodec {
             // Normalize older copies explicitly before deserializing the preference.
             payload.getAsJsonObject("appearance")?.let {
                 if (!it.has("colorPalette")) it.addProperty("colorPalette", ThemePalette.Green.code)
+                if (!it.has("iconRingColor")) it.addProperty("iconRingColor", IconRingColor.Android.code)
             }
             validate(payload)
             return gson.fromJson(payload, BackupDocument::class.java)
@@ -152,6 +154,9 @@ object BackupCodec {
         appearance.bool("dynamicColor")
         if (appearance.has("colorPalette")) {
             require(ThemePalette.entries.any { it.code == appearance.string("colorPalette") }) { "Paleta de colores inválida." }
+        }
+        if (appearance.has("iconRingColor")) {
+            require(IconRingColor.entries.any { it.code == appearance.string("iconRingColor") }) { "Color del aro del icono inválido." }
         }
         require(appearance.string("vehicleId").let { it.isEmpty() || it in ids }) { "El vehículo seleccionado no existe." }
     }
