@@ -71,7 +71,8 @@ class FuelRepository(val database: FuelDatabase) {
         require(plan == null || FuelType.entries.any { it.code == plan.newVehicleFuelType }) { "Combustible inválido." }
         val vehicles = dao.allVehicles().toMutableList()
         val methods = dao.allPaymentMethods().toMutableList()
-        require(plan == null || methods.any { it.id == plan.paymentMethodId }) { "El método de pago elegido ya no existe. Vuelve a seleccionarlo." }
+        val preserveAssignments = plan == null || plan.source == CsvSource.FuelStatus
+        require(preserveAssignments || methods.any { it.id == plan.paymentMethodId }) { "El método de pago elegido ya no existe. Vuelve a seleccionarlo." }
         if (plan != null && plan.targetVehicleId == null) {
             val source = selected.first().vehicle
             require(vehicles.none { it.name.equals(source.name, true) && it.type.equals(source.type, true) && it.year == source.year }) {
@@ -90,14 +91,14 @@ class FuelRepository(val database: FuelDatabase) {
                 it.name.equals(row.vehicle.name, true) && it.type.equals(row.vehicle.type, true) && it.year == row.vehicle.year
             } ?: row.vehicle.copy(id = UUID.randomUUID().toString(), fuelType = plan?.newVehicleFuelType ?: row.vehicle.fuelType).also { dao.save(it); vehicles.add(it) }
             val mapped = row.refuel.copy(vehicleId = vehicle.id,
-                fuelType = if (plan?.useVehicleFuel == true) vehicle.fuelType else row.refuel.fuelType)
+                fuelType = if (plan?.source == CsvSource.Fuel && plan.useVehicleFuel) vehicle.fuelType else row.refuel.fuelType)
             val refuel = mapped.copy(id = "fuel-${FuelCsv.signature(mapped)}")
             val signature = FuelCsv.signature(refuel)
             // Earlier versions kept the CSV ID even when mapping to a different vehicle.
             // Keep those records recognizable after the user edits their values.
             val legacyDuplicate = existingVehicleById[row.refuel.id] == vehicle.id
             if (!legacyDuplicate && refuel.id !in existingIds && signatures.add(signature)) {
-                val methodId = if (plan != null) plan.paymentMethodId else row.paymentMethod?.let { imported ->
+                val methodId = if (plan != null && !preserveAssignments) plan.paymentMethodId else row.paymentMethod?.let { imported ->
                     methods.firstOrNull { it.brand == imported.brand && it.name.equals(imported.name, true) }
                         ?: imported.copy(id = if (imported.brand == PaymentBrand.Cash.code) PaymentMethod.Cash.id else UUID.randomUUID().toString())
                             .also { dao.insertPaymentMethod(it); methods.add(it) }

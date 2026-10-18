@@ -64,6 +64,9 @@ fun FuelApp(model: FuelViewModel, onConnectDrive: () -> Unit) {
         val importFile = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
             if (uri != null) model.prepareImport(uri)
         }
+        val importFuelStatusFile = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+            if (uri != null) model.prepareImport(uri, CsvSource.FuelStatus)
+        }
         val exportFile = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { uri -> uri?.let(model::exportCsv) }
         LaunchedEffect(model) { model.messages.collect { snackbar.showSnackbar(it) } }
         if (dataPage != null) {
@@ -164,6 +167,7 @@ fun FuelApp(model: FuelViewModel, onConnectDrive: () -> Unit) {
                         Destination.Vehicles -> VehiclesScreen(state, model::selectVehicle) { openEditor("vehicle", it.id) }
                         Destination.Settings -> SettingsScreen(state.preferences, busy || driveBusy || backup.running, model::theme, model::dynamicColor,
                             onImport = { importFile.launch(arrayOf("text/*", "application/csv", "application/octet-stream")) },
+                            onImportFuelStatus = { importFuelStatusFile.launch(arrayOf("text/*", "application/csv", "application/octet-stream")) },
                             onExport = { exportFile.launch("FuelStatus_llenados.csv") },
                             onPaymentMethods = { dataPage = "payments" },
                             onExpenseCategories = { dataPage = "categories" },
@@ -325,7 +329,8 @@ private fun VehiclesScreen(state: FuelState, onSelect: (String) -> Unit, onEdit:
 }
 
 @Composable
-private fun SettingsScreen(preferences: Preferences, busy: Boolean, onTheme: (String) -> Unit, onDynamic: (Boolean) -> Unit, onImport: () -> Unit, onExport: () -> Unit,
+internal fun SettingsScreen(preferences: Preferences, busy: Boolean, onTheme: (String) -> Unit, onDynamic: (Boolean) -> Unit,
+    onImport: () -> Unit, onImportFuelStatus: () -> Unit, onExport: () -> Unit,
     onPaymentMethods: () -> Unit, onExpenseCategories: () -> Unit, backupContent: @Composable () -> Unit, deleteContent: @Composable () -> Unit) {
     LazyColumn(contentPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         item { SectionLabel("APARIENCIA", "A tu manera") }
@@ -348,15 +353,22 @@ private fun SettingsScreen(preferences: Preferences, busy: Boolean, onTheme: (St
                 Text("Al desactivarlo se usa la paleta verde de FuelStatus.", style = MaterialTheme.typography.bodySmall)
             }
         } }
+        item { SectionLabel("TUS DATOS") }
         item { backupContent() }
-        item { SectionLabel("TUS DATOS", "Siempre contigo") }
         item { Card(shape = RoundedCornerShape(24.dp)) {
             Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 SettingsTitle(R.drawable.ic_upload_file, "Trae tu historial de Fuel")
                 Text("Importa vehículos y llenados desde tu CSV. Los duplicados se omiten y no se reemplazan tus registros.", style = MaterialTheme.typography.bodyMedium)
                 Button(onClick = onImport, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text("Importar CSV de Fuel") }
+            }
+        } }
+        item { Card(shape = RoundedCornerShape(24.dp)) {
+            Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                SettingsTitle(R.drawable.ic_receipt, "Llenados de FuelStatus")
+                Text("Importa un CSV exportado por FuelStatus conservando el combustible y el método de pago de cada llenado. Los duplicados se omiten.", style = MaterialTheme.typography.bodyMedium)
+                Button(onClick = onImportFuelStatus, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text("Importar llenados de FuelStatus") }
                 OutlinedButton(onClick = onExport, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text("Exportar llenados a CSV") }
-                Text("La exportación incluye los llenados de todos tus vehículos. La copia completa de Drive también incluye los otros gastos.", style = MaterialTheme.typography.bodySmall)
+                Text("La exportación incluye los llenados de todos tus vehículos. Para conservar también los gastos y ajustes, usa una copia completa.", style = MaterialTheme.typography.bodySmall)
             }
         } }
         item {
@@ -431,10 +443,10 @@ private fun SmallMetric(label: String, value: String, modifier: Modifier = Modif
     }
 }
 @Composable
-private fun SectionLabel(label: String, secondary: String) {
+private fun SectionLabel(label: String, secondary: String? = null) {
     Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
         Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
-        Text(secondary, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        if (secondary != null) Text(secondary, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 @Composable

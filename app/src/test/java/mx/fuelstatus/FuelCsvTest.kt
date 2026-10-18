@@ -30,6 +30,10 @@ class FuelCsvTest {
     @Test(expected = IllegalArgumentException::class) fun negativeLitersFail() { FuelCsv.parse("$header\n${row.replace("30.5", "-30.5")}") }
     @Test(expected = IllegalArgumentException::class) fun unclosedQuoteFails() { FuelCsv.parse("$header\n\"$row") }
     @Test(expected = IllegalArgumentException::class) fun wrongFormatFails() { FuelCsv.parse("date,volume\n2026-01-01,40") }
+    @Test fun invalidNativeCsvNamesFuelStatusInTheError() {
+        val error = assertThrows(IllegalArgumentException::class.java) { FuelCsv.parse("date,volume\n2026-01-01,40", CsvSource.FuelStatus) }
+        assertTrue(error.message.orEmpty().contains("CSV de llenados de FuelStatus"))
+    }
     @Test fun exportReimportPreservesMoneyPrecisionAndFlags() {
         val parsed = FuelCsv.parse("$header\n$row").single()
         val refuel = parsed.refuel.copy(costCents = 123456, missedPrevious = true, included = false, notes = "coma, \"comilla\"\nsalto")

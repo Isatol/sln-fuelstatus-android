@@ -11,7 +11,7 @@ object FuelCsv {
     const val MAX_BYTES = 5 * 1024 * 1024
 
     /** RFC 4180 fields, escaped quotes, CRLF, BOM, and semicolon exports. Reject incomplete files. */
-    fun parse(text: String): List<FuelImportRow> {
+    fun parse(text: String, source: CsvSource = CsvSource.Fuel): List<FuelImportRow> {
         require(text.length <= MAX_BYTES) { "El CSV supera el límite de 5 MB." }
         val clean = text.removePrefix("\uFEFF")
         val firstLine = clean.lineSequence().firstOrNull().orEmpty()
@@ -20,7 +20,7 @@ object FuelCsv {
         require(rows.isNotEmpty()) { "El archivo está vacío." }
         val headers = rows.first().map { it.trim() }
         val required = listOf("carName", "dateISO8601", "amount", "price", "meters", "fullFillup")
-        require(headers.containsAll(required)) { "No es un CSV de llenados de Fuel. Faltan: ${required.filterNot { it in headers }.joinToString()}." }
+        require(headers.containsAll(required)) { "No es un CSV de llenados de ${source.label}. Faltan: ${required.filterNot { it in headers }.joinToString()}." }
         val result = rows.drop(1).mapIndexed { index, values ->
             try {
                 require(values.size == headers.size) { "Número de columnas incorrecto." }

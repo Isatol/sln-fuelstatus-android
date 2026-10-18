@@ -1,4 +1,21 @@
-# Validación 0.8.0 · Eliminar tarjetas y categorías
+# Validación 0.8.0 · Iconos de pago, CSV y Ajustes
+
+18 de octubre de 2026, America/Monterrey. Rama `20261018-iconos-tarjetas-csv-ajustes`, creada desde `main` actualizada al merge `85978f9` (PR #13).
+
+- **111 pruebas JVM aprobadas:** 112 registradas, una omitida por requerir el CSV privado. El mensaje de CSV inválido identifica FuelStatus cuando se usa ese flujo; se conservan las pruebas existentes de precisión, metadatos, formatos y respaldos.
+- **29 pruebas Android dirigidas aprobadas:** dos nuevas de importación nativa, dos nuevas de Ajustes/vista previa, cinco de diálogos, diez generales de Room/importación/migraciones, tres de métodos de pago, tres de pagos en gastos y cuatro de eliminación de catálogos. No se repitieron la suite Android completa ni la navegación general.
+- **Las dos pruebas nuevas de interfaz también aprobaron con el texto Android al 130 %** sobre el APK final, después del ajuste singular del contador.
+- **CSV de FuelStatus:** selección de vehículo del archivo y destino existente/nuevo; conservación de combustible por fila, Efectivo, las tres marcas de tarjeta y Sin especificar; reutilización de tarjetas por marca y nombre sin distinguir mayúsculas; precisión monetaria, odómetro, notas multilínea, gasolinera y todos los indicadores. Los duplicados editados no se sobrescriben ni recrean tarjetas eliminadas. El flujo de Fuel mantiene su combustible y método comunes opcionales.
+- **Interfaz:** los tres botones CSV llaman a acciones distintas y se desactivan mientras está ocupado. La vista previa de FuelStatus propone un vehículo coincidente o crearlo al cambiar el origen. Se revisaron capturas claras/oscuras y texto ampliado en Ajustes y en el modal. Se corrigió el contador singular «1 llenado».
+- **Iconos:** el componente compartido de pagos usa Material para las tarjetas, Efectivo y Sin especificar. Se eliminaron las tres imágenes de marcas y su aviso específico. La inspección del APK confirmó que no incluye esos recursos; no quedan referencias a sus identificadores, `PaymentLogo` ni al subtítulo eliminado en `app/src/main`.
+- **Compilación y Android Lint aprobados:** cero errores y 11 avisos existentes. Se mantiene Room 6, respaldo 5 y el formato CSV exportado.
+- **APK:** `.local/releases/FuelStatus-0.8.0-iconos-csv-ajustes.apk`, versión 0.8.0, versionCode 8. SHA-256 `9616f883641cc5dfcac7a9e571e02b84095f2d3012a8612240419f0944fe9df3`. Firma debug anterior verificada: SHA-1 `81:BA:D0:FD:EB:A0:29:7E:6B:3E:F9:04:FF:6B:1D:AD:80:33:1F:36`.
+
+Registros y capturas locales en `.local/qa/iconos-csv-ajustes/`. Se usaron datos sintéticos y un emulador Medium Phone API 37 read-only, sin snapshots, cerrado al terminar; Gradle y el emulador se ejecutaron por separado. No se hicieron operaciones sobre Drive real ni dispositivos personales. El CSV importa un vehículo elegido por operación y contiene llenados; los gastos, ajustes y el catálogo completo se conservan mediante respaldos completos.
+
+---
+
+# Validación histórica 0.8.0 · Eliminar tarjetas y categorías
 
 18 de octubre de 2026, America/Monterrey. Rama `20261018-eliminar-tarjetas-categorias`. Mis métodos de pago usa el icono Material de tarjeta de crédito. Las listas permiten deslizar hacia la izquierda para pedir confirmación de eliminación; el modal muestra asociaciones y explica la reasignación a Efectivo u Otros. Ambas opciones están protegidas.
 

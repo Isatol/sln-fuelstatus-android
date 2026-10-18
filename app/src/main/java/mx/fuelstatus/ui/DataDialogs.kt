@@ -60,18 +60,21 @@ fun ImportFuelDialog(preview: ImportPreview, vehicles: List<Vehicle>, selectedVe
     var sourceId by rememberSaveable { mutableStateOf(preview.vehicles.first().id) }
     val source = preview.vehicles.firstOrNull { it.id == sourceId } ?: preview.vehicles.first()
     val sourceRows = preview.rows.filter { it.vehicle.id == source.id }
-    var targetId by rememberSaveable(vehicles.map { it.id }) { mutableStateOf(selectedVehicleId ?: vehicles.firstOrNull()?.id ?: "create") }
+    val nativeCsv = preview.source == CsvSource.FuelStatus
+    val matching = vehicles.firstOrNull { it.name.equals(source.name, true) && it.type.equals(source.type, true) && it.year == source.year }
+    var targetId by rememberSaveable(source.id, vehicles.map { it.id }) {
+        mutableStateOf(if (nativeCsv) matching?.id ?: "create" else selectedVehicleId ?: vehicles.firstOrNull()?.id ?: "create")
+    }
     var useVehicleFuel by rememberSaveable { mutableStateOf(true) }
     var paymentMethodId by rememberSaveable { mutableStateOf(PaymentMethod.Cash.id) }
     var createdFuel by rememberSaveable(source.id) { mutableStateOf(source.fuelType) }
     val target = vehicles.firstOrNull { it.id == targetId }
-    val matching = vehicles.firstOrNull { it.name.equals(source.name, true) && it.type.equals(source.type, true) && it.year == source.year }
     val canCreate = matching == null
     val label = FuelType.fromCode(target?.fuelType ?: createdFuel).label
-    AlertDialog(onDismissRequest = { if (!busy) onDismiss() }, title = { Text("Importar historial de Fuel") },
+    AlertDialog(onDismissRequest = { if (!busy) onDismiss() }, title = { Text("Importar historial de ${preview.source.label}") },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text("${sourceRows.size} llenados de ${source.label}")
+                Text("${sourceRows.size} ${if (sourceRows.size == 1) "llenado" else "llenados"} de ${source.label}")
                 if (preview.vehicles.size > 1) {
                     Text("El archivo contiene varios vehículos. Elige cuál importar:")
                     preview.vehicles.forEach { vehicle ->
@@ -87,20 +90,24 @@ fun ImportFuelDialog(preview: ImportPreview, vehicles: List<Vehicle>, selectedVe
                 if (canCreate) ImportChoice("Importar y crear ${source.label}", targetId == "create", !busy) { targetId = "create" }
                 else Text("El vehículo del archivo ya está registrado. Elige un vehículo de destino.", style = MaterialTheme.typography.bodySmall)
                 if (targetId == "create" && canCreate) FuelSelector(createdFuel, { createdFuel = it }, enabled = !busy)
-                Row(Modifier.fillMaxWidth().toggleable(useVehicleFuel, enabled = !busy, role = Role.Checkbox,
-                    onValueChange = { useVehicleFuel = it }), verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(useVehicleFuel, onCheckedChange = null, enabled = !busy)
-                    Text("Usar $label en todos los llenados importados", modifier = Modifier.weight(1f))
+                if (nativeCsv) {
+                    Text("Se conservarán el combustible y el método de pago de cada llenado del CSV. Las tarjetas que falten se agregarán a tus métodos de pago. Los datos ausentes quedarán como Sin especificar.")
+                } else {
+                    Row(Modifier.fillMaxWidth().toggleable(useVehicleFuel, enabled = !busy, role = Role.Checkbox,
+                        onValueChange = { useVehicleFuel = it }), verticalAlignment = Alignment.CenterVertically) {
+                        Checkbox(useVehicleFuel, onCheckedChange = null, enabled = !busy)
+                        Text("Usar $label en todos los llenados importados", modifier = Modifier.weight(1f))
+                    }
+                    if (!useVehicleFuel) Text("Se conservará el combustible indicado en el CSV. Si el archivo no lo indica, el registro quedará como Sin especificar.", style = MaterialTheme.typography.bodySmall)
+                    PaymentMethodSelector(paymentMethods, paymentMethodId, { paymentMethodId = it ?: PaymentMethod.Cash.id },
+                        enabled = !busy, label = "Método de pago para los registros")
+                    Text("Se aplicará a todos los llenados nuevos de esta importación.", style = MaterialTheme.typography.bodySmall)
                 }
-                if (!useVehicleFuel) Text("Se conservará el combustible indicado en el CSV. Si el archivo no lo indica, el registro quedará como Sin especificar.", style = MaterialTheme.typography.bodySmall)
-                PaymentMethodSelector(paymentMethods, paymentMethodId, { paymentMethodId = it ?: PaymentMethod.Cash.id },
-                    enabled = !busy, label = "Método de pago para los registros")
-                Text("Se aplicará a todos los llenados nuevos de esta importación.", style = MaterialTheme.typography.bodySmall)
                 Text("Los duplicados se omiten. Tus registros actuales se conservan.", style = MaterialTheme.typography.bodySmall)
             }
         },
         confirmButton = { TextButton(enabled = !busy && ((targetId == "create" && canCreate) || target != null), onClick = {
-            onImport(ImportPlan(source.id, target?.id, useVehicleFuel, createdFuel, paymentMethodId))
+            onImport(ImportPlan(source.id, target?.id, !nativeCsv && useVehicleFuel, createdFuel, paymentMethodId, preview.source))
         }) { Text(if (targetId == "create") "Crear e importar" else "Importar llenados") } },
         dismissButton = { TextButton(enabled = !busy, onClick = onDismiss) { Text("Cancelar") } })
 }

@@ -1,11 +1,11 @@
 # Métodos de pago en gastos · 0.6.0
 
-**Nuevo gasto** y **Editar gasto** muestran el mismo selector de métodos de pago que los llenados, debajo de Categoría. Incluye Efectivo y las tarjetas guardadas en Ajustes, con sus nombres y logos.
+**Nuevo gasto** y **Editar gasto** muestran el mismo selector de métodos de pago que los llenados, debajo de Categoría. Incluye Efectivo y las tarjetas guardadas en Ajustes, con sus nombres e iconos Material de efectivo o tarjeta de crédito.
 
 - Los gastos nuevos empiezan en **Efectivo**.
 - Al editar se conserva el método guardado. Se puede elegir otro o dejar **Sin especificar**, igual que en los llenados.
 - Los gastos anteriores conservan **Sin especificar**; la app no intenta deducir cómo se pagaron.
-- Las tarjetas del historial de Gastos muestran logo y nombre debajo del importe.
+- Las tarjetas del historial de Gastos muestran el icono Material de tarjeta de crédito y el nombre del método debajo del importe.
 - La selección se conserva al recrear la Activity con el formulario abierto.
 
 ## Persistencia y compatibilidad
