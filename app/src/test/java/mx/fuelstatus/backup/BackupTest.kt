@@ -3,6 +3,7 @@ package mx.fuelstatus.backup
 import com.google.gson.JsonParser
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.*
+import mx.fuelstatus.domain.IconRingColor
 import mx.fuelstatus.Preferences
 import mx.fuelstatus.data.*
 import org.junit.Assert.*
@@ -48,6 +49,31 @@ class BackupTest {
             root.addProperty("sha256", sha256(data.toString().toByteArray()))
             assertEquals(original, BackupCodec.decode(root.toString().toByteArray()))
         }
+    }
+    @Test fun iconRingColorsRoundTripWithoutChangingBackupFormatOrAppPalette() {
+        for (color in IconRingColor.entries) {
+            val original = document().let { it.copy(appearance = it.appearance.copy(colorPalette = "violet", iconRingColor = color.code)) }
+            val bytes = BackupCodec.encode(original)
+            assertEquals(5, JsonParser.parseString(bytes.toString(Charsets.UTF_8)).asJsonObject.get("version").asInt)
+            assertEquals(original, BackupCodec.decode(bytes))
+        }
+    }
+    @Test fun oldBackupWithoutIconChoiceUsesAndroidAndInvalidChoiceIsRejected() {
+        val original = document()
+        val root = JsonParser.parseString(BackupCodec.encode(original).toString(Charsets.UTF_8)).asJsonObject
+        val data = root.getAsJsonObject("data")
+        val appearance = data.getAsJsonObject("appearance")
+        appearance.remove("iconRingColor")
+        root.addProperty("sha256", sha256(data.toString().toByteArray()))
+        assertEquals(original, BackupCodec.decode(root.toString().toByteArray()))
+        for (invalid in listOf("unknown", "")) {
+            appearance.addProperty("iconRingColor", invalid)
+            root.addProperty("sha256", sha256(data.toString().toByteArray()))
+            assertThrows(IllegalArgumentException::class.java) { BackupCodec.decode(root.toString().toByteArray()) }
+        }
+        appearance.add("iconRingColor", com.google.gson.JsonNull.INSTANCE)
+        root.addProperty("sha256", sha256(data.toString().toByteArray()))
+        assertThrows(IllegalArgumentException::class.java) { BackupCodec.decode(root.toString().toByteArray()) }
     }
     @Test fun unsupportedVersionAndTruncatedFilesAreRejected() {
         val text = BackupCodec.encode(document()).toString(Charsets.UTF_8).replace("\"version\":5", "\"version\":9")

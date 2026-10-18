@@ -1,4 +1,21 @@
-# Validación 0.8.0 · Icono con aro verde ampliado
+# Validación 0.8.0 · Color del aro del icono
+
+18 de octubre de 2026, America/Monterrey. Rama `20261018-color-aro-icono`, creada desde `main` en `f531006` (PR #16), con el remoto SSH personal.
+
+- **Compilación aprobada:** APK debug 0.8.0, versionCode 8 y APK de pruebas. Android Lint: cero errores y 11 avisos existentes.
+- **115 pruebas JVM aprobadas:** 116 registradas y una omitida por requerir el CSV privado. Se añadieron casos de las siete opciones en respaldos de formato 5, copias anteriores sin el campo nuevo y rechazo de colores inválidos o nulos.
+- **21 pruebas Android dirigidas aprobadas** en una ejecución (`OK (21 tests)`): cuatro nuevas del aro, tres de paletas internas, dos de Ajustes/CSV, dos de interfaz de Drive y diez generales de Room/importación/migraciones/restauración/borrado. Las nuevas comprueban independencia entre aro y tema, texto al 130 % en claro y oscuro, controles deshabilitados, persistencia, reconciliación inicial y recuperación ante fallos sintéticos del launcher. También verifican que restaurar o borrar conserva el historial anterior si falla el cambio del icono.
+- **Siete aliases comprobadas en PackageManager:** cada elección publica una sola actividad de launcher, mantiene habilitada MainActivity y admite reaplicación sin duplicados. Se compararon los píxeles del surtidor y de la capa monocromática de cada variante con el original: idénticos. Solo cambia el aro del primer plano a color.
+- **Revisión manual en Pixel Launcher / API 37:** antes de abrir la app se publicó únicamente AndroidIcon. Desde Ajustes se eligió Azul, se comprobó BlueIcon como única entrada y se revisó su aro azul en el cajón. Después de detener el proceso, tocar ese icono abrió MainActivity y mantuvo `icon_ring=blue`; el tema interno siguió en Sistema con color dinámico. Captura `drawer-blue.png`, preferencias y consultas del launcher conservadas junto a los registros.
+- **APK de entrega:** `.local/releases/FuelStatus-0.8.0-color-aro-icono.apk`, 38 094 354 bytes. SHA-256 `23f425a00ea99983bee44d401f0a9cf639ace0ea54d652b8a93a7a71fdc2e351`. Firma debug anterior conservada, SHA-1 `81:BA:D0:FD:EB:A0:29:7E:6B:3E:F9:04:FF:6B:1D:AD:80:33:1F:36`.
+
+Registros y capturas: `.local/qa/color-aro-icono/`. Se revisaron las capturas de Azul en claro y Gris en oscuro con texto al 130 %. El emulador se ejecutó read-only, sin snapshots y en modo avión, por separado de Gradle, y se cerró al terminar. Durante la revisión manual aparecieron avisos de proceso del sistema y System UI sin respuesta, resueltos con Esperar; la comprobación del launcher se completó después. Una lectura de UI durante la transición de reapertura devolvió raíz nula; se repitió tras finalizar la transición y se confirmó la actividad visible.
+
+**Límites:** no se ejecutaron Android 12/12L ni otros launchers, ni se probó activar iconos temáticos o cambiar el fondo de pantalla en ejecución. La conservación de la silueta temática sí se comprobó por píxeles para todas las variantes. La app no controla qué superficies tematiza cada launcher ni la conservación de accesos fijados a una alias que se deshabilita. Estos límites se explican en Ajustes y en [Icono de FuelStatus](ICONO.md). No se repitió la suite Android completa ni la navegación general. Se usaron datos sintéticos; no se operó sobre Drive real ni teléfonos personales. Se conservan Room 6, respaldo 5 y CSV; el campo nuevo es opcional para respaldos anteriores.
+
+---
+
+# Validación histórica 0.8.0 · Icono con aro verde ampliado
 
 18 de octubre de 2026, America/Monterrey. Rama `20261018-icono-aro-verde`, creada desde `main` en `6c055c2` (PR #15), verificada contra el remoto SSH personal.
 

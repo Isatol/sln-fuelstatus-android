@@ -175,7 +175,7 @@ fun FuelApp(model: FuelViewModel, onConnectDrive: () -> Unit) {
                                 model::syncDrive, model::disconnectDrive, model::reviewDriveCopy, model::useLocalHistory) },
                             deleteContent = { DeleteDataCard(backup, busy || driveBusy) { deleteDrive ->
                                 model.resetData(deleteDrive) { destination = Destination.Refuels; editor = null; editingId = null; refuelFilter.reset() }
-                            } }, onColorPalette = model::colorPalette)
+                            } }, onColorPalette = model::colorPalette, onIconRingColor = model::iconRingColor)
                     }
                 }
             }
@@ -332,7 +332,7 @@ private fun VehiclesScreen(state: FuelState, onSelect: (String) -> Unit, onEdit:
 internal fun SettingsScreen(preferences: Preferences, busy: Boolean, onTheme: (String) -> Unit, onDynamic: (Boolean) -> Unit,
     onImport: () -> Unit, onImportFuelStatus: () -> Unit, onExport: () -> Unit,
     onPaymentMethods: () -> Unit, onExpenseCategories: () -> Unit, backupContent: @Composable () -> Unit, deleteContent: @Composable () -> Unit,
-    onColorPalette: (String) -> Unit = {}) {
+    onColorPalette: (String) -> Unit = {}, onIconRingColor: (String) -> Unit = {}) {
     LazyColumn(contentPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         item { SectionLabel("APARIENCIA", "A tu manera") }
         item { Card(shape = RoundedCornerShape(24.dp)) {
@@ -347,6 +347,7 @@ internal fun SettingsScreen(preferences: Preferences, busy: Boolean, onTheme: (S
                 ThemeColorPicker(preferences, !busy, onDynamic, onColorPalette)
             }
         } }
+        item { IconRingCard(preferences.iconRingColor, !busy, onIconRingColor) }
         item { SectionLabel("TUS DATOS") }
         item { backupContent() }
         item { Card(shape = RoundedCornerShape(24.dp)) {

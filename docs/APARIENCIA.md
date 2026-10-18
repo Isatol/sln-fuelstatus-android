@@ -7,6 +7,10 @@ En Ajustes → Tema se elige por separado el modo **Sistema, Claro u Oscuro** y 
 
 La fila de muestras se desplaza horizontalmente. Los controles Sistema/Claro/Oscuro pueden distribuirse en varias filas cuando falta espacio. Los controles de apariencia se deshabilitan mientras hay una operación en curso.
 
+## Color del aro del icono
+
+Debajo de Tema hay una tarjeta independiente para el aro del icono a color del launcher. Android sigue la paleta del sistema; Verde FuelStatus conserva el aro original y las otras cinco opciones reutilizan la paleta de la aplicación. No cambia el tema interno ni la capa monocromática de los iconos temáticos. Android es el valor predeterminado cuando aún no existe una elección guardada. Los detalles y límites de refresco y accesos del escritorio están en [Icono de FuelStatus](ICONO.md).
+
 ## Alcance de Material You
 
 Se lee la paleta que Android expone a las aplicaciones. No se lee la imagen del fondo ni se solicitan permisos para acceder a ella. Las API públicas no proporcionan la lista completa de propuestas del selector de fondos del sistema; las otras seis opciones son paletas de FuelStatus. Elegirlas solo cambia esta aplicación.

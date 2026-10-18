@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -29,7 +30,7 @@ internal fun ThemeColorPicker(preferences: Preferences, enabled: Boolean,
     Text("Colores de la app", fontWeight = FontWeight.Bold)
     Text("Material You usa la paleta elegida en Android. También puedes elegir una paleta de FuelStatus.",
         style = MaterialTheme.typography.bodySmall)
-    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).selectableGroup(),
+    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).selectableGroup().testTag("app-color-picker"),
         horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         PaletteOption("Android", androidColors, preferences.dynamicColor, enabled) { onDynamic(true) }
         ThemePalette.entries.forEach { palette ->
