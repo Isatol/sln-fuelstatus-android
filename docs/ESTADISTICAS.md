@@ -53,7 +53,11 @@ Para ambas medias se ordena el historial por fecha y odómetro y se examinan par
 
 ## Presentación
 
-Todas las cards de Estadísticas incorporan iconos Material: rendimiento, tendencia, distancia media, frecuencia, costo/km, precio medio/L, litros, kilómetros evaluados, gastos totales, últimos intervalos y explicación del cálculo. En pantallas estrechas o con texto ampliado, las parejas de cards se apilan para conservar legibilidad.
+Todas las cards de Estadísticas incorporan iconos de su indicador y un botón **ⓘ** de información. El botón abre un modal específico con la fuente de los datos, la fórmula, los requisitos y las limitaciones del cálculo o estimación. Incluye las seis proyecciones, el rendimiento principal y los últimos intervalos: 16 ayudas cuando todas las tarjetas están disponibles.
+
+La información también está disponible cuando una tarjeta no tiene datos suficientes. El modal permite desplazar explicaciones largas y cerrarlo con **Entendido**, Atrás o pulsando fuera; conserva su apertura al recrearse la pantalla. La explicación general **Cómo calculamos** se elimina de la lista, junto con el espacio que ocupaba.
+
+Los botones tienen un área táctil de 48 dp y una descripción accesible que identifica la tarjeta. En tarjetas estrechas, el icono del indicador y el botón de información comparten una fila y el título se coloca debajo para conservar su ancho. En pantallas estrechas o con texto ampliado, las parejas de cards se apilan para conservar legibilidad.
 
 ## Proyecciones y métricas recientes
 

@@ -1,4 +1,18 @@
-# Validación 0.8.0 · Proyecciones y métricas recientes
+# Validación 0.8.0 · Información por tarjeta de Estadísticas
+
+18 de octubre de 2026, America/Monterrey. Rama `20261018-informacion-estadisticas`. Las 16 tarjetas disponibles de Estadísticas incluyen un botón ⓘ que abre una explicación propia con la fuente de datos, fórmula, requisitos y alcance del cálculo. Se elimina el bloque general “Cómo calculamos” de la lista.
+
+- **Compilación y Android Lint aprobados:** cero errores y 11 avisos existentes. Se generaron los APK de aplicación y pruebas.
+- **10 pruebas Android dirigidas aprobadas con texto normal y las mismas 10 al 130 %**, veinte ejecuciones finales: tres nuevas de información, cuatro de Estadísticas y tres de proyecciones. Se verificaron las 16 ayudas, sus descripciones accesibles, botones de 48 dp, texto desplazable, cierre con Entendido y Atrás, conservación de apertura con `StateRestorationTester`, ayuda sin datos y ausencia del bloque general.
+- **Revisión visual:** claro, oscuro, títulos de tarjetas estrechas y modales con texto al 130 %. Capturas y registros locales en `.local/qa/info-estadisticas/`.
+- **Entorno:** emulador Medium Phone API 37 read-only, sin snapshots, cerrado al terminar. Gradle y emulador ejecutados por separado.
+- **APK:** `.local/releases/FuelStatus-0.8.0-info-estadisticas.apk`, versión 0.8.0, versionCode 8. SHA-256: `41086a33e915441f36a74e79ec9511753503c1a7696f3948467e2eb896764e06`.
+
+El cambio se limita a interfaz y explicaciones. No se modifican cálculos, datos, migraciones, Room 6 ni respaldo 5. No se repitieron las pruebas JVM, la suite Android completa ni la navegación general; se actualizó el selector de esta última para usar Últimos intervalos en lugar del bloque eliminado. Las pruebas usaron datos sintéticos, sin operaciones sobre Drive real.
+
+---
+
+# Validación histórica 0.8.0 · Proyecciones y métricas recientes
 
 17 de octubre de 2026, America/Monterrey. Rama `20261017-proyecciones-estadisticas`. Se incorporan seis tarjetas: próximo llenado estimado, alcance de una carga habitual, costo reciente por 100 km, tendencia del precio por litro, ahorro potencial y gasto estimado del mes. Costo y precio comparten fila cuando hay espacio; las explicaciones largas ocupan una fila completa.
 

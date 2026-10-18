@@ -379,11 +379,17 @@ private fun SettingsScreen(preferences: Preferences, busy: Boolean, onTheme: (St
 }
 
 @Composable
-internal fun Hero(title: String, value: String, unit: String, subtitle: String, icon: Int? = null) {
+internal fun Hero(title: String, value: String, unit: String, subtitle: String, icon: Int? = null,
+    headerAction: @Composable (() -> Unit)? = null) {
     Surface(color = MaterialTheme.colorScheme.primaryContainer, shape = RoundedCornerShape(32.dp), modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            if (icon == null) Text(title, style = MaterialTheme.typography.labelMedium, letterSpacing = 1.sp)
-            else SettingsTitle(icon, title, style = MaterialTheme.typography.labelMedium.copy(letterSpacing = 1.sp))
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.weight(1f)) {
+                    if (icon == null) Text(title, style = MaterialTheme.typography.labelMedium, letterSpacing = 1.sp)
+                    else SettingsTitle(icon, title, style = MaterialTheme.typography.labelMedium.copy(letterSpacing = 1.sp))
+                }
+                headerAction?.invoke()
+            }
             Row(verticalAlignment = Alignment.Bottom) {
                 Text(value, style = MaterialTheme.typography.displayLarge.copy(fontSize = if (value.length > 9) 36.sp else 56.sp), fontWeight = FontWeight.Bold,
                     modifier = Modifier.weight(1f, fill = false))
