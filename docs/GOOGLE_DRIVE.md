@@ -1,4 +1,6 @@
-# Google Drive en FuelStatus 0.2
+# Google Drive en FuelStatus
+
+Para la distribución 1.0.0 en Google Play, sigue también [Publicación en Google Play](PUBLICACION.md). La configuración debug descrita abajo no acredita el estado de producción de OAuth ni sustituye el cliente Android con el certificado de firma de Play.
 
 ## Configuración de Google Cloud
 
@@ -16,7 +18,7 @@ Esta implementación usa Google Identity AuthorizationClient con autorización d
 
 ## Primera prueba en el teléfono
 
-1. Compila y ejecuta desde Android Studio o instala el APK 0.2 sobre la versión anterior, conservando paquete y firma. No desinstales la versión anterior si quieres conservar su historial local.
+1. Compila y ejecuta desde Android Studio o instala el APK de desarrollo actual sobre la versión anterior, conservando paquete y firma. No desinstales la versión anterior si quieres conservar su historial local. Una distribución de Play con otra firma requiere planificar la transferencia del historial antes de retirar la instalación debug.
 2. Abre **Ajustes → Copias y Google Drive → Conectar Google Drive**.
 3. Elige la cuenta añadida como usuario de prueba y autoriza el acceso solicitado.
 4. Si no existe un historial anterior, la app crea una carpeta **FuelStatus** y programa la primera copia. Puedes pulsar **Sincronizar ahora**.

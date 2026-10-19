@@ -368,7 +368,7 @@ internal fun SettingsScreen(preferences: Preferences, busy: Boolean, onTheme: (S
             }
         }
         item { deleteContent() }
-        item { Text("FuelStatus · 0.8.0\nHecha para Android", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(8.dp)) }
+        item { Text("FuelStatus · 1.0.0\nHecha para Android", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(8.dp)) }
     }
 }
 

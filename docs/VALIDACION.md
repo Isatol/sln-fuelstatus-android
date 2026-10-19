@@ -1,4 +1,18 @@
-# Validación 0.8.0 · Inicio limpio y retiro de importación desde Fuel
+# Preparación 1.0.0 · Distribución en Google Play
+
+18 de octubre de 2026, America/Monterrey. Rama `20261018-preparacion-version-1-0-0`, desde `main` en `1ff71e6` (PR #19).
+
+- **Versión:** `versionName` 1.0.0 y `versionCode` 9, también reflejada en el pie de Ajustes. Se conserva el paquete `mx.fuelstatus`, Room 6, respaldo 5 y el comportamiento de la entrega anterior.
+- **Compilación aprobada:** `:app:assembleDebug :app:bundleRelease`, incluidos los controles `lintVitalRelease`. Se verificaron paquete y versión en los manifiestos de debug/release y con `aapt2` sobre el APK.
+- **APK de desarrollo:** `.local/releases/FuelStatus-1.0.0-debug.apk`, SHA-256 `95d6aed07d7b3ccbf0eaa01c0b7af5db47cedcef6051449522f0c8cdce75d39a`.
+- **AAB técnico sin firma:** `.local/releases/FuelStatus-1.0.0-release-sin-firma.aab`, SHA-256 `1b002b3d35683a92cec81eff767500991c68a48ae22751904875f250169dc52d`. Se comprobó la estructura del archivo y la ausencia de firma JAR. El repositorio no configura una clave de publicación; este archivo no está listo para subir a Play Console.
+- **Publicación:** se documentaron OAuth externo/de producción, verificación de marca, alcance no sensible `drive.file`, certificado de Play App Signing, validación real de Drive, privacidad, precio objetivo de $15 MXN y requisitos de prueba en [PUBLICACION.md](PUBLICACION.md). El usuario confirmó que ambas cuentas son personales; no se accedió ni se cambió su configuración.
+
+Registros y metadatos en `.local/qa/version-1-0-0/`. No se repitieron las suites JVM/Android ni la revisión visual: este cambio solo modifica la identificación de versión y la documentación. No se inició un emulador ni se operó sobre teléfonos, Drive real o datos personales. La prueba real de Drive con la firma de Play y el AAB firmado siguen pendientes antes de publicar. El precio no se configuró en la tienda y no se publicó ninguna versión.
+
+---
+
+# Validación histórica 0.8.0 · Inicio limpio y retiro de importación desde Fuel
 
 18 de octubre de 2026, America/Monterrey. Rama `20261018-inicio-limpio-sin-card-fuel`, desde `main` en `c0f1542` (PR #18).
 

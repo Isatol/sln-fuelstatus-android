@@ -4,7 +4,13 @@ Repositorio: [Isatol/sln-fuelstatus-android](https://github.com/Isatol/sln-fuels
 
 Aplicación personal de combustible y gastos de vehículos inspirada en Fuel, con interfaz nativa para Android. Nombre anterior de trabajo: **FuelDroid**.
 
-## Versión 0.7
+## Versión 1.0.0
+
+La primera distribución prevista en Google Play parte del inicio limpio y del retiro de la importación desde Fuel. Las instalaciones nuevas comienzan sin vehículos, llenados ni gastos, con catálogos y ajustes predeterminados. Se conserva la importación/exportación de llenados de FuelStatus, Room 6 y el respaldo completo de formato 5. `versionCode` es 9, posterior a las entregas 0.8.0.
+
+Precio previsto en México: **$15 MXN por la descarga**, configurado en Play Console. Esta preparación no publica la app ni configura el precio en la tienda. La firma de distribución, OAuth de producción y la validación real de Drive deben completarse antes del lanzamiento. Consulta [Publicación en Google Play](docs/PUBLICACION.md).
+
+### Funcionalidad de 0.7
 
 Iconos en los campos y opciones del formulario de llenados, y filtro de historial por tres meses (predeterminado), seis meses, un año o fechas personalizadas. Los indicadores conservan el cálculo sobre el historial completo. No cambia la base de datos ni las copias. Detalles en [docs/LLENADOS_Y_FILTROS.md](docs/LLENADOS_Y_FILTROS.md).
 
