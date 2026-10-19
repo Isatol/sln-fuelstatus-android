@@ -1,4 +1,22 @@
-# Validación 0.8.0 · Inicio limpio y retiro de importación desde Fuel
+# Validación 1.0.0 · Ajustes y borrado exclusivamente locales
+
+19 de octubre de 2026, America/Monterrey. Rama `20261019-retirar-google-drive`, creada desde `main` limpia en `1ff71e6` después de `pull --ff-only` con el remoto SSH personal.
+
+- **Versión:** 1.0.0, `versionCode` 9, paquete `mx.fuelstatus`. El pie de Ajustes muestra 1.0.0. Room continúa en esquema 6 y las copias completas privadas en formato 5.
+- **Interfaz:** se retiraron la card, conexión, cuenta, sincronización y restauración remotas. Ajustes y Borrar todos los datos no mencionan Drive ni presentan su casilla de borrado. Se conserva la confirmación local, cancelar y el bloqueo mientras la app está ocupada. El texto del CSV aclara que exporta llenados y que gastos, catálogos y ajustes permanecen en el teléfono.
+- **Retiro efectivo:** se eliminaron autorización, transporte de red y dependencias de Google. Los manifiestos generados debug/release no incluyen Internet ni estado de red; tampoco aparecen el SDK de autorización ni el alcance `drive.file` en los DEX del APK. El motor conserva únicamente las copias privadas locales. La clase y nombre del worker anterior se mantienen como identificadores de compatibilidad: se cancela su trabajo y cualquier ejecución retenida termina sin operaciones remotas.
+- **98 pruebas JVM aprobadas:** 99 registradas, una omitida por requerir el CSV privado. Se conservaron los casos del códec, formatos anteriores y catálogos; se retiraron los casos exclusivos de la integración remota eliminada. Los nuevos casos cubren actualización/reutilización de la copia privada, regeneración de archivos dañados, fallo del archivo auxiliar sin perder el guardado de Room, cancelación, borrado de historial/recuperación/catálogos, preservación de copias ante fallo del reinicio y coordinación entre copia y borrado.
+- **6 casos Android dirigidos aprobados**, en una sola ejecución (`OK (6 tests)`): migración de configuración con trabajo antiguo pendiente, conservación de historial/ajustes/archivo privado/identidad de dispositivo, cancelación efectiva del trabajo, ausencia de permisos de red; borrado desde MainActivity con cancelar, confirmar y reabrir vacío; Ajustes/CSV en claro y oscuro con texto al 130 %, y confirmación/bloqueo de borrado. La prueba de actualización usa una base y preferencias aisladas con datos sintéticos.
+- **Revisión final:** después de ajustar únicamente el texto explicativo del CSV se recompilaron APK/AAB y se repitió solo el caso de Ajustes afectado (`OK (1 test)`). Se revisaron las capturas definitivas en claro y oscuro al 130 %, la card de borrado y su confirmación. No se volvieron a ejecutar los otros cinco casos ni las pruebas JVM, ya aprobadas sobre la misma lógica de datos.
+- **Compilación y Lint:** APK de aplicación, APK de pruebas y AAB release generados. Android Lint sin errores y con 8 avisos; la compilación release también superó `lintVitalRelease`. No se repitieron las suites Android completas ni la navegación general.
+- **APK:** `.local/releases/FuelStatus-1.0.0-sin-drive.apk`, SHA-256 `614c1737d5540a3f2013d216d36571a027386285328430246222a04a5b915783`. Firma debug anterior conservada, SHA-1 `81:BA:D0:FD:EB:A0:29:7E:6B:3E:F9:04:FF:6B:1D:AD:80:33:1F:36`.
+- **AAB release sin firma:** `.local/releases/FuelStatus-1.0.0-sin-drive-release-sin-firma.aab`, SHA-256 `72eb3c489965d15282789b2ddfb3be3f588ef0953ae15593f3dbfeab94b494a8`. Es un artefacto técnico pendiente de firma de subida y configuración de Play; no se publicó ni se configuró el precio en la tienda.
+
+Registros y capturas en `.local/qa/retirar-google-drive/`. Gradle y el emulador API 37 se ejecutaron por separado; el emulador se utilizó read-only, sin snapshots y en modo avión, cerrado al terminar. Se usaron datos sintéticos y no se operó sobre cuentas, archivos remotos o teléfonos personales. La versión conserva el CSV de llenados y el formato completo privado, pero no incorpora botones nuevos para exportar o restaurar copias completas; sus límites se describen en [COPIAS_LOCALES.md](COPIAS_LOCALES.md).
+
+---
+
+# Validación histórica 0.8.0 · Inicio limpio y retiro de importación desde Fuel
 
 18 de octubre de 2026, America/Monterrey. Rama `20261018-inicio-limpio-sin-card-fuel`, desde `main` en `c0f1542` (PR #18).
 

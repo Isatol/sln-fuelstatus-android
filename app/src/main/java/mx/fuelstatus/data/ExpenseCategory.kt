@@ -41,7 +41,7 @@ enum class CategoryIcon(val code: String, val label: String, val keywords: Strin
     AddCard("add_card", "Agregar tarjeta", "pago banco"),
     ArrowBack("arrow_back", "Volver", "flecha atras regresar"),
     ChevronRight("chevron_right", "Siguiente", "flecha derecha avanzar"),
-    CloudSync("cloud_sync", "Sincronizar nube", "copia respaldo drive"),
+    CloudSync("cloud_sync", "Sincronizar nube", "copia respaldo nube"),
     CreditCard("credit_card", "Tarjeta de crédito", "pago banco debito"),
     DeleteForever("delete_forever", "Eliminar", "borrar papelera"),
     FilterList("filter_list", "Filtro", "filtrar lista"),

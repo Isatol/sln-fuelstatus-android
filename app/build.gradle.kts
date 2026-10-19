@@ -11,8 +11,8 @@ android {
         applicationId = "mx.fuelstatus"
         minSdk = 31
         targetSdk = 36
-        versionCode = 8
-        versionName = "0.8.0"
+        versionCode = 9
+        versionName = "1.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     sourceSets.getByName("androidTest").assets.srcDir("$projectDir/schemas")
@@ -46,8 +46,6 @@ dependencies {
     implementation("androidx.room:room-runtime:2.8.4")
     implementation("androidx.room:room-ktx:2.8.4")
     implementation("androidx.work:work-runtime-ktx:2.11.2")
-    implementation("com.google.android.gms:play-services-auth:22.0.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2")
     implementation("com.google.code.gson:gson:2.13.2")
     ksp("androidx.room:room-compiler:2.8.4")
     debugImplementation("androidx.compose.ui:ui-tooling")

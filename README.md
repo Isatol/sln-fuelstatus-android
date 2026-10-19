@@ -4,7 +4,13 @@ Repositorio: [Isatol/sln-fuelstatus-android](https://github.com/Isatol/sln-fuels
 
 Aplicación personal de combustible y gastos de vehículos inspirada en Fuel, con interfaz nativa para Android. Nombre anterior de trabajo: **FuelDroid**.
 
-## Versión 0.7
+## Versión 1.0.0
+
+Primera distribución prevista en Google Play: inicio limpio y funcionamiento local, con precio objetivo de **$15 MXN** por descarga. `versionCode` 9. Ajustes conserva apariencia, llenados CSV, métodos de pago, categorías y borrado local con confirmación. Se retiraron la integración de Google Drive, OAuth y la sincronización remota.
+
+Room permanece en esquema 6 y las copias privadas completas en formato 5. El historial y los ajustes existentes se conservan al actualizar con la misma firma. Esta versión no incorpora botones para exportar o restaurar copias completas: el CSV público contiene únicamente llenados. Consulta [Copias locales](docs/COPIAS_LOCALES.md) y [Publicación](docs/PUBLICACION.md).
+
+### Funcionalidad de 0.7
 
 Iconos en los campos y opciones del formulario de llenados, y filtro de historial por tres meses (predeterminado), seis meses, un año o fechas personalizadas. Los indicadores conservan el cálculo sobre el historial completo. No cambia la base de datos ni las copias. Detalles en [docs/LLENADOS_Y_FILTROS.md](docs/LLENADOS_Y_FILTROS.md).
 
@@ -22,11 +28,11 @@ Las tarjetas usan el icono Material de tarjeta de crédito en toda la app, inclu
 
 ### Funcionalidad de 0.4
 
-Métodos de pago con Efectivo, tarjetas VISA/Mastercard/American Express, pantalla completa de administración, selección por llenado y conservación del método de cada registro al importar llenados de FuelStatus. Los métodos se conservan en Room, copias locales y Drive; los registros antiguos mantienen su método como Sin especificar. Detalles en [docs/METODOS_DE_PAGO.md](docs/METODOS_DE_PAGO.md).
+Métodos de pago con Efectivo, tarjetas VISA/Mastercard/American Express, pantalla completa de administración, selección por llenado y conservación del método de cada registro al importar llenados de FuelStatus. Los métodos se conservan en Room y copias locales; los registros antiguos mantienen su método como Sin especificar. Detalles en [docs/METODOS_DE_PAGO.md](docs/METODOS_DE_PAGO.md).
 
 ### Funcionalidad de 0.3
 
-Borrado de datos con confirmación y opción de borrar las copias de Drive, combustible por vehículo y por llenado, e importación con selección del vehículo de destino. Las instalaciones nuevas comienzan sin vehículos; las actualizaciones conservan el historial existente. Detalles en [docs/DATOS_Y_COMBUSTIBLE.md](docs/DATOS_Y_COMBUSTIBLE.md).
+Borrado de datos locales con confirmación, combustible por vehículo y por llenado, e importación con selección del vehículo de destino. Las instalaciones nuevas comienzan sin vehículos; las actualizaciones conservan el historial existente. Detalles en [docs/DATOS_Y_COMBUSTIBLE.md](docs/DATOS_Y_COMBUSTIBLE.md).
 
 Las tarjetas de Llenados incluyen iconos Material Symbols Rounded para el kilometraje, litros, precio por litro y rendimiento, con recipientes de distinto nivel para tanque lleno y carga parcial. Se incluyen como vectores locales y respetan el tema de la app; su licencia se conserva en `app/src/main/assets/licenses`.
 
@@ -39,11 +45,11 @@ Las tarjetas de Llenados incluyen iconos Material Symbols Rounded para el kilome
 - **Gastos:** registro, edición y eliminación, con categorías iniciales y personalizadas, iconos seleccionables y métodos de pago compartidos con los llenados.
 - **Estadísticas:** km/L, precio medio por litro, costo de combustible por kilómetro, volumen, combustible pagado y gastos totales; cálculos a partir de datos registrados.
 - **Vehículos:** historial separado para cada auto, selección, alta, edición y combustible predeterminado. Los vehículos existentes se conservan al actualizar.
-- **Ajustes:** apariencia, importación y exportación de llenados de FuelStatus, catálogos y respaldos completos.
+- **Ajustes:** apariencia, importación y exportación de llenados de FuelStatus, catálogos y borrado local con confirmación.
 - **Datos:** persistencia local con Room; funcionamiento sin conexión, sin cuenta, anuncios ni suscripción. Moneda MXN, distancias en km, volumen en litros.
 - **Entrega:** proyecto fuente y APK debug instalable. Compilación local con Android Studio; GitHub Actions queda pendiente de configurar.
 
-**Versión 0.2:** copias completas locales y en Google Drive, autorización con Google, reintento sin conexión, sincronización manual, detalle de errores y restauración con revisión previa. Guía: [docs/GOOGLE_DRIVE.md](docs/GOOGLE_DRIVE.md). Ubicación, mapas e informes avanzados siguen pendientes.
+Las copias completas privadas se conservan en el dispositivo. Consulta [docs/COPIAS_LOCALES.md](docs/COPIAS_LOCALES.md).
 
 ## Estado de esta recreación
 
@@ -51,7 +57,7 @@ La base de la implementación contiene las cinco secciones, formularios, Room, c
 
 Se utiliza un CSV privado externo al proyecto como comprobación local opcional; no se copia al repositorio. La comparación visual con Fuel y sus totales sigue pendiente de verificar en el teléfono.
 
-**Validado en 0.7:** APK debug compilado y firmado, 74 pruebas JVM y 37 pruebas Android aprobadas, Android Lint sin errores (19 avisos). Se comprobaron los iconos y el formulario de llenados, filtro de periodos y fechas personalizadas, conservación de indicadores, datos, pagos, categorías, copias y reinicio. Se omitió la prueba CSV privada opcional. Drive usa un servicio simulado; no se modificaron copias de la cuenta real. Detalles en [docs/VALIDACION.md](docs/VALIDACION.md).
+**Validado en 0.7:** APK debug compilado y firmado, 74 pruebas JVM y 37 pruebas Android aprobadas, Android Lint sin errores (19 avisos). Se comprobaron los iconos y el formulario de llenados, filtro de periodos y fechas personalizadas, conservación de indicadores, datos, pagos, categorías, copias y reinicio. Se omitió la prueba CSV privada opcional. Detalles en [docs/VALIDACION.md](docs/VALIDACION.md).
 
 ## Abrir y ejecutar
 
@@ -101,8 +107,8 @@ Se usa el método **tanque lleno a tanque lleno**. La primera carga completa fij
 - Material 3 **1.5.0-beta01** permite usar `MaterialExpressiveTheme`; es una dependencia beta deliberada por el requisito Expressive. [Notas oficiales de Material 3](https://developer.android.com/jetpack/androidx/releases/compose-material3).
 - [Compatibilidad de AGP 9.2](https://developer.android.com/build/releases/agp-9-2-0-release-notes).
 - Paquete Android: `mx.fuelstatus`; base de datos: `fuelstatus.db`, esquema 6, con migraciones que conservan el historial de versiones 1, 2, 3, 4 y 5. El esquema de Room se conserva en `app/schemas` para futuras migraciones.
-- Se declaran Internet y estado de red para la copia opcional en Drive. Android backup automático está deshabilitado; Room y el JSON privado se conservan en el dispositivo.
-- El CSV incluye **llenados**; el respaldo JSON de Drive incluye también vehículos, gastos y apariencia. Desinstalar elimina los datos y copias locales, pero conserva las copias ya confirmadas en Drive.
+- La aplicación no declara permisos de Internet ni estado de red. Android backup automático está deshabilitado; Room y el JSON privado se conservan en el dispositivo.
+- El CSV incluye **llenados**; la copia JSON privada incluye también vehículos, gastos, catálogos y apariencia. Desinstalar elimina los datos y las copias privadas locales. Los CSV guardados fuera de la app permanecen.
 
 El alcance y las decisiones pendientes se detallan en [docs/DEFINICION.md](docs/DEFINICION.md). El contrato del archivo está en [docs/IMPORTACION.md](docs/IMPORTACION.md).
 
@@ -112,4 +118,4 @@ Tendencia del consumo con comparación de fechas y equivalencia en km/L, distanc
 
 Cada tarjeta tiene un botón de información que abre un modal con la explicación de su cálculo o estimación. La ayuda sustituye al bloque general de texto “Cómo calculamos” y está disponible incluso sin datos suficientes.
 
-En Ajustes, **Copias y Google Drive** forma parte de **Tus datos**. La card **Llenados de FuelStatus** reúne exportación CSV de todos los vehículos e importación conservando combustible y método de pago por registro, con selección de vehículo de origen/destino y omisión de duplicados.
+En Ajustes → **Tus datos**, la card **Llenados de FuelStatus** reúne exportación CSV de todos los vehículos e importación conservando combustible y método de pago por registro, con selección de vehículo de origen/destino y omisión de duplicados.

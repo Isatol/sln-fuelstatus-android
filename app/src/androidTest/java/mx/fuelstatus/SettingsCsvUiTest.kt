@@ -12,7 +12,6 @@ import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.unit.Density
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import mx.fuelstatus.backup.SyncState
 import mx.fuelstatus.data.*
 import mx.fuelstatus.ui.*
 import org.junit.Assert.*
@@ -37,12 +36,13 @@ class SettingsCsvUiTest {
                 FuelTheme(Preferences(theme, false)) {
                     Surface { Box(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
                         SettingsScreen(Preferences(theme, false), busy, {}, {}, { native++ }, { exports++ }, {}, {},
-                            backupContent = { DriveBackupCard(SyncState(), false, {}, {}, {}, {}, {}) }, deleteContent = {})
+                            deleteContent = { DeleteDataCard(busy) {} })
                     } }
                 }
             }
         }
         settingsNode("TUS DATOS")
+        compose.onAllNodes(hasText("Drive", substring = true, ignoreCase = true)).assertCountEquals(0)
         capture("tus-datos-claro", false)
         compose.onNodeWithText("Trae tu historial de Fuel").assertDoesNotExist()
         compose.onNodeWithText("Importa vehículos y llenados desde tu CSV.", substring = true).assertDoesNotExist()
@@ -52,12 +52,18 @@ class SettingsCsvUiTest {
         settingsNode("Exportar llenados a CSV").performClick()
         compose.runOnIdle { assertEquals("Exportar FuelStatus", 1, exports) }
         capture("csv-claro", false)
+        settingsNode("Borrar todos los datos")
+        compose.onAllNodes(hasText("Drive", substring = true, ignoreCase = true)).assertCountEquals(0)
+        capture("borrar-datos-claro", false)
         compose.runOnIdle { theme = "dark"; scale = 1.3f; busy = true }
         settingsNode("Exportar llenados a CSV").assertIsNotEnabled()
         settingsNode("Importar llenados de FuelStatus").assertIsNotEnabled()
         compose.runOnIdle { busy = false }
         settingsNode("Llenados de FuelStatus")
         capture("csv-oscuro-texto130", false)
+        settingsNode("Borrar todos los datos")
+        compose.onAllNodes(hasText("Drive", substring = true, ignoreCase = true)).assertCountEquals(0)
+        capture("borrar-datos-oscuro-texto130", false)
     }
 
     @Test fun nativePreviewPreservesAssignmentsAndChoosesMatchingOrNewVehiclePerSource() {

@@ -12,7 +12,7 @@
 
 Room pasa al esquema **6**. La migración **5→6** añade `expenses.paymentMethodId`, inicialmente nulo, con índice y referencia a `payment_methods`. Se conservan las migraciones anteriores y no se cambian importes, categorías, notas, fechas ni vehículos. La revisión local aumenta para generar una copia con el formato actualizado.
 
-Las copias completas locales y de Drive pasan al formato **5** e incluyen las asignaciones de pago de los gastos. Se siguen leyendo los formatos **1, 2, 3 y 4**, dejando el pago de sus gastos como Sin especificar. Se rechazan referencias a métodos inexistentes antes de restaurar.
+Las copias completas privadas locales pasan al formato **5** e incluyen las asignaciones de pago de los gastos. Se siguen leyendo los formatos **1, 2, 3 y 4**, dejando el pago de sus gastos como Sin especificar. Se rechazan referencias a métodos inexistentes antes de restaurar.
 
 La restauración inserta los métodos de pago antes de los gastos, dentro de la misma transacción. Borrar datos elimina primero gastos y llenados y después las tarjetas, conservando Efectivo al reiniciar. No cambia la exportación CSV, que sigue siendo de llenados.
 

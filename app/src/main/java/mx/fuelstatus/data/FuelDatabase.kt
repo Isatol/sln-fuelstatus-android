@@ -73,7 +73,7 @@ abstract class FuelDatabase : RoomDatabase() {
                     db.execSQL("INSERT INTO expense_categories (name, icon, sortOrder) VALUES (?, ?, ?)",
                         arrayOf<Any>(category.name, category.icon, category.sortOrder))
                 }
-                // The next local/Drive snapshot must include the new catalog even without a new expense.
+                // The next snapshot must include the new catalog even without a new expense.
                 db.execSQL("UPDATE backup_revision SET revision = revision + 1 WHERE id = 1")
             }
         }

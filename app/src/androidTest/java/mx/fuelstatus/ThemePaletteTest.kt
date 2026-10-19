@@ -43,7 +43,7 @@ class ThemePaletteTest {
                     actual = MaterialTheme.colorScheme
                     Surface { Box(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
                         SettingsScreen(preferences, busy, { preferences = preferences.copy(theme = it) },
-                            { preferences = preferences.copy(dynamicColor = it) }, {}, {}, {}, {}, {}, {},
+                            { preferences = preferences.copy(dynamicColor = it) }, {}, {}, {}, {}, {},
                             onColorPalette = { preferences = preferences.copy(dynamicColor = false, colorPalette = it) })
                     } }
                 }

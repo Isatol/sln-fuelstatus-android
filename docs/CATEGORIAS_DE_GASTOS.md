@@ -25,7 +25,7 @@ La reasignación y la eliminación ocurren en una única transacción, sin cambi
 - Room pasa al esquema **5**, con migración **4→5** y las migraciones anteriores conservadas.
 - La tabla `expense_categories` guarda nombre, código del icono y orden. Los gastos mantienen su campo de categoría original, sin reescribir nombres, importes, notas, fechas ni vehículos. Los nombres históricos ajenos a las siete categorías iniciales se incorporan al catálogo con Etiqueta.
 - La migración incrementa la revisión local para que la siguiente copia incluya el catálogo.
-- Las copias completas locales y de Drive pasan al formato **4**, que incluye categorías e iconos y conserva los formatos **1, 2 y 3** al restaurar. Las copias antiguas generan las categorías iniciales y las que aparezcan en sus gastos.
+- Las copias completas privadas locales pasan al formato **4**, que incluye categorías e iconos y conserva los formatos **1, 2 y 3** al restaurar. Las copias antiguas generan las categorías iniciales y las que aparezcan en sus gastos.
 - Se rechazan copias con categorías duplicadas, iconos desconocidos, Otros ausente o modificado, o referencias de gastos a categorías inexistentes.
 - La restauración reemplaza categorías, métodos de pago, vehículos, llenados y gastos dentro de una transacción.
 - **Borrar todos los datos** elimina las categorías personalizadas y vuelve a dejar las siete iniciales.

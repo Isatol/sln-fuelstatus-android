@@ -4,13 +4,9 @@
 
 En Ajustes → TUS DATOS aparece una tarjeta roja **Borrar datos**. El botón abre un diálogo de confirmación; cancelar no modifica nada.
 
-Al confirmar se borran vehículos, llenados, gastos y los archivos privados de respaldo y recuperación. Se restablece la apariencia, se vacía el vehículo seleccionado y se desconecta Drive. La app queda sin vehículos, llenados ni gastos, con solo Efectivo, las siete categorías iniciales y los ajustes predeterminados, como una instalación nueva de esta versión. No reaparece automáticamente el vehículo inicial de versiones anteriores. Los CSV exportados por el usuario fuera del almacenamiento privado de la app se conservan.
+Al confirmar se borran vehículos, llenados, gastos y los archivos privados de respaldo y recuperación. Se restablece la apariencia, se vacía el vehículo seleccionado. La app queda sin vehículos, llenados ni gastos, con solo Efectivo, las siete categorías iniciales y los ajustes predeterminados, como una instalación nueva de esta versión. No reaparece automáticamente el vehículo inicial de versiones anteriores. Los CSV exportados por el usuario fuera del almacenamiento privado de la app se conservan.
 
-Si hay una cuenta de Drive conectada aparece **También borrar el historial de Drive**, desactivado inicialmente. Si no se marca, se conservan las copias remotas. Si se marca, se requiere conexión: primero se envían a la papelera todas las copias de FuelStatus de la carpeta conectada y después se borra el historial local. Se conserva la carpeta y no se tocan archivos ajenos a FuelStatus. La recuperación desde la papelera depende de las reglas de Google Drive.
-
-Ante un fallo remoto se conservan los datos locales, se muestra el error y se pausa la sincronización automática para no recrear las copias recién retiradas. Si hubo un borrado parcial se muestra cuántas copias se procesaron; puede repetirse Borrar datos para completar la operación. Tras una interrupción de la app se mantiene esa pausa hasta que se revise la operación.
-
-La desconexión de la app no elimina la cuenta de Google del teléfono ni revoca el permiso de Google Play services. No se ejecuta ningún borrado remoto al instalar este APK: solo después de marcar la opción y confirmar desde la aplicación.
+El borrado es exclusivamente local y funciona sin conexión. Cancelar conserva los datos. La actualización a 1.0.0 conserva el historial y retira las tareas y configuración de sincronización anteriores. Las copias privadas completas siguen usando el formato 5; consulta [COPIAS_LOCALES.md](COPIAS_LOCALES.md).
 
 ## Combustible
 
