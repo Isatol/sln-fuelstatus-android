@@ -25,8 +25,7 @@ import java.io.File
 class SettingsCsvUiTest {
     @get:Rule val compose = createComposeRule()
 
-    @Test fun settingsRoutesTheThreeCsvActionsAndSupportsLargeDarkText() {
-        var fuel = 0
+    @Test fun settingsRoutesFuelStatusCsvActionsAndSupportsLargeDarkText() {
         var native = 0
         var exports = 0
         var theme by mutableStateOf("light")
@@ -37,7 +36,7 @@ class SettingsCsvUiTest {
             CompositionLocalProvider(LocalDensity provides Density(density, scale)) {
                 FuelTheme(Preferences(theme, false)) {
                     Surface { Box(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
-                        SettingsScreen(Preferences(theme, false), busy, {}, {}, { fuel++ }, { native++ }, { exports++ }, {}, {},
+                        SettingsScreen(Preferences(theme, false), busy, {}, {}, { native++ }, { exports++ }, {}, {},
                             backupContent = { DriveBackupCard(SyncState(), false, {}, {}, {}, {}, {}) }, deleteContent = {})
                     } }
                 }
@@ -45,8 +44,9 @@ class SettingsCsvUiTest {
         }
         settingsNode("TUS DATOS")
         capture("tus-datos-claro", false)
-        settingsNode("Importar CSV de Fuel").performClick()
-        compose.runOnIdle { assertEquals(1, fuel); assertEquals(0, native); assertEquals(0, exports) }
+        compose.onNodeWithText("Trae tu historial de Fuel").assertDoesNotExist()
+        compose.onNodeWithText("Importa vehículos y llenados desde tu CSV.", substring = true).assertDoesNotExist()
+        compose.onNodeWithText("Importar CSV de Fuel").assertDoesNotExist()
         settingsNode("Importar llenados de FuelStatus").performClick()
         compose.runOnIdle { assertEquals("Importar FuelStatus", 1, native) }
         settingsNode("Exportar llenados a CSV").performClick()
@@ -69,7 +69,7 @@ class SettingsCsvUiTest {
         var saved: ImportPlan? = null
         var canceled = false
         compose.setContent { FuelTheme(Preferences("dark", false)) {
-            ImportFuelDialog(ImportPreview(rows, CsvSource.FuelStatus), listOf(target), target.id, false,
+            ImportRefuelsDialog(ImportPreview(rows, CsvSource.FuelStatus), listOf(target), false,
                 { saved = it }, {}, { canceled = true })
         } }
         compose.onNodeWithText("Importar historial de FuelStatus").assertIsDisplayed()

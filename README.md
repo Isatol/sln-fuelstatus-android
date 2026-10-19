@@ -22,7 +22,7 @@ Las tarjetas usan el icono Material de tarjeta de crédito en toda la app, inclu
 
 ### Funcionalidad de 0.4
 
-Métodos de pago con Efectivo, tarjetas VISA/Mastercard/American Express, pantalla completa de administración, selección por llenado y método común al importar CSV de Fuel. Los métodos se conservan en Room, copias locales y Drive; los registros antiguos mantienen su método como Sin especificar. Detalles en [docs/METODOS_DE_PAGO.md](docs/METODOS_DE_PAGO.md).
+Métodos de pago con Efectivo, tarjetas VISA/Mastercard/American Express, pantalla completa de administración, selección por llenado y conservación del método de cada registro al importar llenados de FuelStatus. Los métodos se conservan en Room, copias locales y Drive; los registros antiguos mantienen su método como Sin especificar. Detalles en [docs/METODOS_DE_PAGO.md](docs/METODOS_DE_PAGO.md).
 
 ### Funcionalidad de 0.3
 
@@ -39,7 +39,7 @@ Las tarjetas de Llenados incluyen iconos Material Symbols Rounded para el kilome
 - **Gastos:** registro, edición y eliminación, con categorías iniciales y personalizadas, iconos seleccionables y métodos de pago compartidos con los llenados.
 - **Estadísticas:** km/L, precio medio por litro, costo de combustible por kilómetro, volumen, combustible pagado y gastos totales; cálculos a partir de datos registrados.
 - **Vehículos:** historial separado para cada auto, selección, alta, edición y combustible predeterminado. Los vehículos existentes se conservan al actualizar.
-- **Ajustes:** apariencia e importación del historial CSV de Fuel. Se agregó exportación CSV de llenados para poder recuperar ese historial.
+- **Ajustes:** apariencia, importación y exportación de llenados de FuelStatus, catálogos y respaldos completos.
 - **Datos:** persistencia local con Room; funcionamiento sin conexión, sin cuenta, anuncios ni suscripción. Moneda MXN, distancias en km, volumen en litros.
 - **Entrega:** proyecto fuente y APK debug instalable. Compilación local con Android Studio; GitHub Actions queda pendiente de configurar.
 
@@ -47,7 +47,7 @@ Las tarjetas de Llenados incluyen iconos Material Symbols Rounded para el kilome
 
 ## Estado de esta recreación
 
-La base de la implementación contiene las cinco secciones, formularios, Room, cálculos e importación/exportación de llenados. No se incluyen datos de demostración ni el CSV personal dentro del APK. Las instalaciones nuevas comienzan sin vehículos y permiten crearlos o importar uno desde Ajustes.
+La base de la implementación contiene las cinco secciones, formularios, Room, cálculos e importación/exportación de llenados. No se incluyen datos de demostración ni el CSV personal dentro del APK. Las instalaciones nuevas comienzan sin vehículos, llenados ni gastos, con Efectivo, las siete categorías iniciales y los ajustes predeterminados, igual que después de Borrar todos los datos. Permiten crear el primer vehículo o importarlo desde Ajustes.
 
 Se utiliza un CSV privado externo al proyecto como comprobación local opcional; no se copia al repositorio. La comparación visual con Fuel y sus totales sigue pendiente de verificar en el teléfono.
 
@@ -112,4 +112,4 @@ Tendencia del consumo con comparación de fechas y equivalencia en km/L, distanc
 
 Cada tarjeta tiene un botón de información que abre un modal con la explicación de su cálculo o estimación. La ayuda sustituye al bloque general de texto “Cómo calculamos” y está disponible incluso sin datos suficientes.
 
-En Ajustes, **Copias y Google Drive** forma parte de **Tus datos**. **Trae tu historial de Fuel** permite importar desde Fuel; la nueva card **Llenados de FuelStatus** reúne exportación CSV de todos los vehículos e importación conservando combustible y método de pago por registro, con selección de vehículo de origen/destino y omisión de duplicados.
+En Ajustes, **Copias y Google Drive** forma parte de **Tus datos**. La card **Llenados de FuelStatus** reúne exportación CSV de todos los vehículos e importación conservando combustible y método de pago por registro, con selección de vehículo de origen/destino y omisión de duplicados.

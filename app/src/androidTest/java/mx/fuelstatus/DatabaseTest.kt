@@ -216,18 +216,30 @@ class DatabaseTest {
     @Test fun resettingRoomAndAppearanceKeepsFreshInstallEmptyAfterInitialization() = runBlocking {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val db = Room.inMemoryDatabaseBuilder(context, FuelDatabase::class.java).build()
+        context.getSharedPreferences("test-reset-appearance", 0).edit().clear().commit()
         val appearance = mx.fuelstatus.backup.AppearanceStore(context, "test-reset-appearance")
         try {
-            val repo = FuelRepository(db); repo.initialize(); repo.import(FuelCsv.parse(csv()))
+            val repo = FuelRepository(db); repo.initialize()
+            val source = mx.fuelstatus.backup.RoomBackupSource(repo, appearance)
+            val fresh = source.snapshot("test-device", 1000)
+            assertTrue(fresh.vehicles.isEmpty()); assertTrue(fresh.refuels.isEmpty()); assertTrue(fresh.expenses.isEmpty())
+            assertEquals(Preferences(), fresh.appearance)
+            assertEquals(listOf(PaymentMethod.Cash), fresh.paymentMethods)
+            assertEquals(ExpenseCategory.Defaults, fresh.expenseCategories)
+            repo.import(FuelCsv.parse(csv()))
             val vehicle = repo.dao.allVehicles().single()
             repo.save(Expense(vehicleId = vehicle.id, timestamp = 1000, category = "Servicio", costCents = 50000))
-            appearance.update { Preferences("dark", false, vehicle.id) }
-            val source = mx.fuelstatus.backup.RoomBackupSource(repo, appearance)
+            repo.addPaymentMethod(PaymentMethod("test-card", "Tarjeta de prueba", PaymentBrand.Visa.code))
+            repo.addExpenseCategory("Llantas", CategoryIcon.Tire.code)
+            repo.deleteExpenseCategory("Lavado")
+            appearance.update { Preferences("dark", false, vehicle.id, "blue", "pink") }
             source.reset(); repo.initialize()
             assertTrue(repo.dao.allVehicles().isEmpty()); assertTrue(repo.dao.allRefuels().isEmpty()); assertTrue(repo.dao.allExpenses().isEmpty())
             assertEquals(Preferences(), appearance.state.value)
             assertEquals(1L, repo.dao.revision())
-            assertTrue(source.snapshot("new-phone", 1000).vehicles.isEmpty())
+            assertEquals(fresh, source.snapshot("test-device", 1000))
+            repo.initialize()
+            assertEquals(fresh, source.snapshot("test-device", 1000))
         } finally { db.close(); context.getSharedPreferences("test-reset-appearance", 0).edit().clear().commit() }
     }
 
