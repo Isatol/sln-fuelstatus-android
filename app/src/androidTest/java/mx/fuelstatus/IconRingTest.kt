@@ -46,7 +46,7 @@ class IconRingTest {
             val density = LocalDensity.current.density
             CompositionLocalProvider(LocalDensity provides Density(density, 1.3f)) {
                 FuelTheme(preferences) { Surface { Box(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
-                    SettingsScreen(preferences, busy, { preferences = preferences.copy(theme = it) }, {}, {}, {}, {}, {}, {}, {}, {},
+                    SettingsScreen(preferences, busy, { preferences = preferences.copy(theme = it) }, {}, {}, {}, {}, {}, {}, {},
                         onIconRingColor = { preferences = preferences.copy(iconRingColor = it) })
                 } } }
             }

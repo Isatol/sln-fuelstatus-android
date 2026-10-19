@@ -19,8 +19,8 @@ import org.junit.runner.RunWith
 class DataDialogsTest {
     @get:Rule val compose = createComposeRule()
     private fun preview(): ImportPreview {
-        val v = Vehicle("source", "Auto de Fuel", "Sedán", 2024)
-        return ImportPreview(listOf(FuelImportRow(v, Refuel("fill", v.id, 1000, 1000000, 40000, 100000))))
+        val v = Vehicle("source", "Auto del archivo", "Sedán", 2024)
+        return ImportPreview(listOf(FuelImportRow(v, Refuel("fill", v.id, 1000, 1000000, 40000, 100000))), CsvSource.FuelStatus)
     }
     @Test fun driveDeletionIsUncheckedByDefaultAndRequiresConfirmation() {
         var requested: Boolean? = null
@@ -44,38 +44,39 @@ class DataDialogsTest {
         compose.onNodeWithText("Sí, borrar datos").performClick()
         assertEquals(false, requested)
     }
-    @Test fun importDefaultsToExistingVehicleFuelAndCanPreserveCsvFuel() {
+    @Test fun importChoosesMatchingVehicleAndPreservesCsvAssignments() {
         var plan: ImportPlan? = null
-        val target = Vehicle("target", "Mi auto", "Hatchback", 2025, "premium")
-        compose.setContent { FuelTheme(Preferences()) { ImportFuelDialog(preview(), listOf(target), target.id, false, { plan = it }, {}, {}) } }
-        compose.onNodeWithText("Usar Premium · 91 octanos en todos los llenados importados").performScrollTo().assertIsOn().performClick().assertIsOff()
+        val target = preview().vehicles.single().copy(id = "target", fuelType = "premium")
+        compose.setContent { FuelTheme(Preferences()) { ImportRefuelsDialog(preview(), listOf(target), false, { plan = it }, {}, {}) } }
+        compose.onNodeWithText("Método de pago para los registros").assertDoesNotExist()
         compose.onNodeWithText("Importar llenados").performClick()
         assertEquals("target", plan!!.targetVehicleId)
+        assertEquals(CsvSource.FuelStatus, plan!!.source)
         assertFalse(plan!!.useVehicleFuel)
     }
     @Test fun noVehiclesOffersCreationBeforeImportOrCreationFromFile() {
         var plan: ImportPlan? = null
         var create = false
-        compose.setContent { FuelTheme(Preferences()) { ImportFuelDialog(preview(), emptyList(), null, false, { plan = it }, { create = true }, {}) } }
+        compose.setContent { FuelTheme(Preferences()) { ImportRefuelsDialog(preview(), emptyList(), false, { plan = it }, { create = true }, {}) } }
         compose.onNodeWithText("Crear un vehículo primero").performScrollTo().performClick()
         assertTrue(create)
         compose.onNodeWithText("Crear e importar").performClick()
         assertNull(plan!!.targetVehicleId)
-        assertTrue(plan!!.useVehicleFuel)
+        assertFalse(plan!!.useVehicleFuel)
         assertEquals("magna", plan!!.newVehicleFuelType)
         assertEquals(PaymentMethod.Cash.id, plan!!.paymentMethodId)
     }
 
-    @Test fun importPaymentStartsWithCashAndCanAssignAnExistingCard() {
+    @Test fun importCanChooseAnotherExistingVehicle() {
         var plan: ImportPlan? = null
         val target = Vehicle("target", "Mi auto", "Sedán", 2024)
-        val card = PaymentMethod("mastercard", "Tarjeta gasolina", "mastercard")
         compose.setContent { FuelTheme(Preferences()) {
-            ImportFuelDialog(preview(), listOf(target), target.id, false, { plan = it }, {}, {}, listOf(PaymentMethod.Cash, card))
+            ImportRefuelsDialog(preview(), listOf(target), false, { plan = it }, {}, {})
         } }
-        compose.onNodeWithText("Efectivo").performScrollTo().assertIsDisplayed().performClick()
-        compose.onNodeWithText("Tarjeta gasolina").performClick()
+        compose.onNodeWithText(target.label).performScrollTo().performClick()
         compose.onNodeWithText("Importar llenados").performClick()
-        assertEquals(card.id, plan!!.paymentMethodId)
+        assertEquals(target.id, plan!!.targetVehicleId)
+        assertEquals(CsvSource.FuelStatus, plan!!.source)
+        assertFalse(plan!!.useVehicleFuel)
     }
 }

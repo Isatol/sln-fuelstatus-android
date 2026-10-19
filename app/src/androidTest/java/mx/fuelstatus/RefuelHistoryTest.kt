@@ -31,7 +31,7 @@ class RefuelHistoryTest {
 
     @Composable private fun History() {
         FuelTheme(Preferences("light", false)) {
-            RefuelsScreen(FuelState(vehicles = listOf(vehicle), refuels = rows, loaded = true), {}, {},
+            RefuelsScreen(FuelState(vehicles = listOf(vehicle), refuels = rows, loaded = true), {},
                 rememberRefuelHistoryFilter(today), RefuelCalendar(today, zone))
         }
     }

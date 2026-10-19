@@ -4,7 +4,7 @@
 
 En Ajustes → TUS DATOS aparece una tarjeta roja **Borrar datos**. El botón abre un diálogo de confirmación; cancelar no modifica nada.
 
-Al confirmar se borran vehículos, llenados, gastos y los archivos privados de respaldo y recuperación. Se restablece la apariencia, se vacía el vehículo seleccionado y se desconecta Drive. La app queda sin vehículos, como una instalación nueva de esta versión. No reaparece automáticamente el vehículo inicial de versiones anteriores. Los CSV exportados por el usuario fuera del almacenamiento privado de la app se conservan.
+Al confirmar se borran vehículos, llenados, gastos y los archivos privados de respaldo y recuperación. Se restablece la apariencia, se vacía el vehículo seleccionado y se desconecta Drive. La app queda sin vehículos, llenados ni gastos, con solo Efectivo, las siete categorías iniciales y los ajustes predeterminados, como una instalación nueva de esta versión. No reaparece automáticamente el vehículo inicial de versiones anteriores. Los CSV exportados por el usuario fuera del almacenamiento privado de la app se conservan.
 
 Si hay una cuenta de Drive conectada aparece **También borrar el historial de Drive**, desactivado inicialmente. Si no se marca, se conservan las copias remotas. Si se marca, se requiere conexión: primero se envían a la papelera todas las copias de FuelStatus de la carpeta conectada y después se borra el historial local. Se conserva la carpeta y no se tocan archivos ajenos a FuelStatus. La recuperación desde la papelera depende de las reglas de Google Drive.
 
@@ -22,13 +22,13 @@ Se guarda el combustible en la copia JSON (formato versión 2) y al exportar CSV
 
 Referencia de octanajes: [Pemex: lo que necesitas saber al cargar combustible](https://www.pemex.com/negocio/gasolineras/pemex-te-lleva/en-tu-camino/Paginas/002.aspx).
 
-## Importar Fuel
+## Importar llenados de FuelStatus
 
-1. Elegir el archivo CSV. Esta lectura no modifica registros.
+1. En Ajustes → TUS DATOS → Llenados de FuelStatus, elegir el archivo CSV exportado por FuelStatus. Esta lectura no modifica registros.
 2. Si contiene varios vehículos, elegir cuál importar.
 3. Elegir un vehículo ya registrado o **Importar y crear** el vehículo encontrado. Si aún no hay vehículos se ofrece también **Crear un vehículo primero**.
-4. Revisar **Usar el combustible del vehículo en todos los llenados importados**. Está activado inicialmente. Al desactivarlo se conserva lo indicado por el CSV; si el CSV no tiene ese campo, el llenado queda como Sin especificar.
-5. Confirmar la importación. Los duplicados se omiten y mantienen sus datos previos, incluidas las ediciones de combustible. Esta opción no modifica registros que ya estaban guardados.
+4. Se conserva el combustible y el método de pago de cada llenado del CSV. Si el archivo no tiene esos campos, permanecen como Sin especificar. Las tarjetas que falten se agregan al catálogo.
+5. Confirmar la importación. Los duplicados se omiten y mantienen sus datos previos, incluidas las ediciones de combustible. La importación no modifica registros que ya estaban guardados.
 
 Crear un vehículo desde el archivo genera una identidad nueva, de modo que no sobrescribe un vehículo existente que haya sido renombrado. Volver a importar al mismo vehículo detecta duplicados. Importar deliberadamente el mismo archivo a otro vehículo permite mantener un historial separado.
 

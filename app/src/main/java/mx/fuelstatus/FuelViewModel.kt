@@ -120,7 +120,7 @@ class FuelViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun prepareImport(uri: Uri, source: CsvSource = CsvSource.Fuel) = work() {
+    fun prepareImport(uri: Uri) = work() {
         val bytes = getApplication<Application>().contentResolver.openInputStream(uri)?.use { input ->
             val output = ByteArrayOutputStream()
             val buffer = ByteArray(8192)
@@ -132,7 +132,7 @@ class FuelViewModel(application: Application) : AndroidViewModel(application) {
             }
             output.toByteArray()
         } ?: error("No se pudo abrir el archivo.")
-        _importPreview.value = ImportPreview(FuelCsv.parse(bytes.toString(Charsets.UTF_8), source), source)
+        _importPreview.value = ImportPreview(FuelCsv.parse(bytes.toString(Charsets.UTF_8), CsvSource.FuelStatus), CsvSource.FuelStatus)
     }
 
     fun dismissImport() { if (!_busy.value) _importPreview.value = null }

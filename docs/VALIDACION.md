@@ -1,4 +1,20 @@
-# Validación 0.8.0 · Textos, formularios y catálogo Material
+# Validación 0.8.0 · Inicio limpio y retiro de importación desde Fuel
+
+18 de octubre de 2026, America/Monterrey. Rama `20261018-inicio-limpio-sin-card-fuel`, desde `main` en `c0f1542` (PR #18).
+
+- **Interfaz:** se retiraron la card de importación desde Fuel, su botón, el selector de archivos asociado y las referencias de los estados vacíos de Llenados y Vehículos. El diálogo de importación queda dedicado a FuelStatus; se retiraron los controles exclusivos del flujo anterior. Ajustes conserva importar y exportar llenados de FuelStatus.
+- **Inicio limpio:** la inicialización existente ya crea cero vehículos, llenados y gastos, solo Efectivo y las siete categorías iniciales, con ajustes predeterminados. No fue necesario modificar la lógica de inicialización ni de borrado. Se comprobó además el primer arranque real de la app, extrayendo la base del emulador y verificando esas tablas.
+- **8 pruebas Android dirigidas aprobadas**, en una sola ejecución (`OK (8 tests)`). La prueba de reinicio compara la copia completa de una base nueva con el resultado de borrar historial, tarjetas y categorías personalizadas, una categoría inicial eliminada y apariencia modificada, y de volver a inicializar dos veces. Otros casos cubren las dos acciones CSV de Ajustes en claro y oscuro con texto al 130 %, ausencia de la card y botón anteriores, controles deshabilitados, selección de vehículo coincidente u otro destino, creación sin vehículos, conservación de combustible/pagos/precisión/indicadores y duplicados sin recrear tarjetas eliminadas ni reemplazar ediciones.
+- **Compilación aprobada:** APK de aplicación y APK de pruebas. Android Lint: cero errores y 11 avisos existentes.
+- **Revisión visual:** primer arranque sin vehículos ni llenados, Vehículos vacío con su botón para añadir el primero y Ajustes sin la card retirada en claro y oscuro con texto al 130 %. Registros, capturas y estado inicial en `.local/qa/inicio-limpio/`.
+- **Compatibilidad:** Room 6, respaldo completo 5, formato CSV de FuelStatus y datos existentes conservados. No cambian cálculos, migraciones ni el comportamiento de restauración.
+- **APK:** `.local/releases/FuelStatus-0.8.0-inicio-limpio.apk`, SHA-256 `3625d9988989206423321f0881dfa125847f238a5ade81bab9add066a0b51a3f`. Firma debug anterior conservada, SHA-1 `81:BA:D0:FD:EB:A0:29:7E:6B:3E:F9:04:FF:6B:1D:AD:80:33:1F:36`.
+
+Se usaron exclusivamente datos sintéticos en el emulador API 37 read-only, sin snapshots y en modo avión, cerrado al terminar. Gradle y emulador se ejecutaron por separado. No se repitieron las suites JVM/Android completas ni la navegación general; se ejecutaron los casos afectados por este cambio. No se operó sobre Drive real ni teléfonos personales. El historial de validaciones que sigue conserva las características y resultados de versiones anteriores.
+
+---
+
+# Validación histórica 0.8.0 · Textos, formularios y catálogo Material
 
 18 de octubre de 2026, America/Monterrey. Rama `20261018-iconos-formularios-categorias`, desde `main` en `d5986e8` (PR #17).
 

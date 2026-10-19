@@ -14,8 +14,8 @@ Conservar de Fuel la sencillez, jerarquía de información y rapidez al registra
 4. Room como base de datos local.
 5. Crear, editar y eliminar llenados.
 6. Calcular km/L, $/L, $/km, promedios y totales.
-7. Vehículo inicial Mazda 3 Hatchback 2025.
-8. Importar el CSV de Fuel y usar un historial privado externo al repositorio para comprobar los cálculos.
+7. Instalación nueva sin vehículos, llenados ni gastos, con catálogos y ajustes predeterminados, igual que después de borrar todos los datos.
+8. Importar y exportar llenados de FuelStatus desde Ajustes. Usar datos sintéticos para validar el inicio vacío.
 9. Uso sin cuenta, sin anuncios y sin suscripción.
 10. Entregar fuentes y APK, con posteriores iteraciones a partir de pruebas en el Pixel.
 11. Dejar Drive, ubicación/mapas e informes/gráficas avanzados para versiones posteriores.
