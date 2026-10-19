@@ -4,11 +4,15 @@ En **Ajustes → TUS DATOS**, el botón **Categorías de gastos** aparece debajo
 
 Las categorías iniciales son Servicio, Mantenimiento, Seguro, Estacionamiento, Peaje, Lavado y Otros. Cada una tiene un icono distinto. Las categorías nuevas aparecen en orden de creación, después de Lavado y antes de Otros; Otros siempre se muestra al final.
 
-**Agregar categoría** abre un formulario de nombre e icono. El nombre se recorta en los extremos, es obligatorio y admite hasta 50 caracteres. No se aceptan duplicados aunque cambien mayúsculas o acentos, incluidas las categorías predeterminadas. El icono inicial es Etiqueta; se puede cambiar en el modal **Seleccionar icono**.
+**Agregar categoría** abre un formulario de nombre e icono. El nombre se recorta en los extremos, es obligatorio y admite hasta 50 caracteres. No se aceptan duplicados aunque cambien mayúsculas o acentos, incluidas las categorías predeterminadas. El icono inicial es `sell` (Etiqueta); se puede cambiar en el modal **Seleccionar icono**.
 
-El modal ofrece los 30 iconos del catálogo local, con sus nombres en español y búsqueda por nombre, sinónimo o código. Por ejemplo, “neumático” encuentra Llanta, “seguro” encuentra Escudo y “bateria” encuentra Batería. Una búsqueda sin resultados muestra un mensaje y permite cambiar el texto. Cancelar conserva el icono anterior. Los recursos son Material Symbols Rounded oficiales, incluidos como vectores Android bajo Apache 2.0; no requieren conexión ni una dependencia adicional.
+El modal reúne los **45 iconos Material distintos que ya están incluidos en la app**, tanto los de categorías como los de otras pantallas. Muestra sus nombres originales, como `tire_repair`, `verified_user`, `battery_charging_full` y `credit_card`, ordenados alfabéticamente. La búsqueda admite el nombre original y los nombres o sinónimos en español: “neumático” encuentra `tire_repair`, “seguro” encuentra `verified_user` y “bateria” encuentra `battery_charging_full`. Una búsqueda sin resultados muestra un mensaje y permite cambiar el texto. Cancelar conserva el icono anterior. Los recursos son Material Symbols Rounded oficiales y el icono Material Icons `credit_card`, incluidos como vectores Android bajo Apache 2.0; no requieren conexión ni una dependencia adicional.
 
 Los formularios **Nuevo gasto** y **Editar gasto** usan el catálogo guardado y muestran nombre e icono en el selector. Un gasto nuevo empieza en Servicio si existe, o en Otros si fue eliminada; al editar se conserva la categoría original. Las categorías son compartidas por los vehículos, igual que los métodos de pago.
+
+## Compatibilidad del catálogo ampliado (0.8.0)
+
+Los 30 códigos anteriores conservan su significado y se añaden 15 códigos de recursos ya existentes. No cambian Room 6 ni el formato 5 del respaldo: nombre y código del icono se guardan y restauran en los mismos campos. Las versiones con el catálogo anterior no reconocen los nuevos códigos, por lo que necesitan actualizarse para restaurar una copia que los utilice. Los iconos siguen disponibles sin conexión.
 
 ## Eliminar categorías (0.8.0)
 

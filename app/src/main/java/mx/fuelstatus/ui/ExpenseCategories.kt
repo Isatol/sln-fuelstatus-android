@@ -101,7 +101,7 @@ fun AddExpenseCategoryScreen(categories: List<ExpenseCategory>, busy: Boolean, s
                 Text("Icono", style = MaterialTheme.typography.labelLarge)
                 OutlinedButton(onClick = { showPicker = true }, enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp)) {
                     ExpenseCategoryIcon(icon)
-                    Text(CategoryIcon.fromCode(icon)?.label.orEmpty(), modifier = Modifier.weight(1f).padding(horizontal = 12.dp))
+                    Text(CategoryIcon.fromCode(icon)?.code.orEmpty(), modifier = Modifier.weight(1f).padding(horizontal = 12.dp))
                     FuelIcon(R.drawable.ic_keyboard_arrow_down)
                 }
                 Text("Selecciona un icono", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -115,7 +115,7 @@ fun AddExpenseCategoryScreen(categories: List<ExpenseCategory>, busy: Boolean, s
 @Composable
 fun CategoryIconPicker(selected: String, onSelect: (String) -> Unit, onDismiss: () -> Unit) {
     var search by rememberSaveable { mutableStateOf("") }
-    val results = remember(search) { CategoryIcon.entries.filter { it.matches(search) } }
+    val results = remember(search) { CategoryIcon.entries.filter { it.matches(search) }.sortedBy { it.code } }
     val cellSize = 120.dp * LocalDensity.current.fontScale.coerceAtLeast(1f)
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
         Surface(shape = MaterialTheme.shapes.extraLarge, tonalElevation = 6.dp,
@@ -123,7 +123,7 @@ fun CategoryIconPicker(selected: String, onSelect: (String) -> Unit, onDismiss: 
             Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Text("Seleccionar icono", style = MaterialTheme.typography.headlineSmall)
                 OutlinedTextField(search, { search = it }, label = { Text("Buscar icono") },
-                    placeholder = { Text("Llanta, seguro, aceite…") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                    placeholder = { Text("tire_repair, llanta, seguro…") }, singleLine = true, modifier = Modifier.fillMaxWidth())
                 if (results.isEmpty()) Text("No hay iconos para esa búsqueda.", modifier = Modifier.weight(1f, fill = false))
                 else LazyVerticalGrid(columns = GridCells.Adaptive(cellSize), modifier = Modifier.weight(1f, fill = false),
                     horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -133,7 +133,7 @@ fun CategoryIconPicker(selected: String, onSelect: (String) -> Unit, onDismiss: 
                                 Column(Modifier.fillMaxWidth().padding(vertical = 12.dp), horizontalAlignment = Alignment.CenterHorizontally,
                                     verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                     ExpenseCategoryIcon(option.code)
-                                    Text(option.label, style = MaterialTheme.typography.labelMedium,
+                                    Text(option.code, style = MaterialTheme.typography.labelMedium,
                                         textAlign = androidx.compose.ui.text.style.TextAlign.Center)
                                 }
                             })

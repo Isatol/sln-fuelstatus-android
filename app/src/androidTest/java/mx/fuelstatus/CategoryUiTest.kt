@@ -33,15 +33,15 @@ class CategoryUiTest {
             }
         }
         capture("catalogo-claro", true)
-        compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("Herramientas"))
-        compose.onNodeWithText("Herramientas").assertIsDisplayed()
+        compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("handyman"))
+        compose.onNodeWithText("handyman").assertIsDisplayed()
         compose.runOnIdle { theme = "dark"; scale = 1.3f }
         compose.onNodeWithText("Buscar icono").performTextInput("sin coincidencias")
         compose.onNodeWithText("No hay iconos para esa búsqueda.").assertIsDisplayed()
         compose.onNodeWithText("Buscar icono").performTextReplacement("bateria")
-        compose.onNodeWithText("Batería").assertIsDisplayed()
+        compose.onNodeWithText("battery_charging_full").assertIsDisplayed()
         capture("catalogo-oscuro-texto130", true)
-        compose.onNodeWithText("Batería").performClick()
+        compose.onNodeWithText("battery_charging_full").performClick()
         assertEquals(CategoryIcon.Battery.code, selected)
     }
 
@@ -55,13 +55,13 @@ class CategoryUiTest {
         compose.onNodeWithText("Ya existe una categoría con ese nombre.").assertIsDisplayed()
         assertNull(saved)
         compose.onNodeWithText("Nombre de la categoría").performTextReplacement(" Refacciones ")
-        compose.onNodeWithText("Etiqueta").performScrollTo().performClick()
-        compose.onNodeWithText("Buscar icono").performTextInput("repuesto")
-        compose.onNodeWithText("Refacción").performClick()
-        compose.onNodeWithText("Refacción").performClick()
+        compose.onNodeWithText("sell").performScrollTo().performClick()
+        compose.onNodeWithText("Buscar icono").performTextInput("credit_card")
+        compose.onNode(hasText("credit_card") and !hasSetTextAction()).performClick()
+        compose.onNode(hasText("credit_card") and !hasSetTextAction()).performClick()
         compose.onNodeWithText("Cancelar").performClick()
         compose.onNodeWithText("Guardar categoría").performClick()
-        assertEquals("Refacciones" to CategoryIcon.Part.code, saved)
+        assertEquals("Refacciones" to CategoryIcon.CreditCard.code, saved)
     }
 
     @Test fun categoryListSupportsDarkThemeAndLargeText() {

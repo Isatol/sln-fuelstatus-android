@@ -33,5 +33,20 @@ fun categoryIconResource(code: String): Int = when (code) {
     "inventory_2" -> R.drawable.ic_category_inventory_2
     "sell" -> R.drawable.ic_category_sell
     "handyman" -> R.drawable.ic_category_handyman
+    "add_card" -> R.drawable.ic_add_card
+    "arrow_back" -> R.drawable.ic_arrow_back
+    "chevron_right" -> R.drawable.ic_chevron_right
+    "cloud_sync" -> R.drawable.ic_cloud_sync
+    "credit_card" -> R.drawable.ic_credit_card
+    "delete_forever" -> R.drawable.ic_delete_forever
+    "filter_list" -> R.drawable.ic_filter_list
+    "keyboard_arrow_down" -> R.drawable.ic_keyboard_arrow_down
+    "notes" -> R.drawable.ic_notes
+    "palette" -> R.drawable.ic_palette
+    "payments" -> R.drawable.ic_payments
+    "upload_file" -> R.drawable.ic_upload_file
+    "water_drop" -> R.drawable.ic_water_drop
+    "water_full" -> R.drawable.ic_water_full
+    "water_medium" -> R.drawable.ic_water_medium
     else -> R.drawable.ic_category_sell
 }

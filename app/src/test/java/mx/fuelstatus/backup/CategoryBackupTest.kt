@@ -18,6 +18,14 @@ class CategoryBackupTest {
         assertEquals(5, JsonParser.parseString(BackupCodec.encode(original).toString(Charsets.UTF_8)).asJsonObject.get("version").asInt)
     }
 
+    @Test fun expandedMaterialCatalogSurvivesBackupAndRestore() {
+        val categories = ExpenseCategory.Defaults + CategoryIcon.entries.mapIndexed { index, icon ->
+            ExpenseCategory("Icono ${icon.code}", icon.code, index + 6)
+        }
+        val original = document().copy(expenses = emptyList(), expenseCategories = categories)
+        assertEquals(original, BackupCodec.decode(BackupCodec.encode(original)))
+    }
+
     @Test fun versionThreeBackupBuildsCatalogFromOriginalExpenseNames() {
         val root = JsonParser.parseString(BackupCodec.encode(document()).toString(Charsets.UTF_8)).asJsonObject
         root.addProperty("version", 3)

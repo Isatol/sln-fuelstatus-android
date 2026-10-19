@@ -130,11 +130,8 @@ fun FuelApp(model: FuelViewModel, onConnectDrive: () -> Unit) {
         ) { padding ->
             Column(Modifier.fillMaxSize().padding(padding)) {
                 Column(Modifier.padding(horizontal = 24.dp, vertical = 12.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("FUELSTATUS", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.Black, letterSpacing = 2.sp, modifier = Modifier.weight(1f))
-                        Text("EN TU TELÉFONO", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
+                    Text("FUELSTATUS", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Black, letterSpacing = 2.sp)
                     Text(destination.label, style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 12.dp))
                     if (destination !in listOf(Destination.Vehicles, Destination.Settings)) {
                         var expanded by remember { mutableStateOf(false) }
@@ -381,7 +378,6 @@ internal fun SettingsScreen(preferences: Preferences, busy: Boolean, onTheme: (S
             }
         }
         item { deleteContent() }
-        item { Explanation("Tu auto, tus datos", "Todo se guarda en este teléfono, con copias opcionales en tu Google Drive. Sin anuncios ni suscripción. Los importes se muestran en pesos mexicanos y las distancias en kilómetros.") }
         item { Text("FuelStatus · 0.8.0\nHecha para Android", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(8.dp)) }
     }
 }

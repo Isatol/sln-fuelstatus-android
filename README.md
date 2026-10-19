@@ -14,7 +14,9 @@ Métodos de pago en Nuevo gasto y Editar gasto, con Efectivo por defecto, tarjet
 
 ### Funcionalidad de 0.5
 
-Categorías de gastos administrables desde Ajustes, con siete categorías iniciales e iconos distintos, formulario para agregar categorías y catálogo local de 30 iconos con búsqueda en español. Los formularios de gastos muestran nombre e icono en el selector; Otros siempre aparece al final. Las categorías se conservan en Room y en las copias completas. Detalles en [docs/CATEGORIAS_DE_GASTOS.md](docs/CATEGORIAS_DE_GASTOS.md).
+Categorías de gastos administrables desde Ajustes, con siete categorías iniciales e iconos distintos, formulario para agregar categorías y catálogo local de 45 iconos Material con sus nombres originales y búsqueda también en español. Los formularios de gastos muestran nombre e icono en el selector; Otros siempre aparece al final. Las categorías se conservan en Room y en las copias completas. Detalles en [docs/CATEGORIAS_DE_GASTOS.md](docs/CATEGORIAS_DE_GASTOS.md).
+
+Los formularios de vehículo y gasto muestran iconos en sus campos y selectores; el combustible del vehículo se identifica como **Combustible predeterminado**. El encabezado conserva únicamente FuelStatus y Ajustes omite el bloque «Tu auto, tus datos».
 
 Las tarjetas usan el icono Material de tarjeta de crédito en toda la app, incluidos Llenados, Gastos, selectores y administración; las marcas permanecen como texto. Tarjetas y categorías admiten deslizar hacia la izquierda para eliminar con confirmación: los llenados y gastos asociados pasan a Efectivo, o los gastos a Otros al eliminar una categoría. Efectivo y Otros están protegidos. Las asignaciones se actualizan para todos los vehículos y se conservan en los respaldos.
 

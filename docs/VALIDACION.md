@@ -1,4 +1,20 @@
-# Validación 0.8.0 · Color del aro del icono
+# Validación 0.8.0 · Textos, formularios y catálogo Material
+
+18 de octubre de 2026, America/Monterrey. Rama `20261018-iconos-formularios-categorias`, desde `main` en `d5986e8` (PR #17).
+
+- **APK debug compilado y firmado:** versión 0.8.0, versionCode 8. Android Lint: cero errores y 11 avisos existentes.
+- **116 pruebas JVM aprobadas:** 117 registradas y una omitida por requerir el CSV privado. El caso nuevo verifica que los 45 códigos Material se conserven en respaldos de formato 5.
+- **11 de 12 pruebas Android dirigidas aprobadas:** vehículo, catálogo, persistencia/restauración de categorías, gastos y Ajustes/CSV. La prueba restante confundió el texto editable `credit_card` con el resultado del mismo nombre. Se corrigió su selector para excluir campos editables; no se repitió la ejecución, atendiendo la petición del usuario de cerrar la entrega. No se atribuye ese fallo a la app ni se afirma una ejecución de 12 casos aprobados.
+- **Revisión visual:** formulario de vehículo en claro y oscuro con texto al 130 %, formulario de gasto en claro y oscuro, catálogo con nombres originales en claro y búsqueda en español en oscuro con texto al 130 %. Se revisaron los nombres largos y los iconos de fecha, total y notas. La prueba de vehículo comprobó que el selector conserva Premium y los datos escritos al guardar.
+- **Revisión manual:** encabezado con FuelStatus sin «En tu teléfono» y final de Ajustes sin el bloque «Tu auto, tus datos» ni su párrafo. Capturas y árboles de UI guardados en `.local/qa/iconos-formularios-categorias/`.
+- **Catálogo:** se verificó que los 45 códigos coinciden exactamente con todos los recursos Material locales distintos y sus referencias. Se conservan los 30 códigos anteriores y se agregan 15. No cambian Room 6, respaldo 5 ni CSV. Versiones antiguas necesitan actualizarse para restaurar copias que utilicen los códigos nuevos.
+- **Entrega:** `.local/releases/FuelStatus-0.8.0-iconos-formularios-categorias.apk`, SHA-256 `3b28020af882c2f3e8bd07f30b01ea2b04f026221ed2acf2528e91f6953f10ac`. Firma anterior conservada: SHA-1 `81:BA:D0:FD:EB:A0:29:7E:6B:3E:F9:04:FF:6B:1D:AD:80:33:1F:36`.
+
+El emulador API 37 se usó read-only, sin snapshots y en modo avión; se cerró al terminar. Un aviso de System UI durante la revisión manual se resolvió con Esperar. Gradle y emulador se ejecutaron por separado. Se usaron datos sintéticos; no se operó sobre Drive real ni teléfonos personales. No se repitió la navegación general ni la suite Android completa. El ajuste final afecta únicamente al selector de la prueba; el APK entregado es el mismo compilado y revisado.
+
+---
+
+# Validación histórica 0.8.0 · Color del aro del icono
 
 18 de octubre de 2026, America/Monterrey. Rama `20261018-color-aro-icono`, creada desde `main` en `f531006` (PR #16), con el remoto SSH personal.
 
