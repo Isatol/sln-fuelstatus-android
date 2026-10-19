@@ -98,11 +98,12 @@ fun ExpenseEditor(vehicle: Vehicle, existing: Expense?, busy: Boolean, onDismiss
     var error by rememberSaveable(key) { mutableStateOf<String?>(null) }
     var deleteConfirmation by remember { mutableStateOf(false) }
     EditorSheet(if (existing == null) "Nuevo gasto" else "Editar gasto", vehicle.label, busy, onDismiss) {
-        DateField(timestamp) { timestamp = it }
+        DateField(timestamp, icon = R.drawable.ic_category_calendar_month) { timestamp = it }
         ExpenseCategorySelector(categories, category, { category = it }, enabled = !busy)
         PaymentMethodSelector(paymentMethods, paymentMethodId, { paymentMethodId = it }, enabled = !busy, allowUnspecified = existing != null)
-        NumberField("Total pagado ($)", total, { total = it })
-        OutlinedTextField(notes, { notes = it }, label = { Text("Notas (opcional)") }, minLines = 2, modifier = Modifier.fillMaxWidth())
+        NumberField("Total pagado ($)", total, { total = it }, icon = R.drawable.ic_payments)
+        OutlinedTextField(notes, { notes = it }, label = { Text("Notas (opcional)") }, leadingIcon = { FuelIcon(R.drawable.ic_notes) },
+            minLines = 2, modifier = Modifier.fillMaxWidth())
         error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
         Button(enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp), onClick = {
             val amount = scaledInput(total, 2)
@@ -125,11 +126,12 @@ fun VehicleEditor(existing: Vehicle?, vehicles: List<Vehicle>, busy: Boolean, on
     var year by rememberSaveable(key) { mutableStateOf(existing?.year?.toString().orEmpty()) }
     var error by rememberSaveable(key) { mutableStateOf<String?>(null) }
     EditorSheet(if (existing == null) "Añadir vehículo" else "Editar vehículo", "Un historial independiente para cada auto", busy, onDismiss) {
-        OutlinedTextField(name, { name = it }, label = { Text("Nombre / modelo") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(type, { type = it }, label = { Text("Tipo (Hatchback, Sedán…)") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(year, { year = it }, label = { Text("Año") }, singleLine = true,
+        OutlinedTextField(name, { name = it }, label = { Text("Nombre / modelo") }, leadingIcon = { FuelIcon(R.drawable.ic_category_directions_car) }, singleLine = true, modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(type, { type = it }, label = { Text("Tipo (Hatchback, Sedán…)") }, leadingIcon = { FuelIcon(R.drawable.ic_category_sell) }, singleLine = true, modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(year, { year = it }, label = { Text("Año") }, leadingIcon = { FuelIcon(R.drawable.ic_category_calendar_month) }, singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.fillMaxWidth())
-        FuelSelector(fuelType, { fuelType = it })
+        FuelSelector(fuelType, { fuelType = it }, enabled = !busy, icon = R.drawable.ic_category_local_gas_station,
+            label = "Combustible predeterminado", labelAbove = true)
         error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
         Button(enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp), onClick = {
             val y = year.toIntOrNull()
@@ -146,16 +148,17 @@ fun VehicleEditor(existing: Vehicle?, vehicles: List<Vehicle>, busy: Boolean, on
 
 @Composable
 fun FuelSelector(value: String, onChange: (String) -> Unit, modifier: Modifier = Modifier,
-    allowUnspecified: Boolean = false, enabled: Boolean = true, icon: Int? = null, compact: Boolean = false) {
+    allowUnspecified: Boolean = false, enabled: Boolean = true, icon: Int? = null, compact: Boolean = false,
+    label: String = "Combustible", labelAbove: Boolean = compact) {
     var expanded by remember { mutableStateOf(false) }
     Column(modifier, verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        if (compact) Text("Combustible", style = MaterialTheme.typography.labelLarge)
+        if (labelAbove) Text(label, style = MaterialTheme.typography.labelLarge)
         Box(if (compact) Modifier.fillMaxWidth().weight(1f) else Modifier) {
             OutlinedButton(onClick = { expanded = true }, enabled = enabled,
                 modifier = if (compact) Modifier.fillMaxSize().heightIn(min = 56.dp) else Modifier.fillMaxWidth(),
                 contentPadding = if (compact) PaddingValues(horizontal = 12.dp, vertical = 8.dp) else ButtonDefaults.ContentPadding) {
                 if (icon != null) { FuelIcon(icon); Spacer(Modifier.width(if (compact) 6.dp else 10.dp)) }
-                Text(if (compact) FuelType.fromCode(value).label else "Combustible: ${FuelType.fromCode(value).label}")
+                Text(if (labelAbove) FuelType.fromCode(value).label else "$label: ${FuelType.fromCode(value).label}")
             }
             DropdownMenu(expanded && enabled, onDismissRequest = { expanded = false }) {
                 FuelType.entries.filter { allowUnspecified || it != FuelType.Unspecified }.forEach { fuel ->

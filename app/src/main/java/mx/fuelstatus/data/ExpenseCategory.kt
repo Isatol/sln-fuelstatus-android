@@ -38,6 +38,21 @@ enum class CategoryIcon(val code: String, val label: String, val keywords: Strin
     Part("inventory_2", "Refacción", "pieza repuesto paquete"),
     Tag("sell", "Etiqueta", "categoria"),
     Tools("handyman", "Herramientas", "reparacion taller"),
+    AddCard("add_card", "Agregar tarjeta", "pago banco"),
+    ArrowBack("arrow_back", "Volver", "flecha atras regresar"),
+    ChevronRight("chevron_right", "Siguiente", "flecha derecha avanzar"),
+    CloudSync("cloud_sync", "Sincronizar nube", "copia respaldo drive"),
+    CreditCard("credit_card", "Tarjeta de crédito", "pago banco debito"),
+    DeleteForever("delete_forever", "Eliminar", "borrar papelera"),
+    FilterList("filter_list", "Filtro", "filtrar lista"),
+    KeyboardArrowDown("keyboard_arrow_down", "Desplegar", "flecha abajo selector"),
+    Notes("notes", "Notas", "texto comentario"),
+    Palette("palette", "Paleta", "colores pintura tema"),
+    Payments("payments", "Pagos", "efectivo dinero billete costo total"),
+    UploadFile("upload_file", "Subir archivo", "importar csv documento"),
+    WaterDrop("water_drop", "Gota de agua", "liquido litros"),
+    WaterFull("water_full", "Recipiente lleno", "tanque agua completo"),
+    WaterMedium("water_medium", "Recipiente a la mitad", "tanque agua parcial"),
     ;
 
     fun matches(query: String): Boolean = categorySearchKey("$label $keywords $code").contains(categorySearchKey(query))
