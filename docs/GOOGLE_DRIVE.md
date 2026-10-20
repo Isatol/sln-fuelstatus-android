@@ -1,3 +1,9 @@
+# Documento histórico: integración retirada en 1.0.0
+
+Esta guía describe la integración de versiones anteriores. La aplicación 1.0.0 retira su interfaz, OAuth y operaciones remotas. No se debe usar esta guía para configurar la versión actual. Consulta [COPIAS_LOCALES.md](COPIAS_LOCALES.md).
+
+---
+
 # Google Drive en FuelStatus 0.2
 
 ## Configuración de Google Cloud

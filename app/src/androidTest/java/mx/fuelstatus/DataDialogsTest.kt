@@ -7,7 +7,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mx.fuelstatus.backup.SyncState
 import mx.fuelstatus.data.*
 import mx.fuelstatus.ui.*
 import org.junit.Assert.*
@@ -22,27 +21,23 @@ class DataDialogsTest {
         val v = Vehicle("source", "Auto del archivo", "Sedán", 2024)
         return ImportPreview(listOf(FuelImportRow(v, Refuel("fill", v.id, 1000, 1000000, 40000, 100000))), CsvSource.FuelStatus)
     }
-    @Test fun driveDeletionIsUncheckedByDefaultAndRequiresConfirmation() {
-        var requested: Boolean? = null
+    @Test fun localDeletionRequiresConfirmationAndCancellationPreservesData() {
+        var requests = 0
         compose.setContent { FuelTheme(Preferences()) { Column(Modifier.verticalScroll(rememberScrollState())) {
-            DeleteDataCard(SyncState(email = "test@example.com"), false) { requested = it }
+            DeleteDataCard(false) { requests++ }
         } } }
-        compose.onNodeWithText("También borrar el historial de Drive").assertIsOff()
         compose.onNodeWithText("Borrar todos los datos").performScrollTo().performClick()
+        compose.onAllNodes(hasText("Drive", substring = true, ignoreCase = true)).assertCountEquals(0)
         compose.onNodeWithText("Cancelar").performClick()
-        assertNull(requested)
-        compose.onNodeWithText("También borrar el historial de Drive").performScrollTo().performClick().assertIsOn()
-        compose.onNodeWithText("Borrar todos los datos").performScrollTo().performClick()
-        compose.onNodeWithText("Sí, borrar datos").performClick()
-        assertEquals(true, requested)
-    }
-    @Test fun localDeletionDoesNotOfferDriveCheckboxWithoutSession() {
-        var requested: Boolean? = null
-        compose.setContent { FuelTheme(Preferences()) { DeleteDataCard(SyncState(), false) { requested = it } } }
-        compose.onNodeWithText("También borrar el historial de Drive").assertDoesNotExist()
+        assertEquals(0, requests)
         compose.onNodeWithText("Borrar todos los datos").performClick()
         compose.onNodeWithText("Sí, borrar datos").performClick()
-        assertEquals(false, requested)
+        assertEquals(1, requests)
+    }
+    @Test fun localDeletionIsDisabledWhileBusy() {
+        compose.setContent { FuelTheme(Preferences()) { DeleteDataCard(true) {} } }
+        compose.onNodeWithText("Borrar todos los datos").assertIsNotEnabled()
+        compose.onNodeWithText("¿Borrar todos los datos?").assertDoesNotExist()
     }
     @Test fun importChoosesMatchingVehicleAndPreservesCsvAssignments() {
         var plan: ImportPlan? = null

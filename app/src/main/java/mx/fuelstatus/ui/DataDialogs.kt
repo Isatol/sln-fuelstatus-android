@@ -3,7 +3,6 @@ package mx.fuelstatus.ui
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -12,42 +11,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
-import mx.fuelstatus.backup.SyncState
 import mx.fuelstatus.R
 import mx.fuelstatus.data.*
 
 @Composable
-fun DeleteDataCard(state: SyncState, busy: Boolean, onDelete: (Boolean) -> Unit) {
-    var deleteDrive by rememberSaveable(state.email) { mutableStateOf(false) }
+fun DeleteDataCard(busy: Boolean, onDelete: () -> Unit) {
     var confirmation by rememberSaveable { mutableStateOf(false) }
-    // Changing accounts or disconnecting also invalidates any open confirmation.
-    LaunchedEffect(state.email) { confirmation = false }
     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer), modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SettingsTitle(R.drawable.ic_delete_forever, "Borrar datos", MaterialTheme.typography.titleLarge, MaterialTheme.colorScheme.onErrorContainer)
-            Text("Elimina vehículos, llenados, gastos, tarjetas guardadas, categorías personalizadas y copias locales. Restablece la apariencia y desconecta Drive, como al comenzar de nuevo.",
+            Text("Elimina vehículos, llenados, gastos, tarjetas guardadas, categorías personalizadas y copias locales. Restablece la apariencia, como al comenzar de nuevo.",
                 color = MaterialTheme.colorScheme.onErrorContainer)
-            if (state.connected) {
-                Row(Modifier.fillMaxWidth().toggleable(deleteDrive, enabled = !busy, role = Role.Checkbox,
-                    onValueChange = { deleteDrive = it }), verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(checked = deleteDrive, onCheckedChange = null, enabled = !busy)
-                    Column(Modifier.weight(1f)) {
-                        Text("También borrar el historial de Drive", color = MaterialTheme.colorScheme.onErrorContainer)
-                        Text(state.email, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onErrorContainer)
-                    }
-                }
-            }
-            Button(onClick = { confirmation = true }, enabled = !busy && !state.running,
+            Button(onClick = { confirmation = true }, enabled = !busy,
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error, contentColor = MaterialTheme.colorScheme.onError),
                 modifier = Modifier.fillMaxWidth()) { Text("Borrar todos los datos") }
         }
     }
     if (confirmation) AlertDialog(onDismissRequest = { if (!busy) confirmation = false },
         title = { Text("¿Borrar todos los datos?") },
-        text = { Text("Se eliminarán todos los vehículos, llenados, gastos, tarjetas guardadas, categorías personalizadas y copias locales de recuperación. Los ajustes volverán a sus valores iniciales y se desconectará Drive. Esta eliminación local no se puede deshacer.\n\n" +
-            if (deleteDrive && state.connected) "También se enviarán a la papelera todas las copias de FuelStatus de ${state.email}. Necesitas conexión. Si Drive falla, los datos locales se conservan."
-            else "Las copias existentes en Drive se conservarán.") },
-        confirmButton = { TextButton(enabled = !busy, onClick = { confirmation = false; onDelete(deleteDrive && state.connected) }) {
+        text = { Text("Se eliminarán todos los vehículos, llenados, gastos, tarjetas guardadas, categorías personalizadas y copias locales de recuperación. Los ajustes volverán a sus valores iniciales. Esta eliminación local no se puede deshacer.") },
+        confirmButton = { TextButton(enabled = !busy, onClick = { confirmation = false; onDelete() }) {
             Text("Sí, borrar datos", color = MaterialTheme.colorScheme.error)
         } },
         dismissButton = { TextButton(enabled = !busy, onClick = { confirmation = false }) { Text("Cancelar") } })

@@ -43,7 +43,7 @@ La exportación incluye `paymentMethodName` y `paymentMethodBrand` (`cash`, `vis
 
 ## Llenados de FuelStatus (0.8.0)
 
-En **Ajustes → Tus datos**, Copias y Google Drive aparece después del encabezado de la sección. La card **Llenados de FuelStatus** ofrece **Importar llenados de FuelStatus** y **Exportar llenados a CSV**.
+En **Ajustes → Tus datos**, la card **Llenados de FuelStatus** ofrece **Importar llenados de FuelStatus** y **Exportar llenados a CSV**.
 
 La nueva importación acepta el CSV exportado por FuelStatus y los mismos límites de tamaño, estructura y precisión descritos arriba. Antes de escribir, muestra un modal propio y permite elegir un vehículo del archivo y su destino, o crearlo. Si hay varios vehículos, se importa el elegido en cada operación. Para FuelStatus se propone el destino que coincide por nombre, tipo y año; si no existe, se propone crear el vehículo del archivo.
 

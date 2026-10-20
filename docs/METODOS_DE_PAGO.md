@@ -2,7 +2,7 @@
 
 ## Ajustes y tarjetas
 
-Los títulos Tema, Copias y Google Drive y Borrar datos incluyen iconos Material Symbols Rounded. En TUS DATOS, entre importar y borrar, aparece el botón **Mis métodos de pago**.
+Los títulos Tema y Borrar datos incluyen iconos Material Symbols Rounded. En TUS DATOS, entre importar y borrar, aparece el botón **Mis métodos de pago**.
 
 Este botón abre una pantalla completa con navegación de regreso a Ajustes. Efectivo está disponible desde el inicio. **Agregar tarjeta** abre un formulario para capturar un nombre de hasta 80 caracteres y elegir VISA, Mastercard o American Express. En toda la app, las tarjetas muestran el icono Material de tarjeta de crédito y conservan su nombre y marca como texto. Esto incluye administración, alta, selectores e historiales de Llenados y Gastos. La combinación de nombre y marca no puede repetirse; las validaciones se ejecutan también al guardar en Room.
 
@@ -30,7 +30,7 @@ Desde FuelStatus 0.6, el respaldo JSON usa el formato 5 e incluye los métodos y
 
 El CSV exportado incluye las columnas `paymentMethodName` y `paymentMethodBrand`; los registros sin especificar dejan ambos campos vacíos. El lector acepta las exportaciones anteriores sin estas columnas. La importación desde la card Llenados de FuelStatus conserva el método de cada fila, reutiliza tarjetas con la misma marca y nombre (sin distinguir mayúsculas), y agrega las que falten. Los registros sin método indicado conservan Sin especificar. La lectura del CSV también conserva los metadatos para herramientas de recuperación y comprobaciones de exportación/importación.
 
-Borrar datos elimina las tarjetas personalizadas y sus asignaciones junto con el resto del historial. Efectivo vuelve a ser la única opción, como en una instalación nueva. Las copias de recuperación y de Drive usan el mismo formato de respaldo completo.
+Borrar datos elimina las tarjetas personalizadas y sus asignaciones junto con el resto del historial. Efectivo vuelve a ser la única opción, como en una instalación nueva. Las copias privadas locales usan el mismo formato de respaldo completo.
 
 ## Recursos visuales
 
