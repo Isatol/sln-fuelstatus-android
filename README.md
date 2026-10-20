@@ -8,7 +8,7 @@ Aplicación personal de combustible y gastos de vehículos inspirada en Fuel, co
 
 Primera distribución prevista en Google Play: inicio limpio y funcionamiento local, con precio objetivo de **$10 MXN** por descarga. `versionCode` 9. Ajustes conserva apariencia, llenados CSV, métodos de pago, categorías y borrado local con confirmación. Se retiraron la integración de Google Drive, OAuth y la sincronización remota.
 
-Room permanece en esquema 6 y las copias privadas completas en formato 5. El historial y los ajustes existentes se conservan al actualizar con la misma firma. Esta versión no incorpora botones para exportar o restaurar copias completas: el CSV público contiene únicamente llenados. Consulta [Copias locales](docs/COPIAS_LOCALES.md), [Publicación](docs/PUBLICACION.md) y [Política de privacidad](docs/privacidad.html). La política está preparada como HTML; su publicación web y el acceso desde la aplicación siguen pendientes.
+Room permanece en esquema 6 y las copias privadas completas en formato 5. El historial y los ajustes existentes se conservan al actualizar con la misma firma. Esta versión no incorpora botones para exportar o restaurar copias completas: el CSV público contiene únicamente llenados. Consulta [Copias locales](docs/COPIAS_LOCALES.md), [Publicación](docs/PUBLICACION.md) y [Política de privacidad](docs/privacidad.html). Ajustes → **Política de privacidad** abre una Activity con el mismo HTML, disponible sin conexión y con regreso a Ajustes. Gradle incluye directamente `docs/privacidad.html` en los assets del APK para conservar una sola fuente. Su publicación web sigue pendiente.
 
 ### Funcionalidad de 0.7
 
@@ -45,7 +45,7 @@ Las tarjetas de Llenados incluyen iconos Material Symbols Rounded para el kilome
 - **Gastos:** registro, edición y eliminación, con categorías iniciales y personalizadas, iconos seleccionables y métodos de pago compartidos con los llenados.
 - **Estadísticas:** km/L, precio medio por litro, costo de combustible por kilómetro, volumen, combustible pagado y gastos totales; cálculos a partir de datos registrados.
 - **Vehículos:** historial separado para cada auto, selección, alta, edición y combustible predeterminado. Los vehículos existentes se conservan al actualizar.
-- **Ajustes:** apariencia, importación y exportación de llenados de FuelStatus, catálogos y borrado local con confirmación.
+- **Ajustes:** apariencia, importación y exportación de llenados de FuelStatus, catálogos, borrado local con confirmación y política de privacidad.
 - **Datos:** persistencia local con Room; funcionamiento sin conexión, sin cuenta, anuncios ni suscripción. Moneda MXN, distancias en km, volumen en litros.
 - **Entrega:** proyecto fuente y APK debug instalable. Compilación local con Android Studio; GitHub Actions queda pendiente de configurar.
 

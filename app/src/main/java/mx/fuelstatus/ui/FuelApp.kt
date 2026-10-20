@@ -1,6 +1,7 @@
 @file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 package mx.fuelstatus.ui
 
+import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -27,6 +28,7 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -58,6 +60,7 @@ fun FuelApp(model: FuelViewModel) {
         val refuelFilter = rememberRefuelHistoryFilter()
         val snackbar = remember { SnackbarHostState() }
         val haptic = LocalHapticFeedback.current
+        val context = LocalContext.current
         val importFuelStatusFile = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
             if (uri != null) model.prepareImport(uri)
         }
@@ -161,6 +164,7 @@ fun FuelApp(model: FuelViewModel) {
                             onExport = { exportFile.launch("FuelStatus_llenados.csv") },
                             onPaymentMethods = { dataPage = "payments" },
                             onExpenseCategories = { dataPage = "categories" },
+                            onPrivacyPolicy = { context.startActivity(Intent(context, PrivacyPolicyActivity::class.java)) },
                             deleteContent = { DeleteDataCard(busy) {
                                 model.resetData { destination = Destination.Refuels; editor = null; editingId = null; refuelFilter.reset() }
                             } }, onColorPalette = model::colorPalette, onIconRingColor = model::iconRingColor)
@@ -320,7 +324,7 @@ private fun VehiclesScreen(state: FuelState, onSelect: (String) -> Unit, onEdit:
 internal fun SettingsScreen(preferences: Preferences, busy: Boolean, onTheme: (String) -> Unit, onDynamic: (Boolean) -> Unit,
     onImportFuelStatus: () -> Unit, onExport: () -> Unit,
     onPaymentMethods: () -> Unit, onExpenseCategories: () -> Unit, deleteContent: @Composable () -> Unit,
-    onColorPalette: (String) -> Unit = {}, onIconRingColor: (String) -> Unit = {}) {
+    onColorPalette: (String) -> Unit = {}, onIconRingColor: (String) -> Unit = {}, onPrivacyPolicy: () -> Unit = {}) {
     LazyColumn(contentPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         item { SectionLabel("APARIENCIA", "A tu manera") }
         item { Card(shape = RoundedCornerShape(24.dp)) {
@@ -361,6 +365,13 @@ internal fun SettingsScreen(preferences: Preferences, busy: Boolean, onTheme: (S
             }
         }
         item { deleteContent() }
+        item {
+            FilledTonalButton(onClick = onPrivacyPolicy, modifier = Modifier.fillMaxWidth().heightIn(min = 64.dp)) {
+                FuelIcon(R.drawable.ic_notes)
+                Text("Política de privacidad", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f).padding(horizontal = 12.dp))
+                FuelIcon(R.drawable.ic_chevron_right)
+            }
+        }
         item { Text("FuelStatus · 1.0.0\nHecha para Android", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(8.dp)) }
     }
 }

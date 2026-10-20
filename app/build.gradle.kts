@@ -4,6 +4,32 @@ plugins {
     id("com.google.devtools.ksp")
 }
 
+// Package the published policy directly so the app and website share one source.
+abstract class PrivacyPolicyAssets : DefaultTask() {
+    @get:InputFile
+    @get:PathSensitive(PathSensitivity.NONE)
+    abstract val policyFile: RegularFileProperty
+
+    @get:OutputDirectory
+    abstract val outputDirectory: DirectoryProperty
+
+    @TaskAction
+    fun generate() {
+        val directory = outputDirectory.get().asFile
+        directory.mkdirs()
+        policyFile.get().asFile.copyTo(directory.resolve("privacidad.html"), overwrite = true)
+    }
+}
+
+val privacyPolicyAssets = tasks.register<PrivacyPolicyAssets>("privacyPolicyAssets") {
+    policyFile.set(rootProject.layout.projectDirectory.file("docs/privacidad.html"))
+    outputDirectory.set(layout.buildDirectory.dir("generated/privacyPolicyAssets"))
+}
+
+androidComponents.onVariants { variant ->
+    variant.sources.assets?.addGeneratedSourceDirectory(privacyPolicyAssets, PrivacyPolicyAssets::outputDirectory)
+}
+
 android {
     namespace = "mx.fuelstatus"
     compileSdk { version = release(37) }
