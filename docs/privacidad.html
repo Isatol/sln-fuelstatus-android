@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Política de privacidad de FuelStatus para Android: almacenamiento local, archivos CSV, conservación, eliminación de datos y contacto.">
+  <meta name="color-scheme" content="light dark">
+  <title>Política de privacidad de FuelStatus</title>
+  <style>
+    :root { color-scheme: light dark; --background: #f5f8f6; --surface: #fff; --text: #1c2b23; --muted: #435b4e; --accent: #155a37; --border: #ccdcd2; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--background); color: var(--text); font: 1rem/1.7 system-ui, sans-serif; }
+    main { max-width: 50rem; margin: 2rem auto; padding: clamp(1.25rem, 5vw, 3rem); background: var(--surface); border: 1px solid var(--border); border-radius: 1rem; }
+    header { padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+    h1 { margin: .25rem 0 1rem; font-size: clamp(1.8rem, 6vw, 2.6rem); line-height: 1.2; }
+    h2 { margin: 2rem 0 .5rem; font-size: 1.25rem; line-height: 1.4; }
+    p { margin: .75rem 0; }
+    li { margin-bottom: .5rem; }
+    .brand { color: var(--accent); font-weight: 700; letter-spacing: .04em; }
+    .details { color: var(--muted); }
+    a { color: var(--accent); text-underline-offset: .2em; overflow-wrap: anywhere; }
+    a:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; border-radius: 2px; }
+    footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+    @media (max-width: 40rem) { main { margin: 0; border: 0; border-radius: 0; } }
+    @media (prefers-color-scheme: dark) {
+      :root { --background: #101a14; --surface: #19261e; --text: #e6f0e9; --muted: #bed0c3; --accent: #9cdbb3; --border: #41574a; }
+    }
+    @media print { main { max-width: none; margin: 0; border: 0; padding: 0; } }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <p class="brand">FuelStatus</p>
+      <h1>Política de privacidad de FuelStatus</h1>
+      <div class="details">
+        <p>Última actualización: <time datetime="2026-10-20">20 de octubre de 2026</time>.</p>
+        <p>Aplicación: FuelStatus para Android, versión 1.0.0, paquete <strong>mx.fuelstatus</strong>.</p>
+        <p>Responsable y desarrollador: <strong>Isaías Orozco Toledo</strong>.<br>
+          Contacto: <a href="mailto:isaiasot93@gmail.com">isaiasot93@gmail.com</a>.</p>
+      </div>
+    </header>
+
+    <section aria-labelledby="funcionamiento">
+      <h2 id="funcionamiento">1. Funcionamiento local</h2>
+      <p>FuelStatus permite llevar el historial de combustible y gastos de vehículos. Funciona sin conexión y no requiere crear una cuenta. El historial se procesa en el dispositivo y no se envía al desarrollador. No se vende ni se comparte automáticamente tu historial.</p>
+      <p>La aplicación no contiene anuncios, herramientas de seguimiento, servicios de analítica ni envío automático de informes de errores.</p>
+    </section>
+
+    <section aria-labelledby="informacion">
+      <h2 id="informacion">2. Información que guarda la aplicación</h2>
+      <p>FuelStatus guarda los datos que introduces o importas:</p>
+      <ul>
+        <li><strong>Vehículos:</strong> nombre, tipo, año y combustible predeterminado.</li>
+        <li><strong>Llenados:</strong> fechas, kilometraje, litros, combustible, importes, estado del tanque, opciones para estadísticas, gasolinera, notas y método de pago.</li>
+        <li><strong>Gastos:</strong> fechas, importes, categorías, notas y método de pago.</li>
+        <li><strong>Catálogos y ajustes:</strong> nombres y marcas de los métodos de pago, categorías e iconos personalizados, vehículo seleccionado y preferencias de apariencia.</li>
+      </ul>
+      <p>Los métodos de pago son etiquetas para organizar el historial. La aplicación no solicita números de tarjeta, códigos de seguridad, contraseñas bancarias ni acceso a cuentas financieras, y no realiza cobros de combustible o gastos. Evita escribir esos datos en nombres o notas.</p>
+      <p>También mantiene identificadores aleatorios locales para relacionar registros y copias internas. No se usan para seguimiento ni se transmiten al desarrollador.</p>
+    </section>
+
+    <section aria-labelledby="finalidad">
+      <h2 id="finalidad">3. Finalidad y acceso</h2>
+      <p>Estos datos se utilizan para mostrar y editar el historial, calcular estadísticas y estimaciones, conservar preferencias e importar y exportar llenados.</p>
+      <p>FuelStatus no accede a ubicación GPS, contactos, cámara ni micrófono. El nombre de la gasolinera es texto proporcionado por ti, no una ubicación obtenida automáticamente.</p>
+    </section>
+
+    <section aria-labelledby="archivos">
+      <h2 id="archivos">4. Archivos y copias locales</h2>
+      <p>La base de datos, los ajustes y las copias internas se guardan en el almacenamiento privado de la aplicación. La copia automática de Android está deshabilitada para FuelStatus. Las copias internas permanecen en el mismo dispositivo y no sustituyen un respaldo externo; la versión 1.0.0 no ofrece exportación ni restauración de copias completas.</p>
+      <p>La importación y exportación CSV utiliza el selector de archivos de Android. Solo se lee o escribe el archivo que eliges. El CSV exportado incluye los llenados de todos tus vehículos y sus datos asociados, como notas y métodos de pago; no incluye los gastos ni todos los ajustes y catálogos.</p>
+      <p>El CSV no está cifrado por FuelStatus. Si eliges un proveedor externo en el selector de Android, ese proveedor puede almacenar o transferir el archivo conforme a sus propias condiciones.</p>
+    </section>
+
+    <section aria-labelledby="conservacion">
+      <h2 id="conservacion">5. Conservación y eliminación</h2>
+      <p>El historial permanece en el dispositivo hasta que lo eliminas. Puedes consultar y editar tus registros y eliminar llenados o gastos desde la aplicación.</p>
+      <p>En Ajustes, <strong>“Borrar todos los datos”</strong> solicita confirmación y elimina vehículos, llenados, gastos, métodos de pago personalizados, categorías personalizadas y copias internas del historial; además, restablece los ajustes. Se crea una nueva copia interna del estado vacío. El identificador técnico local de las copias puede conservarse tras este reinicio; no contiene tu historial.</p>
+      <p>Borrar el almacenamiento de la aplicación desde Android o desinstalarla elimina su información privada local, incluido ese identificador.</p>
+      <p>Los CSV guardados fuera de la aplicación y las copias que hayas compartido no se eliminan con esas acciones: debes gestionarlos donde los guardaste. El desarrollador no tiene acceso remoto al historial para recuperarlo o borrarlo.</p>
+    </section>
+
+    <section aria-labelledby="proteccion">
+      <h2 id="proteccion">6. Protección de la información</h2>
+      <p>FuelStatus utiliza el almacenamiento privado y el aislamiento de aplicaciones de Android. No añade cifrado propio a la base de datos ni a las copias internas. La protección también depende del bloqueo, las actualizaciones y la seguridad de tu dispositivo.</p>
+    </section>
+
+    <section aria-labelledby="externos">
+      <h2 id="externos">7. Servicios externos y consultas</h2>
+      <p>La compra, descarga y actualización mediante Google Play se gestionan conforme a la <a href="https://policies.google.com/privacy?hl=es">Política de Privacidad de Google</a>. Esas operaciones son independientes del historial local de FuelStatus.</p>
+      <p>Si escribes al correo de contacto, el responsable recibe tu dirección y el contenido que envías, y los utiliza para atender la consulta. Esa correspondencia se conserva durante el tiempo necesario para resolverla y atender obligaciones aplicables. Puedes solicitar su eliminación por el mismo medio. No necesitas enviar tu historial ni información bancaria para consultar sobre privacidad. El servicio de correo también está sujeto a las políticas de su proveedor.</p>
+      <p>Esta página no incorpora analítica, publicidad ni cookies propias. Si se aloja en GitHub Pages, <a href="https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages#data-collection">GitHub registra las direcciones IP de sus visitantes por motivos de seguridad</a>, conforme a su <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">política de privacidad</a>.</p>
+    </section>
+
+    <section aria-labelledby="cambios">
+      <h2 id="cambios">8. Cambios y contacto</h2>
+      <p>Las modificaciones se publicarán en esta página con una nueva fecha de actualización. Para consultas sobre privacidad o sobre la información que hayas enviado voluntariamente, escribe a <a href="mailto:isaiasot93@gmail.com">isaiasot93@gmail.com</a>.</p>
+    </section>
+    <footer><p>FuelStatus · Isaías Orozco Toledo</p></footer>
+  </main>
+</body>
+</html>

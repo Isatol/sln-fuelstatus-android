@@ -6,9 +6,9 @@ Aplicación personal de combustible y gastos de vehículos inspirada en Fuel, co
 
 ## Versión 1.0.0
 
-Primera distribución prevista en Google Play: inicio limpio y funcionamiento local, con precio objetivo de **$15 MXN** por descarga. `versionCode` 9. Ajustes conserva apariencia, llenados CSV, métodos de pago, categorías y borrado local con confirmación. Se retiraron la integración de Google Drive, OAuth y la sincronización remota.
+Primera distribución prevista en Google Play: inicio limpio y funcionamiento local, con precio objetivo de **$10 MXN** por descarga. `versionCode` 9. Ajustes conserva apariencia, llenados CSV, métodos de pago, categorías y borrado local con confirmación. Se retiraron la integración de Google Drive, OAuth y la sincronización remota.
 
-Room permanece en esquema 6 y las copias privadas completas en formato 5. El historial y los ajustes existentes se conservan al actualizar con la misma firma. Esta versión no incorpora botones para exportar o restaurar copias completas: el CSV público contiene únicamente llenados. Consulta [Copias locales](docs/COPIAS_LOCALES.md) y [Publicación](docs/PUBLICACION.md).
+Room permanece en esquema 6 y las copias privadas completas en formato 5. El historial y los ajustes existentes se conservan al actualizar con la misma firma. Esta versión no incorpora botones para exportar o restaurar copias completas: el CSV público contiene únicamente llenados. Consulta [Copias locales](docs/COPIAS_LOCALES.md), [Publicación](docs/PUBLICACION.md) y [Política de privacidad](docs/privacidad.html). La política está preparada como HTML; su publicación web y el acceso desde la aplicación siguen pendientes.
 
 ### Funcionalidad de 0.7
 
